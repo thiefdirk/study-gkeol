@@ -11,16 +11,18 @@ y = np.array([1,2,3,4,5])
 
 model = Sequential()
 model.add(Dense(300, input_dim=1))
-model.add(Dense(200))
+model.add(Dense(500))
 model.add(Dense(800))
-model.add(Dense(510))
+model.add(Dense(800))
+model.add(Dense(800))
+model.add(Dense(710))
 model.add(Dense(760))
 model.add(Dense(1))
 
 #3. 컴파일, 훈련 https://wikidocs.net/32105
 
 model.compile(loss='mae', optimizer='adam')
-model.fit(x, y, epochs=1000)
+model.fit(x, y, epochs=2340)
 
 #4 평가, 예측
 
@@ -30,6 +32,5 @@ print('loss : ', loss)
 result = model.predict([6])
 print('6의 예측값 : ', result)
 
-#epochs=30
-#loss :  0.4130973815917969
-#6의 예측값 :  [[6.0985265]]
+# loss :  0.4028788208961487
+# 6의 예측값 :  [[5.9963813]]
