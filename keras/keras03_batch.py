@@ -22,7 +22,7 @@ model.add(Dense(1))
 #3. 컴파일, 훈련 https://wikidocs.net/32105
 
 model.compile(loss='mae', optimizer='adam')
-model.fit(x, y, epochs=2340)
+model.fit(x, y, epochs=234, batch_size=1)
 
 #4. 평가, 예측
 
@@ -34,3 +34,5 @@ print('6의 예측값 : ', result)
 
 # loss :  0.4028788208961487
 # 6의 예측값 :  [[5.9963813]]
+# epochs=2340
+# model=300,500,800,800,800,710,760
