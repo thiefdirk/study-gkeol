@@ -39,7 +39,7 @@ model.fit(x, y, epochs=1500, batch_size=1)
 loss = model.evaluate(x, y)
 print('loss : ', loss )
 
-result = model.predict([[10, 1.4, 0]])  # 괄호 하나빼먹으면 (2, )나오기때문에 에러
+result = model.predict([[10, 1.4, 0]])  # 괄호 하나빼먹으면 (3, )나오기때문에 에러
 print('[10, 1.4, 0]의 예측값 : ', result)
 
 # loss :  9.267793211620301e-05
