@@ -43,38 +43,29 @@ print(y.shape) # (1459,)
 
 x_train, x_test, y_train, y_test = train_test_split(x,y,
                                                     train_size=0.8,
-                                                    random_state=72
+                                                    random_state=85
                                                     )
 
 #2. 모델구성
 model = Sequential()
-model.add(Dense(100, input_dim=9))
-model.add(Dense(110))
-model.add(Dense(150))
-model.add(Dense(200))
-model.add(Dense(300))
-model.add(Dense(300))
-model.add(Dense(300))
-model.add(Dense(300))
-model.add(Dense(300))
-model.add(Dense(300))
-model.add(Dense(300))
-model.add(Dense(300))
+model.add(Dense(300, input_dim=9))
+model.add(Dense(510))
+model.add(Dense(450))
+model.add(Dense(600))
+model.add(Dense(500))
 model.add(Dense(300))
 model.add(Dense(200))
-model.add(Dense(150))
 model.add(Dense(100))
 model.add(Dense(100))
-model.add(Dense(200))
 model.add(Dense(100))
-model.add(Dense(150))
+model.add(Dense(100))
 model.add(Dense(100))
 model.add(Dense(100))
 model.add(Dense(1))
 
 #3. 컴파일, 훈련
 model.compile(loss='mse', optimizer='adam')
-model.fit(x_train, y_train, epochs=1500, batch_size=200, verbose=1)
+model.fit(x_train, y_train, epochs=900, batch_size=100, verbose=1)
 
 #4. 평가, 예측
 loss = model.evaluate(x, y)
@@ -90,8 +81,8 @@ print("RMSE : ", rmse)
 
 # y_predict = model.predict(test_set)
 
-# loss :  2847.10302734375
-# RMSE :  51.6441636904107
+# loss :  2840.80712890625
+# RMSE :  49.719413679003836
 
 # 함수에 대해서 정의, 공부
 # https://wikidocs.net/63
