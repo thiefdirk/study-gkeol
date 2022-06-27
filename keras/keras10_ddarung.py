@@ -1,6 +1,7 @@
 # 데이콘 따릉이 문제풀이
 import numpy as np
-import pandas as pd #pandas : 엑셀땡겨올때 씀
+import pandas as pd
+from sqlalchemy import true #pandas : 엑셀땡겨올때 씀
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Dense
 from sklearn.model_selection import train_test_split
@@ -25,14 +26,15 @@ print(train_set.describe()) # describe 평균치, 중간값, 최소값 등등 �
 
 #### 결측치 처리 1. 제거 ####
 print(train_set.isnull().sum())
-train_set = train_set.dropna()  # train_set 에서 na, null 값 들어간 행 삭제
+train_set = train_set.dropna()# train_set 에서 na, null 값 들어간 행 삭제
+test_set = test_set.fillna(method='ffill') # 
 print(train_set.isnull().sum()) 
 print(train_set.shape) # (1328, 10)
 
 ############################
 
 
-x = train_set.drop(['count'], axis=1)  # drop 데이텅서 ''사이 값 빼기
+x = train_set.drop(['count'], axis=1)  # drop 데이터에서 ''사이 값 빼기
 print(x)
 print(x.columns)
 print(x.shape) # (1459, 9)
@@ -42,33 +44,25 @@ print(y)
 print(y.shape) # (1459,)
 
 x_train, x_test, y_train, y_test = train_test_split(x,y,
-                                                    train_size=0.8,
-                                                    random_state=85
+                                                    train_size=0.9,
+                                                    random_state=31
                                                     )
 
 #2. 모델구성
 model = Sequential()
-model.add(Dense(300, input_dim=9))
-model.add(Dense(510))
-model.add(Dense(450))
-model.add(Dense(600))
-model.add(Dense(500))
-model.add(Dense(300))
-model.add(Dense(200))
-model.add(Dense(100))
-model.add(Dense(100))
-model.add(Dense(100))
-model.add(Dense(100))
-model.add(Dense(100))
-model.add(Dense(100))
+model.add(Dense(100, activation='relu', input_dim=9))
+model.add(Dense(100, activation='relu'))
+model.add(Dense(100, activation='relu'))
+model.add(Dense(100, activation='relu'))
+model.add(Dense(100, activation='relu'))
 model.add(Dense(1))
 
 #3. 컴파일, 훈련
 model.compile(loss='mse', optimizer='adam')
-model.fit(x_train, y_train, epochs=900, batch_size=100, verbose=1)
+model.fit(x_train, y_train, epochs=800, batch_size=25, verbose=1)
 
 #4. 평가, 예측
-loss = model.evaluate(x, y)
+loss = model.evaluate(x, y) 
 print('loss : ', loss)
 
 y_predict = model.predict(x_test)
@@ -79,10 +73,29 @@ def RMSE(a, b):
 rmse = RMSE(y_test, y_predict)
 print("RMSE : ", rmse)
 
+y_summit = model.predict(test_set)
+
+print(y_summit)
+print(y_summit.shape) # (715, 1)
+
+submission_set = pd.read_csv(path + 'submission.csv', # + 명령어는 문자를 앞문자와 더해줌
+                             index_col=0) # index_col=n n번째 컬럼을 인덱스로 인식
+
+print(submission_set)
+
+submission_set['count'] = y_summit
+print(submission_set)
+
+
+submission_set.to_csv('./_data/ddarung/submission.csv', index = True)
+
 # y_predict = model.predict(test_set)
 
-# loss :  2840.80712890625
-# RMSE :  49.719413679003836
+# loss :  2867.519287109375
+# RMSE :  46.122726401887626
+
+# loss :  328.2398376464844
+# RMSE :  33.9185222763881
 
 # 함수에 대해서 정의, 공부
 # https://wikidocs.net/63
