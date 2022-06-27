@@ -26,8 +26,8 @@ print(train_set.describe()) # describe 평균치, 중간값, 최소값 등등 �
 
 #### 결측치 처리 1. 제거 ####
 print(train_set.isnull().sum())
-train_set = train_set.dropna()# train_set 에서 na, null 값 들어간 행 삭제
-test_set = test_set.fillna(method='ffill') # 
+train_set = train_set.fillna(train_set.mean()) # dropna() : train_set 에서 na, null 값 들어간 행 삭제
+test_set = test_set.fillna(test_set.mean()) # test_set 에서 이빨빠진데 바로  ffill : 위에서 가져오기 test_set.mean : 평균값
 print(train_set.isnull().sum()) 
 print(train_set.shape) # (1328, 10)
 
@@ -44,21 +44,19 @@ print(y)
 print(y.shape) # (1459,)
 
 x_train, x_test, y_train, y_test = train_test_split(x,y,
-                                                    train_size=0.9,
+                                                    train_size=0.75,
                                                     random_state=31
                                                     )
 
 #2. 모델구성
 model = Sequential()
-model.add(Dense(100, activation='relu', input_dim=9))
-model.add(Dense(100, activation='relu'))
-model.add(Dense(100, activation='relu'))
-model.add(Dense(100, activation='relu'))
-model.add(Dense(100, activation='relu'))
+model.add(Dense(100, activation='selu', input_dim=9))
+model.add(Dense(100, activation='selu'))
+model.add(Dense(100, activation='selu'))
 model.add(Dense(1))
 
 #3. 컴파일, 훈련
-model.compile(loss='mse', optimizer='adam')
+model.compile(loss='mae', optimizer='adam')
 model.fit(x_train, y_train, epochs=800, batch_size=25, verbose=1)
 
 #4. 평가, 예측
