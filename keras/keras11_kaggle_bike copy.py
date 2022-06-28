@@ -73,8 +73,26 @@ print(x_train)
 print(y_train)
 
 #2. 모델구성
-model = RandomForestRegressor()
+'''
+from sklearn.model_selection import GridSearchCV
 
+params = {
+    'n_estimators':(100, 200),
+    'max_depth' : (5, 8),
+    'min_samples_leaf' : (8, 18),
+    'min_samples_split' : (8, 16)
+}
+model = RandomForestRegressor(random_state=0, n_jobs=-1)
+grid_cv = GridSearchCV(model, param_grid=params, cv=2, n_jobs=-1)
+grid_cv.fit(x_train, y_train)
+ 
+ 
+print('최적 하이퍼 파라미터:', grid_cv.best_params_)
+print('최적 예측 정확도: {0:.4f}'.format(grid_cv.best_score_))
+  
+
+'''
+model = RandomForestRegressor()
 model.fit(x_train, y_train)
 
 print(model.score(x_train, y_train))
@@ -97,8 +115,8 @@ y_summit = model.predict(test_set)
 
 print(y_summit)
 print(y_summit.shape) # (6493, 1)
-'''
-submission_set = pd.read_csv(path + 'submission.csv', # + 명령어는 문자를 앞문자와 더해줌
+
+submission_set = pd.read_csv(path + 'sampleSubmission.csv', # + 명령어는 문자를 앞문자와 더해줌
                              index_col=0) # index_col=n n번째 컬럼을 인덱스로 인식
 
 print(submission_set)
@@ -108,4 +126,5 @@ print(submission_set)
 
 
 submission_set.to_csv(path + 'submission_.csv', index = True)
-'''
+
+# https://www.kaggle.com/code/rajmehra03/bike-sharing-demand-rmsle-0-3194/notebook

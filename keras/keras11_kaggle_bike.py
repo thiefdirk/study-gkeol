@@ -43,11 +43,11 @@ test_set["month"] = [t.month for t in pd.DatetimeIndex(test_set.datetime)]
 test_set['year'] = [t.year for t in pd.DatetimeIndex(test_set.datetime)]
 test_set['year'] = test_set['year'].map({2011:0, 2012:1})
 
-train_set.drop('datetime',axis=1) # 트레인 세트에서 데이트타임 드랍
-train_set.drop('casual',axis=1) # 트레인 세트에서 캐주얼 레지스터드 드랍
-train_set.drop('registered',axis=1)
+train_set.drop('datetime',axis=1,inplace=True) # 트레인 세트에서 데이트타임 드랍
+train_set.drop('casual',axis=1,inplace=True) # 트레인 세트에서 캐주얼 레지스터드 드랍
+train_set.drop('registered',axis=1,inplace=True)
 
-test_set.drop('datetime',axis=1) # 트레인 세트에서 데이트타임 드랍
+test_set.drop('datetime',axis=1,inplace=True) # 트레인 세트에서 데이트타임 드랍
 
 print(train_set)
 print(test_set)
@@ -70,10 +70,10 @@ x_train, x_test, y_train, y_test = train_test_split(x,y,
 
 #2. 모델구성
 model = Sequential()
-model.add(Dense(100, activation='elu', input_dim=12))
-model.add(Dense(100, activation='swish'))
+model.add(Dense(100, activation='swish', input_dim=12))
 model.add(Dense(100, activation='elu'))
 model.add(Dense(100, activation='swish'))
+model.add(Dense(100, activation='elu'))
 model.add(Dense(1))
 
 #3. 컴파일, 훈련
@@ -100,7 +100,7 @@ y_summit = model.predict(test_set)
 print(y_summit)
 print(y_summit.shape) # (6493, 1)
 
-submission_set = pd.read_csv(path + 'submission.csv', # + 명령어는 문자를 앞문자와 더해줌
+submission_set = pd.read_csv(path + 'sampleSubmission.csv', # + 명령어는 문자를 앞문자와 더해줌
                              index_col=0) # index_col=n n번째 컬럼을 인덱스로 인식
 
 print(submission_set)
