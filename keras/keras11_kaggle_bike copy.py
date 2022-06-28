@@ -5,7 +5,7 @@ from sqlalchemy import true #pandas : 엑셀땡겨올때 씀
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Dense
 from sklearn.model_selection import train_test_split
-from sklearn.metrics import r2_score, mean_squared_error
+from sklearn.metrics import r2_score, mean_squared_error, mean_squared_log_error
 from sklearn.ensemble import RandomForestRegressor
 import datetime as dt
 
@@ -43,14 +43,15 @@ test_set["month"] = [t.month for t in pd.DatetimeIndex(test_set.datetime)]
 test_set['year'] = [t.year for t in pd.DatetimeIndex(test_set.datetime)]
 test_set['year'] = test_set['year'].map({2011:0, 2012:1})
 
-train_set.drop('datetime',axis=1) # 트레인 세트에서 데이트타임 드랍
-train_set.drop('casual',axis=1) # 트레인 세트에서 캐주얼 레지스터드 드랍
-train_set.drop('registered',axis=1)
+train_set.drop('datetime',axis=1,inplace=True) # 트레인 세트에서 데이트타임 드랍
+train_set.drop('casual',axis=1,inplace=True) # 트레인 세트에서 캐주얼 레지스터드 드랍
+train_set.drop('registered',axis=1,inplace=True)
 
-test_set.drop('datetime',axis=1) # 트레인 세트에서 데이트타임 드랍
+test_set.drop('datetime',axis=1,inplace=True) # 테스트 세트에서 데이트타임 드랍
 
 print(train_set)
 print(test_set)
+
 ##########################################
 
 
@@ -64,42 +65,39 @@ print(y)
 print(y.shape) # (10886,)
 
 x_train, x_test, y_train, y_test = train_test_split(x,y,
-                                                    train_size=0.75,
+                                                    train_size=0.25,
                                                     random_state=31
                                                     )
 
-#2. 모델구성
-model = Sequential()
-model.add(Dense(100, activation='elu', input_dim=12))
-model.add(Dense(100, activation='swish'))
-model.add(Dense(100, activation='elu'))
-model.add(Dense(100, activation='swish'))
-model.add(Dense(1))
+print(x_train)
+print(y_train)
 
-#3. 컴파일, 훈련
-model.compile(loss='mse', optimizer='adam')
-model.fit(x_train, y_train, epochs=800, batch_size=100, verbose=1)
+#2. 모델구성
+model = RandomForestRegressor()
+
+model.fit(x_train, y_train)
+
+print(model.score(x_train, y_train))
+print(model.score(x_test, y_test))
+
 
 #4. 평가, 예측
-loss = model.evaluate(x, y) 
-print('loss : ', loss)
 
 y_predict = model.predict(x_test)
 
-def RMSE(a, b): 
-    return np.sqrt(mean_squared_error(a, b))
+def RMSLE(a, b): 
+    return np.sqrt(mean_squared_log_error(a, b))
 
-rmse = RMSE(y_test, y_predict)
-print("RMSE : ", rmse)
+rmsle = RMSLE(y_test, y_predict)
+print("RMSLE : ", rmsle)
 
-# loss :  708.68310546875
-# RMSE :  42.18903164279918
+# RMSLE :  0.3958732766907716
 
 y_summit = model.predict(test_set)
 
 print(y_summit)
 print(y_summit.shape) # (6493, 1)
-
+'''
 submission_set = pd.read_csv(path + 'submission.csv', # + 명령어는 문자를 앞문자와 더해줌
                              index_col=0) # index_col=n n번째 컬럼을 인덱스로 인식
 
@@ -109,4 +107,5 @@ submission_set['count'] = y_summit
 print(submission_set)
 
 
-submission_set.to_csv(path + 'submission.csv', index = True)
+submission_set.to_csv(path + 'submission_.csv', index = True)
+'''
