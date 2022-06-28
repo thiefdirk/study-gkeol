@@ -6,7 +6,7 @@ from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Dense
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import r2_score, mean_squared_error, mean_squared_log_error
-from sklearn.ensemble import RandomForestRegressor
+from keras.layers.recurrent import LSTM, SimpleRNN
 import datetime as dt
 
 #1. 데이터
@@ -73,41 +73,27 @@ print(x_train)
 print(y_train)
 
 #2. 모델구성
-'''
-from sklearn.model_selection import GridSearchCV
+model = Sequential()
+model.add(LSTM(64, return_sequences=True, input_shape=(12, 1), dropout=0.0, recurrent_dropout=0.2,))
+#model.add(LSTM(164, return_sequences=True, input_shape=(n_steps, n_features)))
+#model.add(LSTM(164, return_sequences=True, input_shape=(n_steps, n_features)))
+model.add(LSTM(32))
+model.add(Dense(1))
 
-params = {
-    'n_estimators':(100, 200),
-    'max_depth' : (5, 8),
-    'min_samples_leaf' : (8, 18),
-    'min_samples_split' : (8, 16)
-}
-model = RandomForestRegressor(random_state=0, n_jobs=-1)
-grid_cv = GridSearchCV(model, param_grid=params, cv=2, n_jobs=-1)
-grid_cv.fit(x_train, y_train)
- 
- 
-print('최적 하이퍼 파라미터:', grid_cv.best_params_)
-print('최적 예측 정확도: {0:.4f}'.format(grid_cv.best_score_))
-  
 
-'''
-model = RandomForestRegressor()
-model.fit(x_train, y_train)
-
-print(model.score(x_train, y_train))
-print(model.score(x_test, y_test))
-
+#3. 컴파일, 훈련
+model.compile(loss='mse', optimizer='adam')
+model.fit(x_train, y_train, validation_split=0.1, epochs=150, verbose=1)
 
 #4. 평가, 예측
 
 y_predict = model.predict(x_test)
 
-def RMSLE(a, b): 
-    return np.sqrt(mean_squared_log_error(a, b))
+def RMSE(a, b): 
+    return np.sqrt(mean_squared_error(a, b))
 
-rmsle = RMSLE(y_test, y_predict)
-print("RMSLE : ", rmsle)
+rmse = RMSE(y_test, y_predict)
+print("RMSE : ", rmse)
 
 # RMSLE :  0.3958732766907716
 
@@ -121,10 +107,10 @@ submission_set = pd.read_csv(path + 'sampleSubmission.csv', # + 명령어는 문
 
 print(submission_set)
 
-submission_set['count'] = y_summit
+submission_set['count'] = abs(y_summit)
 print(submission_set)
 
 
-submission_set.to_csv(path + 'submission_.csv', index = True)
+submission_set.to_csv(path + 'submission__.csv', index = True)
 
-# https://www.kaggle.com/code/rajmehra03/bike-sharing-demand-rmsle-0-3194/notebook
+# https://www.kaggle.com/code/drcapa/bike-sharing-demand-rnn
