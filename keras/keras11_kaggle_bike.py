@@ -69,9 +69,10 @@ x_train, x_test, y_train, y_test = train_test_split(x,y,
 
 #2. 모델구성
 model = Sequential()
-model.add(Dense(100, activation='selu', input_dim=12))
-model.add(Dense(100, activation='selu'))
-model.add(Dense(100, activation='selu'))
+model.add(Dense(100, activation='elu', input_dim=12))
+model.add(Dense(100, activation='swish'))
+model.add(Dense(100, activation='elu'))
+model.add(Dense(100, activation='swish'))
 model.add(Dense(1))
 
 #3. 컴파일, 훈련
@@ -96,7 +97,7 @@ print("RMSE : ", rmse)
 y_summit = model.predict(test_set)
 
 print(y_summit)
-print(y_summit.shape) # (715, 1)
+print(y_summit.shape) # (6493, 1)
 
 submission_set = pd.read_csv(path + 'submission.csv', # + 명령어는 문자를 앞문자와 더해줌
                              index_col=0) # index_col=n n번째 컬럼을 인덱스로 인식
