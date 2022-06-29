@@ -159,8 +159,8 @@ total = train_set.isnull().sum().sort_values(ascending=False)
 percent = (train_set.isnull().sum()/train_set.isnull().count()).sort_values(ascending=False)
 missing_data = pd.concat([total, percent], axis=1, keys=['Total', 'Percent'])
 
-print(train_set.isnull().sum().sum(), test_set.isnull().sum().sum())
-#################### 0 0 출력시 결측치 확인 끝###########################
+print(train_set.isnull().sum().sum(), test_set.isnull().sum().sum()) # 0 0 출력시 결측치 확인 끝
+
 id_test = test_set['Id']
 
 to_drop_num = num_weak_corr
@@ -241,8 +241,8 @@ x = train_set.drop(['SalePrice'], axis=1)
 y = train_set['SalePrice']
 
 x_train, x_test, y_train, y_test = train_test_split(x,y,
-                                                    train_size=0.99,
-                                                    random_state=32
+                                                    train_size=0.75,
+                                                    random_state=80
                                                     )
 print(x_train)
 print(y_train)
@@ -250,7 +250,7 @@ print(y_train)
 #2. 모델구성
 model = Sequential()
 model.add(Dense(100, activation='selu', input_dim=12))
-model.add(Dense(80, activation='selu'))
+model.add(Dense(800, activation='selu'))
 model.add(Dense(200, activation='selu'))
 model.add(Dense(100, activation='selu'))
 model.add(Dense(90, activation='selu'))
@@ -273,6 +273,9 @@ def RMSE(a, b):
 rmse = RMSE(y_test, y_predict)
 print("RMSE : ", rmse)
 
+r2 = r2_score(y_test, y_predict)
+print('r2스코어 : ', r2)
+
 y_summit = model.predict(test_set)
 
 print(y_summit)
@@ -290,11 +293,10 @@ print(submission_set)
 submission_set.to_csv(path + 'submission.csv', index = True)
 
 
-# loss :  17600.408203125
-# RMSE :  23218.929188085083
-
-
-################################안씀####################################
+# loss :  16607.67578125
+# RMSE :  23327.937209340154
+# r2스코어 :  0.8902162442087134
+################################이 밑으로 안씀####################################
 '''
 le = le.fit(train_set[categorical_feats])   #train['col']을 fit
 train_set = le.transform(train_set[categorical_feats])
