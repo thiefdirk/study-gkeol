@@ -1,14 +1,14 @@
 import numpy as np
+import datetime as dt 
 import pandas as pd
-from sqlalchemy import true #pandas : 엑셀땡겨올때 씀
+from collections import Counter
+import datetime as dt
+from sqlalchemy import asc
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Dense, Dropout
 from sklearn.model_selection import train_test_split
-from sklearn.preprocessing import LabelEncoder
-from sklearn.preprocessing import OneHotEncoder
-from sklearn.metrics import r2_score, mean_squared_error, mean_squared_log_error
-from keras.layers.recurrent import LSTM, SimpleRNN
-from collections import Counter
+from sklearn.metrics import r2_score, mean_squared_error
+from sklearn.preprocessing import LabelEncoder, OneHotEncoder
 
 encording_columns = ['MSZoning','Street','Alley','LotShape','LandContour','Utilities','LotConfig',
                     'LandSlope','Neighborhood','Condition1','Condition2','BldgType','HouseStyle',
@@ -89,32 +89,32 @@ categorical_feats_ = test_set.dtypes[test_set.dtypes == "object"].index
 # print("*"*79)
 # print(test_set[categorical_feats_].columns)   
 
+# ###################범주형변수값 수치형으로 변환###############
+# train_set_encoded = train_set.drop(numerical_feats,axis=1)
+# print(train_set_encoded)
 
-train_set_encoded = train_set.drop(numerical_feats,axis=1)
-print(train_set_encoded)
+# test_set_encoded = test_set.drop(numerical_feats_,axis=1)
+# print(test_set_encoded)
 
-test_set_encoded = test_set.drop(numerical_feats_,axis=1)
-print(test_set_encoded)
-###################범주형변수값 수치형으로 변환###############
-le = LabelEncoder()
+# le = LabelEncoder()
 
-train_set_encoded.loc[:,:] = \
-train_set_encoded.loc[:,:].apply(LabelEncoder().fit_transform)    
+# train_set_encoded.loc[:,:] = \
+# train_set_encoded.loc[:,:].apply(LabelEncoder().fit_transform)    
 
-print(train_set_encoded)
+# print(train_set_encoded)
 
-train_set = pd.concat([train_set_encoded, train_set.loc[:,numerical_feats]], axis=1)
+# train_set = pd.concat([train_set_encoded, train_set.loc[:,numerical_feats]], axis=1)
 
-print(train_set)
+# print(train_set)
 
-test_set_encoded.loc[:,:] = \
-test_set_encoded.loc[:,:].apply(LabelEncoder().fit_transform)    
+# test_set_encoded.loc[:,:] = \
+# test_set_encoded.loc[:,:].apply(LabelEncoder().fit_transform)    
 
-print(test_set_encoded)
+# print(test_set_encoded)
 
-test_set = pd.concat([test_set_encoded, test_set.loc[:,numerical_feats_]], axis=1)
+# test_set = pd.concat([test_set_encoded, test_set.loc[:,numerical_feats_]], axis=1)
 
-print(test_set)
+# print(test_set)
 
 #################긁어온거####################################
 
@@ -241,22 +241,20 @@ x = train_set.drop(['SalePrice'], axis=1)
 y = train_set['SalePrice']
 
 x_train, x_test, y_train, y_test = train_test_split(x,y,
-                                                    train_size=0.75,
-                                                    random_state=31
+                                                    train_size=0.99,
+                                                    random_state=32
                                                     )
 print(x_train)
 print(y_train)
 
 #2. 모델구성
 model = Sequential()
-model.add(Dense(80, input_dim=12,activation='relu')) ##### 긁어온거썻으면 인풋딤 12로 쓸것
-model.add(Dropout(0.2))  # 입력 단위를 무작위로 0으로 
-                         #설정하여 과적합을 방지하는 데 도움이 됩니다
-model.add(Dense(500,activation='relu'))
-model.add(Dropout(0.2))
-model.add(Dense(200,activation='relu'))
-model.add(Dropout(0.2))
-model.add(Dense(100,activation='relu'))
+model.add(Dense(100, activation='selu', input_dim=12))
+model.add(Dense(80, activation='selu'))
+model.add(Dense(200, activation='selu'))
+model.add(Dense(100, activation='selu'))
+model.add(Dense(90, activation='selu'))
+model.add(Dense(70, activation='selu'))
 model.add(Dense(1))
 
 #3. 컴파일, 훈련
@@ -264,7 +262,7 @@ model.compile(loss='mae', optimizer='adam')
 model.fit(x_train, y_train, epochs=5000, batch_size=100, verbose=1)
 
 #4. 평가, 예측
-loss = model.evaluate(x, y) 
+loss = model.evaluate(x_test, y_test) 
 print('loss : ', loss)
 
 y_predict = model.predict(x_test)
@@ -292,8 +290,8 @@ print(submission_set)
 submission_set.to_csv(path + 'submission.csv', index = True)
 
 
-# loss :  3473040896.0
-# RMSE :  77228.58322014891
+# loss :  17600.408203125
+# RMSE :  23218.929188085083
 
 
 ################################안씀####################################
