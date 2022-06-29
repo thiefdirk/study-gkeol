@@ -241,25 +241,24 @@ x = train_set.drop(['SalePrice'], axis=1)
 y = train_set['SalePrice']
 
 x_train, x_test, y_train, y_test = train_test_split(x,y,
-                                                    train_size=0.75,
-                                                    random_state=80
+                                                    train_size=0.99,
+                                                    random_state=100
                                                     )
 print(x_train)
 print(y_train)
 
 #2. 모델구성
 model = Sequential()
-model.add(Dense(100, activation='selu', input_dim=12))
-model.add(Dense(800, activation='selu'))
-model.add(Dense(200, activation='selu'))
-model.add(Dense(100, activation='selu'))
-model.add(Dense(90, activation='selu'))
-model.add(Dense(70, activation='selu'))
+model.add(Dense(100, input_dim=12,activation='swish'))
+model.add(Dense(200,activation='swish'))
+model.add(Dense(100,activation='swish'))
+model.add(Dense(200,activation='swish'))
+model.add(Dense(100,activation='swish'))
 model.add(Dense(1))
 
 #3. 컴파일, 훈련
-model.compile(loss='mae', optimizer='adam')
-model.fit(x_train, y_train, epochs=5000, batch_size=100, verbose=1)
+model.compile(loss='mse', optimizer='adam')
+model.fit(x_train, y_train, epochs=6000, batch_size=100, verbose=1)
 
 #4. 평가, 예측
 loss = model.evaluate(x_test, y_test) 
@@ -292,10 +291,9 @@ print(submission_set)
 
 submission_set.to_csv(path + 'submission.csv', index = True)
 
-
-# loss :  16607.67578125
-# RMSE :  23327.937209340154
-# r2스코어 :  0.8902162442087134
+# loss :  346772192.0
+# RMSE :  18621.822288455824
+# r2스코어 :  0.8978239152495886
 ################################이 밑으로 안씀####################################
 '''
 le = le.fit(train_set[categorical_feats])   #train['col']을 fit
