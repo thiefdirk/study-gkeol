@@ -41,6 +41,7 @@ numerical_feats_ = test_set.dtypes[test_set.dtypes != "object"].index
 categorical_feats_ = test_set.dtypes[test_set.dtypes == "object"].index
 # print("Number of Numberical features: ", len(numerical_feats)) # 37
 # print("Number of Categorical features: ", len(categorical_feats)) # 43
+
 '''
 # 변수명 출력
 print(train_set[numerical_feats].columns)      
@@ -50,6 +51,7 @@ print(test_set[numerical_feats_].columns)
 print("*"*79)
 print(test_set[categorical_feats_].columns)   
 '''
+
 train_set_encoded = train_set.drop(numerical_feats,axis=1)
 print(train_set_encoded)
 
@@ -136,7 +138,7 @@ submission_set.to_csv(path + 'submission.csv', index = True)
 # RMSE :  32729.866146587963
 
 '''
-
+################################안씀####################################
 
 le = le.fit(train_set[categorical_feats])   #train['col']을 fit
 train_set = le.transform(train_set[categorical_feats])
