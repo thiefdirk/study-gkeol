@@ -241,24 +241,26 @@ x = train_set.drop(['SalePrice'], axis=1)
 y = train_set['SalePrice']
 
 x_train, x_test, y_train, y_test = train_test_split(x,y,
-                                                    train_size=0.99,
-                                                    random_state=100
+                                                    train_size=0.75,
+                                                    random_state=984
                                                     )
 print(x_train)
 print(y_train)
 
 #2. 모델구성
 model = Sequential()
-model.add(Dense(100, input_dim=12,activation='swish'))
-model.add(Dense(200,activation='swish'))
+model.add(Dense(80, input_dim=12,activation='swish'))
+model.add(Dropout(0.2))
 model.add(Dense(100,activation='swish'))
-model.add(Dense(200,activation='swish'))
-model.add(Dense(100,activation='swish'))
+model.add(Dropout(0.2))
+model.add(Dense(110,activation='swish'))
+model.add(Dropout(0.2))
+model.add(Dense(90,activation='swish'))
 model.add(Dense(1))
 
 #3. 컴파일, 훈련
-model.compile(loss='mse', optimizer='adam')
-model.fit(x_train, y_train, epochs=6000, batch_size=100, verbose=1)
+model.compile(loss='mae', optimizer='adam')
+model.fit(x_train, y_train, epochs=2000, batch_size=100, verbose=1)
 
 #4. 평가, 예측
 loss = model.evaluate(x_test, y_test) 
