@@ -1,7 +1,7 @@
 from tabnanny import verbose
 from sklearn.model_selection import train_test_split
-from tensorflow.keras.models import Sequential
-from tensorflow.keras.layers import Dense
+from tensorflow.python.keras.models import Sequential
+from tensorflow.python.keras.layers import Dense
 from sklearn.datasets import load_boston
 
 #1. 데이터
@@ -38,7 +38,7 @@ model.compile(loss='mse', optimizer='adam')
 
 start_time = time.time()
 print(start_time)
-model.fit(x_train, y_train, epochs=50, batch_size=1, verbose=0)
+model.fit(x_train, y_train, epochs=50,batch_size=1, verbose=1)
 end_time = time.time() - start_time
 
 print("걸린시간 : ", end_time)

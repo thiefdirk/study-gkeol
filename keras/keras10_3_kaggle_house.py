@@ -4,8 +4,8 @@ import pandas as pd
 from collections import Counter
 import datetime as dt
 from sqlalchemy import asc
-from tensorflow.keras.models import Sequential
-from tensorflow.keras.layers import Dense, Dropout
+from tensorflow.python.keras.models import Sequential
+from tensorflow.python.keras.layers import Dense, Dropout
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import r2_score, mean_squared_error
 from sklearn.preprocessing import LabelEncoder, OneHotEncoder
@@ -250,17 +250,14 @@ print(y_train)
 #2. 모델구성
 model = Sequential()
 model.add(Dense(80, input_dim=12,activation='swish'))
-model.add(Dropout(0.2))
 model.add(Dense(100,activation='swish'))
-model.add(Dropout(0.2))
 model.add(Dense(110,activation='swish'))
-model.add(Dropout(0.2))
 model.add(Dense(90,activation='swish'))
 model.add(Dense(1))
 
 #3. 컴파일, 훈련
-model.compile(loss='mae', optimizer='adam')
-model.fit(x_train, y_train, epochs=2000, batch_size=100, verbose=1)
+model.compile(loss='mse', optimizer='adam')
+model.fit(x_train, y_train, epochs=1, batch_size=100, verbose=1)
 
 #4. 평가, 예측
 loss = model.evaluate(x_test, y_test) 
