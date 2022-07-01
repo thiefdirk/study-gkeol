@@ -50,13 +50,13 @@ x_train, x_test, y_train, y_test = train_test_split(x,y,
 
 #2. 모델구성
 model = Sequential()
-model.add(Dense(100, activation='selu', input_dim=9))
-model.add(Dense(100, activation='selu'))
-model.add(Dense(100, activation='selu'))
+model.add(Dense(100, input_dim=9))
+model.add(Dense(100))
+model.add(Dense(100))
 model.add(Dense(1))
 
 #3. 컴파일, 훈련
-model.compile(loss='mae', optimizer='adam')
+model.compile(loss='mse', optimizer='adam')
 model.fit(x_train, y_train, epochs=800, batch_size=25, verbose=1)
 
 #4. 평가, 예측
@@ -70,6 +70,11 @@ def RMSE(a, b):
 
 rmse = RMSE(y_test, y_predict)
 print("RMSE : ", rmse)
+
+from sklearn.metrics import r2_score
+r2 = r2_score(y_test, y_predict)
+
+print("r2스코어 : ", r2)
 
 y_summit = model.predict(test_set)
 
@@ -94,6 +99,10 @@ submission_set.to_csv('./_data/ddarung/submission.csv', index = True)
 
 # loss :  328.2398376464844
 # RMSE :  33.9185222763881
+
+# loss :  2817.2021484375
+# RMSE :  55.043381747129075
+# r2스코어 :  0.5676858327700348
 
 # 함수에 대해서 정의, 공부
 # https://wikidocs.net/63

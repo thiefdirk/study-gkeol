@@ -71,15 +71,15 @@ from sklearn.metrics import r2_score
 r2 = r2_score(y_test, y_predict)
 print('r2스코어 : ', r2)
 
-plt.figure(figsize=(9,6))
-plt.plot(hist.history['loss'], marker='.', label='loss', color='red')
-plt.plot(hist.history['val_loss'], marker='.', label='val_loss', color='blue')
-plt.grid()
-plt.title('당뇨')
-plt.ylabel('loss')
-plt.xlabel('epochs')
-plt.legend(loc='upper right')
-plt.show()
+# plt.figure(figsize=(9,6))
+# plt.plot(hist.history['loss'], marker='.', label='loss', color='red')
+# plt.plot(hist.history['val_loss'], marker='.', label='val_loss', color='blue')
+# plt.grid()
+# plt.title('당뇨')
+# plt.ylabel('loss')
+# plt.xlabel('epochs')
+# plt.legend(loc='upper right')
+# plt.show()
 # r2 0.62 이상
 # loss :  2452.336669921875
 # r2스코어 :  0.6286149246878252

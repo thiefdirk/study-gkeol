@@ -249,15 +249,15 @@ print(y_train)
 
 #2. 모델구성
 model = Sequential()
-model.add(Dense(80, input_dim=12,activation='swish'))
-model.add(Dense(100,activation='swish'))
-model.add(Dense(110,activation='swish'))
-model.add(Dense(90,activation='swish'))
+model.add(Dense(80, input_dim=12))
+model.add(Dense(100))
+model.add(Dense(110))
+model.add(Dense(90))
 model.add(Dense(1))
 
 #3. 컴파일, 훈련
 model.compile(loss='mse', optimizer='adam')
-model.fit(x_train, y_train, epochs=1, batch_size=100, verbose=1)
+model.fit(x_train, y_train, epochs=1000, batch_size=100, verbose=1)
 
 #4. 평가, 예측
 loss = model.evaluate(x_test, y_test) 

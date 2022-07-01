@@ -70,10 +70,10 @@ x_train, x_test, y_train, y_test = train_test_split(x,y,
 
 #2. 모델구성
 model = Sequential()
-model.add(Dense(100, activation='swish', input_dim=12))
-model.add(Dense(100, activation='elu'))
-model.add(Dense(100, activation='swish'))
-model.add(Dense(100, activation='elu'))
+model.add(Dense(100, input_dim=12))
+model.add(Dense(100))
+model.add(Dense(100))
+model.add(Dense(100))
 model.add(Dense(1))
 
 #3. 컴파일, 훈련
@@ -82,7 +82,6 @@ model.fit(x_train, y_train, epochs=800, batch_size=100, verbose=1)
 
 #4. 평가, 예측
 loss = model.evaluate(x, y) 
-print('loss : ', loss)
 
 y_predict = model.predict(x_test)
 
@@ -90,11 +89,18 @@ def RMSE(a, b):
     return np.sqrt(mean_squared_error(a, b))
 
 rmse = RMSE(y_test, y_predict)
+
+from sklearn.metrics import r2_score
+r2 = r2_score(y_test, y_predict)
+
+print('loss : ', loss)
 print("RMSE : ", rmse)
+print('r2스코어 : ', r2)
 
-# loss :  507.6263122558594
-# RMSE :  40.8111499985313
-
+# loss :  20049.21484375
+# RMSE :  140.3344816795905
+# r2스코어 :  0.3978910778053413
+'''
 y_summit = model.predict(test_set)
 
 print(y_summit)
@@ -110,3 +116,4 @@ print(submission_set)
 
 
 submission_set.to_csv(path + 'submission.csv', index = True)
+'''
