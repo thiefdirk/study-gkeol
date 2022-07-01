@@ -6,46 +6,36 @@ from matplotlib import font_manager, rc
 font_path = "C:/Windows/Fonts/gulim.TTc"
 font = font_manager.FontProperties(fname=font_path).get_name()
 rc('font', family=font)
-from sklearn.datasets import load_boston
+from sklearn.datasets import fetch_california_housing
 import time
 
+
 #1. 데이터
-datasets = load_boston()
+datasets = fetch_california_housing()
 x = datasets.data
 y = datasets.target
 
+start_time = time.time()
 x_train, x_test, y_train, y_test = train_test_split(x,y,
-                                                    train_size=0.8,
-                                                    random_state=66
+                                                    train_size=0.7,
+                                                    random_state=18
                                                     )
-'''
-print(x)
-print(y)
-print(x.shape, y.shape) # (506, 13) (506,)
-
-print(datasets.feature_names) #싸이킷런에만 있는 명령어
-print(datasets.DESCR)
-'''
+end_time = time.time()
 
 #2. 모델구성
+
 model = Sequential()
-model.add(Dense(20, input_dim=13))
+model.add(Dense(20, input_dim=8))
 model.add(Dense(30))
 model.add(Dense(50))
-model.add(Dense(30))
-model.add(Dense(20))
+model.add(Dense(50))
+model.add(Dense(50))
 model.add(Dense(10))
 model.add(Dense(1))
 
 #3. 컴파일, 훈련
 model.compile(loss='mse', optimizer='adam')
-
-start_time = time.time()
-hist = model.fit(x_train, y_train, epochs=1000, batch_size=100,
-                 validation_split=0.2,
-                 verbose=1)
-
-end_time = time.time()
+hist = model.fit(x_train, y_train, epochs=1000, batch_size=100, verbose = 1, validation_split=0.2)
 
 #4. 평가, 예측
 loss = model.evaluate(x_test, y_test)
@@ -66,8 +56,15 @@ plt.figure(figsize=(9,6))
 plt.plot(hist.history['loss'], marker='.', label='loss', color='red')
 plt.plot(hist.history['val_loss'], marker='.', label='val_loss', color='blue')
 plt.grid()
-plt.title('보스턴')
+plt.title('캘리포니아')
 plt.ylabel('loss')
 plt.xlabel('epochs')
 plt.legend(loc='upper right')
 plt.show()
+
+
+y_predict = model.predict(x_test)
+
+from sklearn.metrics import r2_score
+r2 = r2_score(y_test, y_predict)
+print('r2스코어 : ', r2)

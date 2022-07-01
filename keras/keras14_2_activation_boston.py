@@ -1,3 +1,10 @@
+#### 과제 2 
+# activation : sigmoid, relu, linear 넣고 돌리기
+# metrics 추가
+# EarlyStopping 넣고
+# 성능 비교
+# 감상문, 느낀점 2줄이상!!!
+
 from sklearn.model_selection import train_test_split
 from tensorflow.python.keras.models import Sequential
 from tensorflow.python.keras.layers import Dense
@@ -38,11 +45,16 @@ model.add(Dense(10))
 model.add(Dense(1))
 
 #3. 컴파일, 훈련
-model.compile(loss='mse', optimizer='adam')
+model.compile(loss='mse', optimizer='adam', metrics=['mae'])
+
+from tensorflow.python.keras.callbacks import EarlyStopping
+earlyStopping = EarlyStopping(monitor='val_loss', patience=150, mode='auto', verbose=1, 
+                              restore_best_weights=True)        
 
 start_time = time.time()
 hist = model.fit(x_train, y_train, epochs=1000, batch_size=100,
                  validation_split=0.2,
+                 callbacks=[earlyStopping],
                  verbose=1)
 
 end_time = time.time()
