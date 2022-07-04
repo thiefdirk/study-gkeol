@@ -53,7 +53,7 @@ print(train_set)
 print(test_set)
 ##########################################
 
-
+'''
 x = train_set.drop(['count'], axis=1)  # drop 데이터에서 ''사이 값 빼기
 print(x)
 print(x.columns)
@@ -112,7 +112,7 @@ print('r2스코어 : ', r2)
 # RMSE :  42.40323210832085
 # r2스코어 :  0.9450276636367779
 
-'''
+
 y_summit = model.predict(test_set)
 
 print(y_summit)
