@@ -14,3 +14,7 @@
 #  to_categorical을 쓰더라도 위와 같은 경우 1 2 4 6 8 의 컬럼들을 다 drop 시켜주면 사용 할수도 있지만 굳이 그럴바에 딴거 씀
 
 #1 판다스는 아웃풋이 무조건 데이터프레임으로 되기때문에 np.argmax 가 아닌 tf.argmax를 이용
+
+#3 sklearn onehotencoder sparse=true 는 매트릭스반환 False는 array 반환 
+# 원핫인코딩에서 필요한 것은 array이므로 sparse 옵션에 False를 넣어준다.
+# array 가 반환되니 np.argmax 써주면 됨
