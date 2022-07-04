@@ -45,7 +45,7 @@ from tensorflow.python.keras.callbacks import EarlyStopping
 earlyStopping = EarlyStopping(monitor='val_loss', patience=200, mode='auto', verbose=1, 
                               restore_best_weights=True)        
 
-                  #restore_best_weights false 로 하면 중단한 지점의 웨이트값을 가져옴 true로하면 끊기기 전이라도 최적의 웨이트값을 가져옴
+                  #restore_best_weights false 로 하면 중단한 지점의 웨이트값을 가져옴 true로하면 끊기기 전의 최적의 웨이트값을 가져옴
 
 
 start_time = time.time()
