@@ -39,8 +39,8 @@ x_train, x_test, y_train, y_test = train_test_split(x,y,
                                                     random_state=66
                                                     )
 
-print(y_test)
-print(y_train)
+# print(y_test)
+# print(y_train)
 
 
 #2. 모델
@@ -75,26 +75,27 @@ results= model.evaluate(x_test, y_test)
 print('loss : ', results[0])
 print('accuracy : ', results[1])
 
-# print("=================y_test[:5]=================")
-# print(y_test[:5])
-# print("===============y_pred===================")
+
 y_predict = model.predict(x_test)
 
 print(y_predict)
+print(y_test)
+
+
 y_predict = np.argmax(y_predict, axis= 1)
 print(y_predict)
-y_predict = to_categorical(y_predict)
 print(y_test)
+y_test = np.argmax(y_test, axis= 1)
 print(y_predict)
+print(y_test)
 
-# print(y_pred)
-# print("==================================")
-
+# y_predict = to_categorical(y_predict)
+# print(y_test)
 # print(y_predict)
 
 acc= accuracy_score(y_test, y_predict)
 print('acc스코어 : ', acc) 
-
+'''
 # plt.figure(figsize=(9,6))
 # plt.plot(hist.history['loss'], marker='.', label='loss', color='red')
 # plt.plot(hist.history['val_loss'], marker='.', label='val_loss', color='blue')
@@ -105,5 +106,6 @@ print('acc스코어 : ', acc)
 # plt.legend(loc='upper right')
 # plt.show()
 
-# loss :  0.0530550517141819
+# loss :  0.05714249983429909
 # accuracy :  1.0
+'''
