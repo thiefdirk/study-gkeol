@@ -24,8 +24,8 @@ import time
 
 #1. 데이터
 path = './_data/kaggle_titanic/'
-train_set = pd.read_csv(path + 'train.csv' # + 명령어는 문자를 앞문자와 더해줌
-                        ) # index_col=n n번째 컬럼을 인덱스로 인식
+train_set = pd.read_csv(path + 'train.csv', # + 명령어는 문자를 앞문자와 더해줌
+                        index_col=0) # index_col=n n번째 컬럼을 인덱스로 인식
 # print(train_set)
 # print(train_set.shape) # (891, 11)
 # print(train_set.describe())
@@ -68,7 +68,7 @@ sns.barplot(x="SibSp", y="Survived", data=train_set)
 
 #### 결측치 처리 1. 제거 ####
 
-train_set = train_set.fillna({"Embarked": "S"})
+train_set = train_set.fillna({"Embarked": "C"})
 train_set.Age = train_set.Age.fillna(value=train_set.Age.mean())
 
 train_set = train_set.drop(['Name'], axis = 1)
@@ -91,8 +91,7 @@ print(train_set, test_set, train_set.shape, test_set.shape)
 ############################
 
 
-
-x = train_set.drop(['Survived', 'PassengerId'], axis=1)  # drop 데이터에서 ''사이 값 빼기
+x = train_set.drop(['Survived'], axis=1)  # drop 데이터에서 ''사이 값 빼기
 print(x)
 print(x.columns)
 print(x.shape) # (891, 8)
@@ -102,7 +101,7 @@ print(y)
 print(y.shape) # (891,)
 
 x_train, x_test, y_train, y_test = train_test_split(x,y,
-                                                    train_size=0.7,
+                                                    train_size=0.8,
                                                     random_state=66
                                                     )
 
@@ -111,10 +110,11 @@ x_train, x_test, y_train, y_test = train_test_split(x,y,
 
 #2. 모델구성
 model = Sequential()
-model.add(Dense(30, input_dim=8, activation='linear')) #sigmoid : 이진분류일때 아웃풋에 activation = 'sigmoid' 라고 넣어줘서 아웃풋 값 범위를 0에서 1로 제한해줌
-model.add(Dense(20, activation='sigmoid'))               # 출력이 0 or 1으로 나와야되기 때문, 그리고 최종으로 나온 값에 반올림을 해주면 0 or 1 완성
+model.add(Dense(30, input_dim=8, activation='relu')) #sigmoid : 이진분류일때 아웃풋에 activation = 'sigmoid' 라고 넣어줘서 아웃풋 값 범위를 0에서 1로 제한해줌
+model.add(Dense(20, activation='relu'))               # 출력이 0 or 1으로 나와야되기 때문, 그리고 최종으로 나온 값에 반올림을 해주면 0 or 1 완성
 model.add(Dense(20, activation='relu'))               # relu : 히든에서만 쓸수있음, 요즘에 성능 젤좋음
-model.add(Dense(20, activation='linear'))               
+model.add(Dense(20, activation='relu'))
+model.add(Dense(20, activation='relu'))               
 model.add(Dense(1, activation='sigmoid'))   
                                                                         
 #3. 컴파일, 훈련
@@ -123,7 +123,7 @@ model.compile(loss='binary_crossentropy', optimizer='adam',
                                       # 컴파일에있는 metrics는 평가지표라고도 읽힘
 
 
-earlyStopping = EarlyStopping(monitor='val_loss', patience=400, mode='auto', verbose=1, 
+earlyStopping = EarlyStopping(monitor='val_loss', patience=600, mode='auto', verbose=1, 
                               restore_best_weights=True)        
 
                   #restore_best_weights false 로 하면 중단한 지점의 웨이트값을 가져옴 true로하면 끊기기 전의 최적의 웨이트값을 가져옴
@@ -131,7 +131,7 @@ earlyStopping = EarlyStopping(monitor='val_loss', patience=400, mode='auto', ver
 
 
 model.fit(x_train, y_train, epochs=3000, batch_size=100,
-                 validation_split=0.3,
+                 validation_split=0.2,
                  callbacks=[earlyStopping],
                  verbose=1)
 
@@ -141,8 +141,6 @@ model.fit(x_train, y_train, epochs=3000, batch_size=100,
 loss = model.evaluate(x_test, y_test)
 y_predict = model.predict(x_test)
 
-
-#### 과제 1 accuracy_score 완성 y 테스트는 반올림이 됫는데 y 프리딕트는 반올림이 안됫음 ######
 print(y_predict)
 y_predict = y_predict.round(0)
 print(y_predict)
@@ -175,5 +173,5 @@ acc= accuracy_score(y_test, y_predict)
 print('loss : ' , loss)
 print('acc스코어 : ', acc) 
 
-# loss :  0.3944142162799835
-# acc스코어 :  0.8171641791044776
+# loss :  0.4480155110359192
+# acc스코어 :  0.8268156424581006
