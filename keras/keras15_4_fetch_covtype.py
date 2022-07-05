@@ -38,7 +38,7 @@ print(np.unique(y)) # [1 2 3 4 5 6 7]
 #################################################
 
 ####################겟더미#######################
-# y = pd.get_dummies(y)
+# y = pd.get_dummies(y)  #겟더미는 y_predict 할때 np아니고 tf.argmax로 바꾸기
 # print(y)
 ################################################
 
@@ -64,10 +64,10 @@ print(y)
 #2. 모델
 
 model = Sequential()
-model.add(Dense(30, input_dim=54, activation='linear')) #sigmoid : 이진분류일때 아웃풋에 activation = 'sigmoid' 라고 넣어줘서 아웃풋 값 범위를 0에서 1로 제한해줌
+model.add(Dense(30, input_dim=54, activation='relu')) #sigmoid : 이진분류일때 아웃풋에 activation = 'sigmoid' 라고 넣어줘서 아웃풋 값 범위를 0에서 1로 제한해줌
 model.add(Dense(20, activation='sigmoid'))               # 출력이 0 or 1으로 나와야되기 때문, 그리고 최종으로 나온 값에 반올림을 해주면 0 or 1 완성
 model.add(Dense(20, activation='relu'))               # relu : 히든에서만 쓸수있음, 요즘에 성능 젤좋음
-model.add(Dense(20, activation='linear'))               
+model.add(Dense(20, activation='relu'))               
 model.add(Dense(7, activation='softmax'))             # softmax : 다중분류일때 아웃풋에 활성화함수로 넣어줌, 아웃풋에서 소프트맥스 활성화 함수를 씌워 주면 그 합은 무조건 1로 변함
                                                                  # ex 70, 20, 10 -> 0.7, 0.2, 0.1
 
@@ -76,10 +76,10 @@ model.add(Dense(7, activation='softmax'))             # softmax : 다중분류�
 model.compile(loss='categorical_crossentropy', optimizer='adam', # 다중 분류에서는 로스함수를 'categorical_crossentropy' 로 써준다 (99퍼센트로)
               metrics=['accuracy'])
 
-es = EarlyStopping(monitor='val_loss', patience=200, mode='auto', verbose=1, 
+es = EarlyStopping(monitor='val_loss', patience=300, mode='auto', verbose=1, 
                               restore_best_weights=True)   
 
-model.fit(x_train, y_train, epochs=500, batch_size=1000,
+model.fit(x_train, y_train, epochs=2000, batch_size=1000,
                  validation_split=0.2,
                  callbacks=[es],
                  verbose=1)
@@ -115,5 +115,5 @@ print('acc스코어 : ', acc)
 # plt.matshow(datasets.images[0])
 # plt.show()
 
-# loss :  0.63250732421875
-# acc스코어 :  0.7325534697998899
+# loss :  0.5174677968025208
+# acc스코어 :  0.781129520837158
