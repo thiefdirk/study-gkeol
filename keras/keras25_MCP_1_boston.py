@@ -4,10 +4,15 @@ from tensorflow.python.keras.layers import Dense
 from sklearn.preprocessing import MinMaxScaler, StandardScaler
 from sklearn.datasets import load_boston
 import numpy as np
-import sys
-sys._getframe().f_code.co_filename
+import inspect, os
+import time
+a = inspect.getfile(inspect.currentframe()) #현재 파일이 위치한 경로 + 현재 파일 명
+print(a)
+print(os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))) #현재 파일이 위치한 경로
+print(a.split("\\")[-1]) #현재 파일 명
+current_name = a.split("\\")[-1]
 
-'''
+
 #1. 데이터
 datasets = load_boston()
 x, y = datasets.data, datasets.target
@@ -45,10 +50,10 @@ import datetime
 date = datetime.datetime.now()
 date = date.strftime("%m%d_%H%M") # 0707_1723
 print(date)
-print Scriptname
 
 
-filepath = './_ModelCheckPoint/'
+
+filepath = './_ModelCheckPoint/' + current_name + '/'
 filename = '{epoch:04d}-{val_loss:.4f}.hdf5'
 
 earlyStopping = EarlyStopping(monitor='val_loss', patience=10, mode='auto', verbose=1, 
@@ -76,4 +81,3 @@ r2 = r2_score(y_test, y_predict)
 print('loss : ' , loss)
 print('r2스코어 : ', r2)
 print("걸린시간 : ", end_time)
-'''
