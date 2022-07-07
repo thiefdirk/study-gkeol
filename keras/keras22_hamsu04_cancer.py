@@ -2,7 +2,7 @@ from sklearn.preprocessing import MinMaxScaler, StandardScaler
 from sklearn.preprocessing import MaxAbsScaler, RobustScaler
 import numpy as np
 from sklearn.datasets import load_breast_cancer
-from tensorflow.python.keras.models import Sequential, Model
+from tensorflow.python.keras.models import Sequential, Model, load_model
 from tensorflow.python.keras.layers import Dense, Input
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import r2_score, accuracy_score
@@ -43,6 +43,9 @@ print(np.min(x_test))  # 1.0
 print(np.max(x_test))  # 1.0
 
 #2. 모델구성
+
+# model = load_model("./_save/keras22_hamsu04_cancer.h5")
+
 # model = Sequential()
 # model.add(Dense(30, input_dim=30, activation='linear')) #sigmoid : 이진분류일때 아웃풋에 activation = 'sigmoid' 라고 넣어줘서 아웃풋 값 범위를 0에서 1로 제한해줌
 # model.add(Dense(20, activation='sigmoid'))               # 출력이 0 or 1으로 나와야되기 때문, 그리고 최종으로 나온 값에 반올림을 해주면 0 or 1 완성
@@ -78,6 +81,8 @@ hist = model.fit(x_train, y_train, epochs=3000, batch_size=100,
 
 end_time = time.time()
 
+model.save("./_save/keras22_hamsu04_cancer.h5")
+
 #4. 평가, 예측
 loss = model.evaluate(x_test, y_test)
 y_predict = model.predict(x_test)
@@ -96,3 +101,6 @@ print('acc스코어 : ', acc)
 
 # loss :  0.07074400782585144
 # acc스코어 :  0.9766081871345029
+
+# loss :  [0.059245605021715164, 0.9824561476707458]
+# acc스코어 :  0.9824561403508771

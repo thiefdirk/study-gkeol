@@ -115,6 +115,8 @@ print(np.max(x_test))  # 1.0
 
 #2. 모델구성
 
+# model = load_model("./_save/keras22_hamsu12_kaggle_titanic.h5")
+
 # model = Sequential()
 # model.add(Dense(300, input_dim=8, activation='relu')) #sigmoid : 이진분류일때 아웃풋에 activation = 'sigmoid' 라고 넣어줘서 아웃풋 값 범위를 0에서 1로 제한해줌
 # model.add(Dense(200, activation='relu'))               # 출력이 0 or 1으로 나와야되기 때문, 그리고 최종으로 나온 값에 반올림을 해주면 0 or 1 완성
@@ -161,6 +163,8 @@ model.fit(x_train, y_train, epochs=3000, batch_size=100,
                  verbose=1)
 
 
+model.save("./_save/keras22_hamsu12_kaggle_titanic.h5")
+
 
 #4. 평가, 예측
 loss = model.evaluate(x_test, y_test)
@@ -205,3 +209,6 @@ model.summary()
 
 # loss :  [0.4151661992073059, 0.8156424760818481]
 # acc스코어 :  0.8156424581005587
+
+# loss :  [0.4102078974246979, 0.826815664768219]  
+# acc스코어 :  0.8268156424581006

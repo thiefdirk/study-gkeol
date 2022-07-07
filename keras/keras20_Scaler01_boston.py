@@ -26,15 +26,16 @@ y = datasets['target']
 # print(x[:10])
 
 x_train, x_test, y_train, y_test = train_test_split(
-    x,y,train_size=0.7, random_state=66
-)
+    x,y,train_size=0.7, random_state=66)
 
-# scaler = MinMaxScaler()
+scaler = MinMaxScaler()
 # scaler = StandardScaler()
 # scaler = MaxAbsScaler()
-scaler = RobustScaler()
-scaler.fit(x_train)
-x_train = scaler.transform(x_train)
+# scaler = RobustScaler()
+# scaler.fit(x_train)
+# x_train = scaler.transform(x_train)
+
+x_trian = scaler.fit_transform(x_train) # 핏 트랜스폼 한번에 돌리기도 가능
 x_test = scaler.transform(x_test)
 print(np.min(x_train))  # 0.0
 print(np.max(x_train))  # 1.0

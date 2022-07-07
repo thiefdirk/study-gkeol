@@ -1,4 +1,4 @@
-from tensorflow.python.keras.models import Sequential, Model
+from tensorflow.python.keras.models import Sequential, Model, load_model
 from tensorflow.python.keras.layers import Dense, Input
 import matplotlib.pyplot as plt
 from sklearn import datasets
@@ -37,6 +37,9 @@ print(np.max(x_test))  # 1.0
 
 #2. 모델구성
 
+# model = load_model("./_save/keras22_hamsu01_boston.h5")
+
+
 # model = Sequential()
 # model.add(Dense(20, input_dim=13))
 # model.add(Dense(30, activation='sigmoid'))
@@ -70,6 +73,8 @@ model.fit(x_train, y_train, epochs=3000, batch_size=100,
                  callbacks=[earlyStopping],
                  verbose=1)
 
+model.save("./_save/keras22_hamsu01_boston.h5")
+
 #4. 평가, 예측
 
 
@@ -86,3 +91,6 @@ print('r2스코어 : ', r2)
 
 # loss :  11.531048774719238
 # r2스코어 :  0.8604278190790369
+
+# loss :  [11.603978157043457, 2.4175617694854736]
+# r2스코어 :  0.859545071136829

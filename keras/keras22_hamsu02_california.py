@@ -1,5 +1,5 @@
 from sklearn.model_selection import train_test_split
-from tensorflow.python.keras.models import Sequential, Model
+from tensorflow.python.keras.models import Sequential, Model, load_model
 from tensorflow.python.keras.layers import Dense, Input
 import matplotlib.pyplot as plt
 from matplotlib import font_manager, rc
@@ -45,6 +45,9 @@ print(np.max(x_test))  # 1.0
 
 
 #2. 모델구성
+
+# model = load_model("./_save/keras22_hamsu02_california.h5")
+
 # model = Sequential()
 # model.add(Dense(20, input_dim=8,activation='sigmoid'))
 # model.add(Dense(30,activation='relu'))
@@ -79,6 +82,8 @@ hist = model.fit(x_train, y_train, epochs=3000, batch_size=1000,
 
 end_time = time.time()
 
+model.save("./_save/keras22_hamsu02_california.h5")
+
 #4. 평가, 예측
 loss = model.evaluate(x_test, y_test)
 y_predict = model.predict(x_test)
@@ -96,4 +101,5 @@ print('r2스코어 : ', r2)
 # loss :  0.2707752585411072
 # r2스코어 :  0.8057657243030926
 
-
+# loss :  [0.2925138473510742, 0.33528944849967957]
+# r2스코어 :  0.7901720946372207

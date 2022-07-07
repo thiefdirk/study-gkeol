@@ -74,6 +74,8 @@ print(np.max(x_test))  # 1.0
 
 #2. 모델
 
+# model = load_model("./_save/keras22_hamsu08_fetch_covtype.h5")
+
 # model = Sequential()
 # model.add(Dense(30, input_dim=54, activation='relu')) #sigmoid : 이진분류일때 아웃풋에 activation = 'sigmoid' 라고 넣어줘서 아웃풋 값 범위를 0에서 1로 제한해줌
 # model.add(Dense(20, activation='sigmoid'))               # 출력이 0 or 1으로 나와야되기 때문, 그리고 최종으로 나온 값에 반올림을 해주면 0 or 1 완성
@@ -95,13 +97,15 @@ model = Model(inputs=input1, outputs=output1)
 model.compile(loss='categorical_crossentropy', optimizer='adam', # 다중 분류에서는 로스함수를 'categorical_crossentropy' 로 써준다 (99퍼센트로)
               metrics=['accuracy'])
 
-es = EarlyStopping(monitor='val_loss', patience=300, mode='auto', verbose=1, 
+es = EarlyStopping(monitor='val_loss', patience=100, mode='auto', verbose=1, 
                               restore_best_weights=True)   
 
 model.fit(x_train, y_train, epochs=2000, batch_size=2000,
                  validation_split=0.2,
                  callbacks=[es],
                  verbose=1)
+
+model.save("./_save/keras22_hamsu08_fetch_covtype.h5")
 
 #4. 평가, 예측
 # loss, acc= model.evaluate(x_test, y_test)
@@ -127,3 +131,6 @@ print('acc스코어 : ', acc)
 
 # loss :  0.31770646572113037
 # acc스코어 :  0.8707029098586377
+
+# loss :  0.3139004409313202
+# acc스코어 :  0.8732903433082431

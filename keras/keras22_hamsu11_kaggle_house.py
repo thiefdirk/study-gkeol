@@ -246,6 +246,9 @@ print(np.max(x_test))  # 1.0
 
 
 #2. 모델구성
+
+# model = load_model("./_save/keras22_hamsu11_kaggle_house.h5")
+
 # model = Sequential()
 # model.add(Dense(80, input_dim=12))
 # model.add(Dense(100,activation='relu'))
@@ -270,6 +273,8 @@ earlyStopping = EarlyStopping(monitor='val_loss', patience=500, mode='min', verb
 
 model.compile(loss='mse', optimizer='adam', metrics=['mae'])
 model.fit(x_train, y_train, epochs=4000, batch_size=100, verbose=1, validation_split=0.2, callbacks=[earlyStopping])
+
+model.save("./_save/keras22_hamsu11_kaggle_house.h5")
 
 #4. 평가, 예측
 loss = model.evaluate(x_test, y_test) 
@@ -311,3 +316,7 @@ print('r2스코어 : ', r2)
 # loss :  [619659136.0, 17251.5703125]
 # RMSE :  24892.95172195353
 # r2스코어 :  0.8682493638526246
+
+# loss :  [612524096.0, 16987.072265625]
+# RMSE :  24749.224372671073
+# r2스코어 :  0.8697663798273331

@@ -1,5 +1,5 @@
 from sklearn.model_selection import train_test_split
-from tensorflow.python.keras.models import Sequential, Model
+from tensorflow.python.keras.models import Sequential, Model, load_model
 from tensorflow.python.keras.layers import Dense, Input
 import matplotlib.pyplot as plt
 from matplotlib import font_manager, rc
@@ -38,6 +38,9 @@ print(np.max(x_test))  # 1.0
 
 
 #2. 모델구성
+
+# model = load_model("./_save/keras22_hamsu03_diabets.h5")
+
 # model = Sequential()
 # model.add(Dense(200, input_dim=10))
 # model.add(Dense(300))
@@ -70,6 +73,8 @@ print(hist)
 
 end_time = time.time()
 
+model.save("./_save/keras22_hamsu03_diabets.h5")
+
 #4. 평가, 예측
 loss = model.evaluate(x_test, y_test)
 y_predict = model.predict(x_test)
@@ -86,3 +91,6 @@ print('r2스코어 : ', r2)
 
 # loss :  2132.549072265625
 # r2스코어 :  0.677043978287722
+
+# loss :  [1966.503662109375, 34.46048355102539]   
+# r2스코어 :  0.7021901376455495
