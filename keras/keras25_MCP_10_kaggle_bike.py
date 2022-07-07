@@ -10,6 +10,15 @@ from sklearn.preprocessing import MinMaxScaler, StandardScaler
 from sklearn.preprocessing import MaxAbsScaler, RobustScaler
 import datetime as dt
 
+###########################폴더 생성시 현재 파일명으로 자동생성###########################################
+import inspect, os
+a = inspect.getfile(inspect.currentframe()) #현재 파일이 위치한 경로 + 현재 파일 명
+print(a)
+print(os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))) #현재 파일이 위치한 경로
+print(a.split("\\")[-1]) #현재 파일 명
+current_name = a.split("\\")[-1]
+##########################밑에 filepath경로에 추가로  + current_name + '/' 삽입해야 돌아감#######################
+
 #1. 데이터
 path = './_data/kaggle_bike/'
 train_set = pd.read_csv(path + 'train.csv') # + 명령어는 문자를 앞문자와 더해줌  index_col=n n번째 컬럼을 인덱스로 인식
@@ -77,11 +86,7 @@ scaler.fit(x_train)
 x_train = scaler.transform(x_train)
 x_test = scaler.transform(x_test)
 test_set = scaler.transform(test_set)
-print(np.min(x_train))  # 0.0
-print(np.max(x_train))  # 1.0
 
-print(np.min(x_test))  # 1.0
-print(np.max(x_test))  # 1.0
 
 
 
@@ -106,15 +111,28 @@ model = Model(inputs=input1, outputs=output1)
 
 
 #3. 컴파일, 훈련
-
-from tensorflow.python.keras.callbacks import EarlyStopping
-earlyStopping = EarlyStopping(monitor='val_loss', patience=500, mode='min', verbose=1, 
-                              restore_best_weights=True)
-
 model.compile(loss='mse', optimizer='adam', metrics=['mae'])
-model.fit(x_train, y_train, epochs=800, batch_size=100, verbose=1,validation_split=0.2, callbacks=[earlyStopping])
+from tensorflow.python.keras.callbacks import EarlyStopping, ModelCheckpoint
+import datetime
+date = datetime.datetime.now()
+date = date.strftime("%m%d_%H%M") # 0707_1723
+print(date)
 
-model.save("./_save/keras22_hamsu10_kaggle_bike.h5")
+filepath = './_ModelCheckPoint/' + current_name + '/'
+filename = '{epoch:04d}-{val_loss:.4f}.hdf5'
+
+earlyStopping = EarlyStopping(monitor='val_loss', patience=100, mode='auto', verbose=1, 
+                              restore_best_weights=True)        
+
+mcp = ModelCheckpoint(monitor='val_loss', mode='auto', verbose=1, save_best_only=True, 
+                      filepath= "".join([filepath, date, '_', filename])
+                      )
+
+hist = model.fit(x_train, y_train, epochs=1000, batch_size=100,
+                 validation_split=0.2,
+                 callbacks=[earlyStopping, mcp],
+                 verbose=1)
+
 
 #4. 평가, 예측
 loss = model.evaluate(x, y) 
@@ -149,12 +167,3 @@ print('r2스코어 : ', r2)
 
 
 # submission_set.to_csv(path + 'submission_robust_scaler.csv', index = True)
-
-# 스탠다드
-# loss :  [44807.94140625, 156.9504852294922]
-# RMSE :  40.385026096679304
-# r2스코어 :  0.9501360120892682
-
-# loss :  [77177.328125, 218.48867797851562]
-# RMSE :  42.06061976287204
-# r2스코어 :  0.945912412806713

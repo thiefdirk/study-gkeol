@@ -12,6 +12,15 @@ from sklearn.preprocessing import LabelEncoder, OneHotEncoder
 from sklearn.preprocessing import MinMaxScaler, StandardScaler
 from sklearn.preprocessing import MaxAbsScaler, RobustScaler
 
+###########################폴더 생성시 현재 파일명으로 자동생성###########################################
+import inspect, os
+a = inspect.getfile(inspect.currentframe()) #현재 파일이 위치한 경로 + 현재 파일 명
+print(a)
+print(os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))) #현재 파일이 위치한 경로
+print(a.split("\\")[-1]) #현재 파일 명
+current_name = a.split("\\")[-1]
+##########################밑에 filepath경로에 추가로  + current_name + '/' 삽입해야 돌아감#######################
+
 
 #1. 데이터
 path = './_data/kaggle_house/'
@@ -266,15 +275,27 @@ model = Model(inputs=input1, outputs=output1)
 
 
 #3. 컴파일, 훈련
-
-from tensorflow.python.keras.callbacks import EarlyStopping
-earlyStopping = EarlyStopping(monitor='val_loss', patience=500, mode='min', verbose=1, 
-                              restore_best_weights=True)
-
 model.compile(loss='mse', optimizer='adam', metrics=['mae'])
-model.fit(x_train, y_train, epochs=4000, batch_size=100, verbose=1, validation_split=0.2, callbacks=[earlyStopping])
+from tensorflow.python.keras.callbacks import EarlyStopping, ModelCheckpoint
+import datetime
+date = datetime.datetime.now()
+date = date.strftime("%m%d_%H%M") # 0707_1723
+print(date)
 
-model.save("./_save/keras22_hamsu11_kaggle_house.h5")
+filepath = './_ModelCheckPoint/' + current_name + '/'
+filename = '{epoch:04d}-{val_loss:.4f}.hdf5'
+
+earlyStopping = EarlyStopping(monitor='val_loss', patience=100, mode='auto', verbose=1, 
+                              restore_best_weights=True)        
+
+mcp = ModelCheckpoint(monitor='val_loss', mode='auto', verbose=1, save_best_only=True, 
+                      filepath= "".join([filepath, date, '_', filename])
+                      )
+
+hist = model.fit(x_train, y_train, epochs=1000, batch_size=100,
+                 validation_split=0.2,
+                 callbacks=[earlyStopping, mcp],
+                 verbose=1)
 
 #4. 평가, 예측
 loss = model.evaluate(x_test, y_test) 
@@ -307,16 +328,3 @@ print('r2스코어 : ', r2)
 
 
 # submission_set.to_csv(path + 'submission_robust.csv', index = True)
-
-# 스탠다드
-# loss :  [607278016.0, 17240.154296875]
-# RMSE :  24643.01084320446
-# r2스코어 :  0.870881799880869
-
-# loss :  [619659136.0, 17251.5703125]
-# RMSE :  24892.95172195353
-# r2스코어 :  0.8682493638526246
-
-# loss :  [612524096.0, 16987.072265625]
-# RMSE :  24749.224372671073
-# r2스코어 :  0.8697663798273331
