@@ -39,20 +39,27 @@ model.summary()
 model.compile(loss='mse', optimizer='adam')
 
 from tensorflow.python.keras.callbacks import EarlyStopping, ModelCheckpoint
-earlyStopping = EarlyStopping(monitor='val_loss', patience=300, mode='auto', verbose=1, 
+import datetime
+date = datetime.datetime.now()
+date = date.strftime("%m%d_%H%M") # 0707_1723
+print(date)
+
+filepath = './_ModelCheckPoint/'
+filename = '{epoch:04d}-{val_loss:.4f}.hdf5'
+
+earlyStopping = EarlyStopping(monitor='val_loss', patience=10, mode='auto', verbose=1, 
                               restore_best_weights=True)        
 
 mcp = ModelCheckpoint(monitor='val_loss', mode='auto', verbose=1, save_best_only=True, 
-                      filepath='./_ModelCheckPoint/keras24_ModelCheckPoint3.hdf5')
+                      filepath= "".join([filepath, 'k24_', date, '_', filename])
+                      )
 
-hist = model.fit(x_train, y_train, epochs=1000, batch_size=100,
+hist = model.fit(x_train, y_train, epochs=100, batch_size=100,
                  validation_split=0.2,
                  callbacks=[earlyStopping, mcp],
                  verbose=1)
 
 end_time = time.time() - start_time
-
-model.save('./_save/keras24_3_save_model.h5')
 
 
 #4. 평가, 예측
@@ -66,6 +73,27 @@ print('loss : ' , loss)
 print('r2스코어 : ', r2)
 print("걸린시간 : ", end_time)
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+'''
 print("=============================2. load_model 출력=================================")
 model2 = load_model('./_save/keras24_3_save_model.h5')
 loss2 = model2.evaluate(x_test, y_test)
@@ -99,3 +127,5 @@ print('r2스코어 : ', r2)
 
 # loss3 :  7.460868835449219
 # r2스코어 :  0.910736941916507
+
+'''
