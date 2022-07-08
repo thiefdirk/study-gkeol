@@ -7,6 +7,7 @@ import pandas as pd
 from tensorflow.keras.utils import to_categorical # https://wikidocs.net/22647 케라스 원핫인코딩
 from sklearn.preprocessing import OneHotEncoder  # https://psystat.tistory.com/136 싸이킷런 원핫인코딩
 from sklearn.metrics import r2_score, accuracy_score
+from sklearn.preprocessing import MinMaxScaler, StandardScaler, MaxAbsScaler, RobustScaler
 
 
 
@@ -25,10 +26,26 @@ current_name = a.split("\\")[-1]
 print(x_train.shape, y_train.shape) #(60000, 28, 28) (60000,)
 print(x_test.shape, y_test.shape) #(10000, 28, 28) (10000,)
 
+###################리세이프#######################
 x_train = x_train.reshape(60000, 28, 28, 1)
 x_test = x_test.reshape(10000, 28, 28, 1)
 print(x_train.shape)
 print(np.unique(y_train, return_counts=True))
+#################################################
+
+#####################XXXXX스케일러XXXXX######################
+# scaler = MinMaxScaler()
+# scaler = StandardScaler()
+# scaler = MaxAbsScaler()
+# scaler = RobustScaler()
+# x_train = scaler.fit_transform(x_train)
+# x_test = scaler.transform(x_test)
+#################################################
+
+####################겟더미#######################
+# y = pd.get_dummies(y)  #겟더미는 y_predict 할때 np아니고 tf.argmax로 바꾸기
+# print(y)
+################################################
 
 # ####################원핫인코더###################
 # df = pd.DataFrame(y)
@@ -80,24 +97,29 @@ model.add(Dense(10, activation='softmax'))
 # x = x.reshape(10,2) 현재 데이터를 순서대로 표기된 행렬로 바꿈
 
 #3. 컴파일, 훈련
-model.compile(loss='mse', optimizer='adam', metrics=['mae'])
+model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
 from tensorflow.python.keras.callbacks import EarlyStopping, ModelCheckpoint
 import datetime
 date = datetime.datetime.now()
 date = date.strftime("%m%d_%H%M") # 0707_1723
 print(date)
 
-filepath = './_ModelCheckPoint/' + current_name + '/'
+save_filepath = './_ModelCheckPoint/' + current_name + '/'
+load_filepath = './_ModelCheckPoint/' + current_name + '/'
+
+# model = load_model(load_filepath + '0708_1753_0011-0.0731.hdf5')
+
+
 filename = '{epoch:04d}-{val_loss:.4f}.hdf5'
 
 earlyStopping = EarlyStopping(monitor='val_loss', patience=100, mode='auto', verbose=1, 
                               restore_best_weights=True)        
 
 mcp = ModelCheckpoint(monitor='val_loss', mode='auto', verbose=1, save_best_only=True, 
-                      filepath= "".join([filepath, date, '_', filename])
+                      filepath= "".join([save_filepath, date, '_', filename])
                       )
 
-hist = model.fit(x_train, y_train, epochs=1000, batch_size=100,
+hist = model.fit(x_train, y_train, epochs=1000, batch_size=1000,
                  validation_split=0.2,
                  callbacks=[earlyStopping, mcp],
                  verbose=1)
@@ -107,6 +129,12 @@ loss = model.evaluate(x_test, y_test)
 print('loss : ', loss)
 
 y_predict = model.predict(x_test)
+y_predict = np.argmax(y_predict, axis= 1)
+y_predict = to_categorical(y_predict)
+
 
 acc = accuracy_score(y_test, y_predict)
 print('acc스코어 : ', acc)
+
+# loss :  [0.06361404806375504, 0.983299970626831]
+# acc스코어 :  0.9833
