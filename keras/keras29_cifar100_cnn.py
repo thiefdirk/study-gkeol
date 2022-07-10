@@ -29,9 +29,6 @@ print(np.unique(y_train, return_counts=True)) # [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
 print(np.unique(y_test, return_counts=True))
 
 
-plt.imshow(x_train[5])
-plt.show()
-'''
 # ###################리세이프#######################
 # x_train = x_train.reshape(60000, 28, 28, 1)
 # x_test = x_test.reshape(10000, 28, 28, 1)
@@ -95,6 +92,7 @@ model.add(Conv2D(200, (2,2),
                  activation='relu'))
 model.add(Flatten())  # (N, 5408)
 model.add(Dense(300, activation='relu'))
+model.add(Dense(300, activation='relu'))
 model.add(Dense(200, activation='relu'))
 model.add(Dense(100, activation='softmax'))
 
@@ -143,6 +141,5 @@ print(y_test.shape, y_predict.shape)
 acc = accuracy_score(y_test, y_predict)
 print('acc스코어 : ', acc)
 
-# loss :  [3.662278890609741, 0.13459999859333038]
-# acc스코어 :  0.1346
-'''
+# loss :  [3.563563585281372, 0.19300000369548798]
+# acc스코어 :  0.193
