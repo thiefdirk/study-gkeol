@@ -107,15 +107,21 @@ model = Sequential()
 # model.add(Dense(10, activation='softmax'))
 
 input1 = Input(shape=(32,32,3))
-dense1 = Dense(30, activation='relu')(input1)
-
-dense2 = Dense(20, activation='sigmoid')(dense1)
-
-dense3 = Dense(20, activation='relu')(dense2)
-
-dense4 = Dense(20, activation='relu')(dense3)
-
-output1 = Dense(10, activation='softmax')(dense4)
+conv2D_1 = Conv2D(64,3, padding='same')(input1)
+MaxP1 = MaxPooling2D()(conv2D_1)
+conv2D_2 = Conv2D(100,2, padding='valid',
+                  activation='relu')(MaxP1)
+MaxP2 = MaxPooling2D()(conv2D_2)
+conv2D_3 = Conv2D(100,2, padding='valid',
+                  activation='relu')(MaxP2)
+flatten = Flatten()(conv2D_3)
+dense1 = Dense(20)(flatten)
+batchnorm1 = BatchNormalization()(dense1)
+activ1 = Activation('relu')(batchnorm1)
+dense2 = Dense(20)(activ1)
+batchnorm2 = BatchNormalization()(dense2)
+activ2 = Activation('relu')(batchnorm2)
+output1 = Dense(10, activation='softmax')(activ2)
 model = Model(inputs=input1, outputs=output1)   
 
 # # (kernel_size * channels +bias) * filters = summary param # (CNN모델)
