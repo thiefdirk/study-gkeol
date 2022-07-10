@@ -1,6 +1,7 @@
+import tensorflow as tf
 from warnings import filters
-from tensorflow.python.keras.models import Sequential
-from tensorflow.python.keras.layers import Dense, Conv2D, Flatten, MaxPooling2D
+from tensorflow.python.keras.models import Sequential, Model
+from tensorflow.python.keras.layers import Activation, Dense, Conv2D, Flatten, MaxPooling2D, Input
 from keras.datasets import mnist, fashion_mnist, cifar10, cifar100
 import numpy as np
 import pandas as pd
@@ -8,9 +9,8 @@ from tensorflow.keras.utils import to_categorical # https://wikidocs.net/22647 �
 from sklearn.preprocessing import OneHotEncoder  # https://psystat.tistory.com/136 싸이킷런 원핫인코딩
 from sklearn.metrics import r2_score, accuracy_score
 from sklearn.preprocessing import MinMaxScaler, StandardScaler, MaxAbsScaler, RobustScaler
-
 from keras.layers import BatchNormalization
-from keras.layers import Activation
+
 
 
 
@@ -83,28 +83,40 @@ model = Sequential()
 # (input_dim + bias) * units = summary Param # (Dense 모델)
 
 
-model.add(Conv2D(filters = 64, kernel_size=(3,3), # kernel_size = 이미지 분석을위해 2x2로 잘라서 분석하겠다~
-                 padding='same', # padding : 커널 사이즈대로 자르다보면 가생이는 중복되서 분석을 못해주기때문에 행렬을 키워주는것, 패딩을 입혀준다? 이런 너낌
-                 input_shape=(32,32,3))) #  (batch_size, rows, columns, channels)            conv2d : model.add input_shape= (x, y, z) x=가로 픽셀 y=세로픽셀 z= 컬러 흑백
-model.add(MaxPooling2D())
-model.add(Conv2D(100, (2,2), 
-                 padding='valid', # 디폴트 값
-                 activation='relu'))
-model.add(MaxPooling2D())
+# model.add(Conv2D(filters = 64, kernel_size=(3,3), # kernel_size = 이미지 분석을위해 2x2로 잘라서 분석하겠다~
+#                  padding='same', # padding : 커널 사이즈대로 자르다보면 가생이는 중복되서 분석을 못해주기때문에 행렬을 키워주는것, 패딩을 입혀준다? 이런 너낌
+#                  input_shape=(32,32,3))) #  (batch_size, rows, columns, channels)            conv2d : model.add input_shape= (x, y, z) x=가로 픽셀 y=세로픽셀 z= 컬러 흑백
+# model.add(MaxPooling2D())
+# model.add(Conv2D(100, (2,2), 
+#                  padding='valid', # 디폴트 값
+#                  activation='relu'))
+# model.add(MaxPooling2D())
 
-model.add(Conv2D(100, (2,2), 
-                 padding='valid', # 디폴트 값
-                 activation='relu'))
-model.add(Flatten())  # (N, 5408)
-model.add(Dense(20))
-model.add(BatchNormalization())
-model.add(Activation('relu'))
+# model.add(Conv2D(100, (2,2), 
+#                  padding='valid', # 디폴트 값
+#                  activation='relu'))
+# model.add(Flatten())  # (N, 5408)
+# model.add(Dense(20))
+# model.add(BatchNormalization())
+# model.add(Activation('relu'))
 
-model.add(Dense(20))
-model.add(BatchNormalization())
-model.add(Activation('relu'))
+# model.add(Dense(20))
+# model.add(BatchNormalization())
+# model.add(Activation('relu'))
 
-model.add(Dense(10, activation='softmax'))
+# model.add(Dense(10, activation='softmax'))
+
+input1 = Input(shape=(32,32,3))
+dense1 = Dense(30, activation='relu')(input1)
+
+dense2 = Dense(20, activation='sigmoid')(dense1)
+
+dense3 = Dense(20, activation='relu')(dense2)
+
+dense4 = Dense(20, activation='relu')(dense3)
+
+output1 = Dense(10, activation='softmax')(dense4)
+model = Model(inputs=input1, outputs=output1)   
 
 # # (kernel_size * channels +bias) * filters = summary param # (CNN모델)
 
@@ -133,7 +145,7 @@ mcp = ModelCheckpoint(monitor='val_loss', mode='auto', verbose=1, save_best_only
                       filepath= "".join([save_filepath, date, '_', filename])
                       )
 
-hist = model.fit(x_train, y_train, epochs=10, batch_size=1000,
+model.fit(x_train, y_train, epochs=45, batch_size=32,
                  validation_split=0.2,
                  callbacks=[earlyStopping, mcp],
                  verbose=1)
