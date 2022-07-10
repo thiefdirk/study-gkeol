@@ -107,21 +107,22 @@ model = Sequential()
 # model.add(Dense(10, activation='softmax'))
 
 input1 = Input(shape=(32,32,3))
-conv2D_1 = Conv2D(64,3, padding='same')(input1)
+conv2D_1 = Conv2D(10,3, padding='same')(input1)
 MaxP1 = MaxPooling2D()(conv2D_1)
-conv2D_2 = Conv2D(100,2, padding='valid',
+conv2D_2 = Conv2D(20,2, padding='valid',
                   activation='relu')(MaxP1)
 MaxP2 = MaxPooling2D()(conv2D_2)
-conv2D_3 = Conv2D(100,2, padding='valid',
-                  activation='relu')(MaxP2)
-flatten = Flatten()(conv2D_3)
-dense1 = Dense(20)(flatten)
+flatten = Flatten()(MaxP2)
+dense1 = Dense(200)(flatten)
 batchnorm1 = BatchNormalization()(dense1)
 activ1 = Activation('relu')(batchnorm1)
-dense2 = Dense(20)(activ1)
+dense2 = Dense(100)(activ1)
 batchnorm2 = BatchNormalization()(dense2)
 activ2 = Activation('relu')(batchnorm2)
-output1 = Dense(10, activation='softmax')(activ2)
+dense3 = Dense(100)(activ2)
+batchnorm3 = BatchNormalization()(dense3)
+activ3 = Activation('relu')(batchnorm3)
+output1 = Dense(10, activation='softmax')(activ3)
 model = Model(inputs=input1, outputs=output1)   
 
 # # (kernel_size * channels +bias) * filters = summary param # (CNN모델)
@@ -151,7 +152,7 @@ mcp = ModelCheckpoint(monitor='val_loss', mode='auto', verbose=1, save_best_only
                       filepath= "".join([save_filepath, date, '_', filename])
                       )
 
-model.fit(x_train, y_train, epochs=45, batch_size=32,
+model.fit(x_train, y_train, epochs=20, batch_size=32,
                  validation_split=0.2,
                  callbacks=[earlyStopping, mcp],
                  verbose=1)
