@@ -9,6 +9,9 @@ from sklearn.preprocessing import OneHotEncoder  # https://psystat.tistory.com/1
 from sklearn.metrics import r2_score, accuracy_score
 from sklearn.preprocessing import MinMaxScaler, StandardScaler, MaxAbsScaler, RobustScaler
 
+from keras.layers import BatchNormalization
+from keras.layers import Activation
+
 
 
 ###########################폴더 생성시 현재 파일명으로 자동생성###########################################
@@ -87,12 +90,20 @@ model.add(MaxPooling2D())
 model.add(Conv2D(100, (2,2), 
                  padding='valid', # 디폴트 값
                  activation='relu'))
+model.add(MaxPooling2D())
+
 model.add(Conv2D(100, (2,2), 
                  padding='valid', # 디폴트 값
                  activation='relu'))
 model.add(Flatten())  # (N, 5408)
-model.add(Dense(200, activation='relu'))
-model.add(Dense(100, activation='relu'))
+model.add(Dense(20))
+model.add(BatchNormalization())
+model.add(Activation('relu'))
+
+model.add(Dense(20))
+model.add(BatchNormalization())
+model.add(Activation('relu'))
+
 model.add(Dense(10, activation='softmax'))
 
 # # (kernel_size * channels +bias) * filters = summary param # (CNN모델)
@@ -115,14 +126,14 @@ load_filepath = './_ModelCheckPoint/' + current_name + '/'
 
 filename = '{epoch:04d}-{val_loss:.4f}.hdf5'
 
-earlyStopping = EarlyStopping(monitor='val_loss', patience=100, mode='auto', verbose=1, 
+earlyStopping = EarlyStopping(monitor='val_loss', patience=10, mode='auto', verbose=1, 
                               restore_best_weights=True)        
 
 mcp = ModelCheckpoint(monitor='val_loss', mode='auto', verbose=1, save_best_only=True, 
                       filepath= "".join([save_filepath, date, '_', filename])
                       )
 
-hist = model.fit(x_train, y_train, epochs=1000, batch_size=1000,
+hist = model.fit(x_train, y_train, epochs=10, batch_size=1000,
                  validation_split=0.2,
                  callbacks=[earlyStopping, mcp],
                  verbose=1)

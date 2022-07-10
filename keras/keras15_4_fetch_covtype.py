@@ -9,9 +9,9 @@ from tensorflow.python.keras.callbacks import EarlyStopping
 from sklearn.metrics import r2_score, accuracy_score
 import matplotlib.pyplot as plt
 from matplotlib import font_manager, rc
-font_path = "C:/Windows/Fonts/gulim.TTc"
-font = font_manager.FontProperties(fname=font_path).get_name()
-rc('font', family=font)
+# font_path = "C:/Windows/Fonts/gulim.TTc"
+# font = font_manager.FontProperties(fname=font_path).get_name()
+# rc('font', family=font)
 from tensorflow.keras.utils import to_categorical # https://wikidocs.net/22647 케라스 원핫인코딩
 from sklearn.preprocessing import OneHotEncoder  # https://psystat.tistory.com/136 싸이킷런 원핫인코딩
 from sklearn.datasets import fetch_covtype
@@ -48,6 +48,7 @@ print(df)
 oh = OneHotEncoder(sparse=False) # sparse=true 는 매트릭스반환 False는 array 반환
 y = oh.fit_transform(df)
 print(y)
+print(y.shape)
 ################################################
 
 
@@ -60,7 +61,7 @@ print(y_test)
 print(y_train)
 print(y)
 
-
+'''
 #2. 모델
 
 model = Sequential()
@@ -117,3 +118,4 @@ print('acc스코어 : ', acc)
 
 # loss :  0.5174677968025208
 # acc스코어 :  0.781129520837158
+'''

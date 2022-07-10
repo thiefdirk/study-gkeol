@@ -9,9 +9,9 @@ from tensorflow.python.keras.callbacks import EarlyStopping
 from sklearn.metrics import r2_score, accuracy_score
 import matplotlib.pyplot as plt
 from matplotlib import font_manager, rc
-font_path = "C:/Windows/Fonts/gulim.TTc"
-font = font_manager.FontProperties(fname=font_path).get_name()
-rc('font', family=font)
+# font_path = "C:/Windows/Fonts/gulim.TTc"
+# font = font_manager.FontProperties(fname=font_path).get_name()
+# rc('font', family=font)
 from tensorflow.keras.utils import to_categorical # https://wikidocs.net/22647 케라스 원핫인코딩
 from sklearn.preprocessing import OneHotEncoder  # https://psystat.tistory.com/136 싸이킷런 원핫인코딩
 
@@ -29,8 +29,11 @@ print(x)
 print(y)
 print(x.shape,y.shape) # (150, 4) (150,)
 print("y의 라벨값 : ", np.unique(y))  # y의 라벨값 :  [0 1 2]
-y = to_categorical(y) # https://wikidocs.net/22647 케라스 원핫인코딩
+# y = to_categorical(y) # https://wikidocs.net/22647 케라스 원핫인코딩
+
+y = pd.get_dummies(y)  #겟더미는 y_predict 할때 np아니고 tf.argmax로 바꾸기
 print(y)
+
 print(y.shape) #(150, 3)
 
 
@@ -39,8 +42,8 @@ x_train, x_test, y_train, y_test = train_test_split(x,y,
                                                     random_state=66
                                                     )
 
-# print(y_test)
-# print(y_train)
+print(y_test)
+print(y_train)
 
 
 #2. 모델
@@ -85,7 +88,7 @@ print(y_test)
 y_predict = np.argmax(y_predict, axis= 1)
 print(y_predict)
 print(y_test)
-y_test = np.argmax(y_test, axis= 1)
+y_test = tf.argmax(y_test, axis= 1)
 print(y_predict)
 print(y_test)
 
@@ -95,7 +98,7 @@ print(y_test)
 
 acc= accuracy_score(y_test, y_predict)
 print('acc스코어 : ', acc) 
-'''
+
 # plt.figure(figsize=(9,6))
 # plt.plot(hist.history['loss'], marker='.', label='loss', color='red')
 # plt.plot(hist.history['val_loss'], marker='.', label='val_loss', color='blue')
@@ -108,4 +111,3 @@ print('acc스코어 : ', acc)
 
 # loss :  0.05714249983429909
 # accuracy :  1.0
-'''
