@@ -3,7 +3,7 @@ from sklearn.preprocessing import MaxAbsScaler, RobustScaler
 import numpy as np
 import pandas as pd
 from sqlalchemy import true #pandas : 엑셀땡겨올때 씀
-from tensorflow.python.keras.models import Sequential, Model
+from tensorflow.python.keras.models import Sequential, Model, load_model
 from tensorflow.python.keras.layers import Activation, Dense, Conv2D, Flatten, MaxPooling2D, Input, Dropout
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import r2_score, mean_squared_error
@@ -77,7 +77,7 @@ print(test_set2)
 
 
 
-###############################
+###############프로모션 결측치 처리###############
 
 train_set2 = train_set2.fillna(0)
 test_set2 = test_set2.fillna(0)
@@ -95,22 +95,26 @@ y = train_set2['Weekly_Sales']
 
 
 x_train, x_test, y_train, y_test = train_test_split(x,y,
-                                                    train_size=0.8,
+                                                    train_size=0.7,
                                                     random_state=66
                                                     )
 
 
-
 scaler = MinMaxScaler()
+# scaler = StandardScaler()
+# scaler = MaxAbsScaler()
+# scaler = RobustScaler()
 scaler.fit(x_train)
 x_train = scaler.transform(x_train)
 x_test = scaler.transform(x_test)
 test_set2 = scaler.transform(test_set2)
 
+print(test_set2)
 
-#2. 모델구성
+
+# 2. 모델구성
 input1 = Input(shape=(77,))
-dense1 = Dense(200)(input1)
+dense1 = Dense(50)(input1)
 batchnorm1 = BatchNormalization()(dense1)
 activ1 = Activation('relu')(batchnorm1)
 drp4 = Dropout(0.2)(activ1)
@@ -118,15 +122,20 @@ dense2 = Dense(100)(drp4)
 batchnorm2 = BatchNormalization()(dense2)
 activ2 = Activation('relu')(batchnorm2)
 drp5 = Dropout(0.2)(activ2)
-dense3 = Dense(100)(drp5)
+dense3 = Dense(150)(drp5)
 batchnorm3 = BatchNormalization()(dense3)
 activ3 = Activation('relu')(batchnorm3)
 drp6 = Dropout(0.2)(activ3)
-output1 = Dense(1)(drp6)
+dense4 = Dense(100)(drp6)
+batchnorm4 = BatchNormalization()(dense4)
+activ4 = Activation('relu')(batchnorm4)
+drp7 = Dropout(0.2)(activ4)
+output1 = Dense(1)(drp7)
 model = Model(inputs=input1, outputs=output1)   
 
 
 #3. 컴파일, 훈련
+
 
 model.compile(loss='mse', optimizer='adam', metrics=['mae'])
 
@@ -139,23 +148,23 @@ print(date)
 save_filepath = './_ModelCheckPoint/' + current_name + '/'
 load_filepath = './_ModelCheckPoint/' + current_name + '/'
 
-# model = load_model(load_filepath + '0707_1753_0096-20.8518.hdf5')
-
 
 filename = '{epoch:04d}-{val_loss:.4f}.hdf5'
 
-earlyStopping = EarlyStopping(monitor='val_loss', patience=100, mode='auto', verbose=1, 
+earlyStopping = EarlyStopping(monitor='val_loss', patience=200, mode='auto', verbose=1, 
                               restore_best_weights=True)        
 
 mcp = ModelCheckpoint(monitor='val_loss', mode='auto', verbose=1, save_best_only=True, 
                       filepath= "".join([save_filepath, date, '_', filename])
                       )
 
-hist = model.fit(x_train, y_train, epochs=1000, batch_size=100,
-                 validation_split=0.2,
+hist = model.fit(x_train, y_train, epochs=2000, batch_size=128,
+                 validation_split=0.3,
                  callbacks=[earlyStopping, mcp],
                  verbose=1)
 
+
+# model = load_model(load_filepath + '0711_1732_2300-8791202816.발리데이션0.3.hdf5')
 
 #4. 평가, 예측
 
@@ -176,6 +185,8 @@ print('loss : ', loss)
 print("RMSE : ", rmse)
 print('r2스코어 : ', r2)
 
+print(test_set2)
+
 y_summit = model.predict(test_set2)
 
 print(y_summit)
@@ -190,5 +201,39 @@ submission_set['Weekly_Sales'] = y_summit
 print(submission_set)
 
 
-submission_set.to_csv(path + 'submission.csv', index = True)
+submission_set.to_csv(path + 'submission2000.csv', index = True)
 
+# 민맥스
+# loss :  [12031329280.0, 60506.640625]
+# RMSE :  109687.42480795768
+# r2스코어 :  0.9654250161340566
+
+# 스탠다드
+# loss :  [13667978240.0, 65182.3046875]
+# RMSE :  116910.13121703712
+# r2스코어 :  0.9607217073891772
+
+# 로버스트
+# loss :  [19251437568.0, 76360.9453125]
+# RMSE :  138749.56208955363
+# r2스코어 :  0.9446762579822676
+
+# 맥스앱스
+# loss :  [14230065152.0, 60868.4140625]
+# RMSE :  119289.83618940222
+# r2스코어 :  0.9591064145913685
+
+# 트레인사이즈 0.7 발리데이션 0.3 민맥스
+# loss :  [11345984512.0, 60342.859375]
+# RMSE :  106517.52817997398
+# r2스코어 :  0.966259471816233
+
+# 트레인사이즈 0.8 발리데이션 0.2 민맥스 epochs 2500 페이션스 300
+# loss :  [13296029696.0, 59877.20703125]
+# RMSE :  115308.41749125942
+# r2스코어 :  0.9617905902393659
+
+# 트레인사이즈 0.8 발리데이션 0.1 민맥스 epochs 2500 페이션스 300
+# loss :  [14210052096.0, 60650.4921875]
+# RMSE :  119205.92252226875
+# r2스코어 :  0.9591639270145448

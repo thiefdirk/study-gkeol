@@ -4,7 +4,7 @@ import numpy as np
 import pandas as pd
 from sqlalchemy import true #pandas : 엑셀땡겨올때 씀
 from tensorflow.python.keras.models import Sequential, Model
-from tensorflow.python.keras.layers import Dense, Input
+from tensorflow.python.keras.layers import Activation, Dense, Conv2D, Flatten, MaxPooling2D, Input, Dropout
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import r2_score, mean_squared_error
 
@@ -71,7 +71,14 @@ print(np.max(x_train))  # 1.0
 
 print(np.min(x_test))  # 1.0
 print(np.max(x_test))  # 1.0
-
+print(x_train.shape)
+print(x_test.shape) 
+###################리세이프#######################
+x_train = x_train.reshape(1094, 3, 3, 1)
+x_test = x_test.reshape(365, 3, 3, 1) 
+print(x_train.shape)
+print(np.unique(y_train, return_counts=True))
+#################################################
 
 #2. 모델구성
 
@@ -82,13 +89,27 @@ print(np.max(x_test))  # 1.0
 # model.add(Dense(100, activation='selu'))
 # model.add(Dense(1))
 
-input1 = Input(shape=(9,))
-dense1 = Dense(100, activation='selu')(input1)
-dense2 = Dense(100, activation='selu')(dense1)
-dense3 = Dense(100, activation='selu')(dense2)
-output1 = Dense(1)(dense3)
-model = Model(inputs=input1, outputs=output1)     
-
+model = Sequential()
+model.add(Conv2D(filters = 200, kernel_size=(3,3), # kernel_size = 이미지 분석을위해 2x2로 잘라서 분석하겠다~
+                   padding='same', # padding : 커널 사이즈대로 자르다보면 가생이는 중복되서 분석을 못해주기때문에 행렬을 키워주는것, 패딩을 입혀준다? 이런 너낌
+                   input_shape=(3,3,1)))
+model.add(Conv2D(filters = 200, kernel_size=(3,3), # kernel_size = 이미지 분석을위해 2x2로 잘라서 분석하겠다~
+                   padding='same'))
+model.add(Flatten())
+model.add(Dense(256))
+model.add(Dropout(0.3))
+model.add(Dense(128, activation='relu'))
+model.add(Dropout(0.2))
+model.add(Dense(64, activation='relu'))
+model.add(Dropout(0.2))
+model.add(Dense(32, activation='relu'))
+model.add(Dropout(0.2))
+model.add(Dense(16, activation='relu'))
+model.add(Dropout(0.2))
+model.add(Dense(8, activation='relu'))
+model.add(Dense(1))
+model.summary()
+    
 #3. 컴파일, 훈련
 
 model.compile(loss='mse', optimizer='adam', metrics=['mae'])
@@ -115,10 +136,10 @@ hist = model.fit(x_train, y_train, epochs=1000, batch_size=100,
                  verbose=1)
 
 #4. 평가, 예측
-loss = model.evaluate(x, y) 
+loss = model.evaluate(x_test, y_test)
 
 
-y_predict = model.predict(x_test)
+y_predict = model.predict(test_set)
 
 def RMSE(a, b): 
     return np.sqrt(mean_squared_error(a, b))
