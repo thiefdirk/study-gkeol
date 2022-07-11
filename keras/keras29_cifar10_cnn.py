@@ -1,7 +1,7 @@
 import tensorflow as tf
 from warnings import filters
 from tensorflow.python.keras.models import Sequential, Model
-from tensorflow.python.keras.layers import Activation, Dense, Conv2D, Flatten, MaxPooling2D, Input
+from tensorflow.python.keras.layers import Activation, Dense, Conv2D, Flatten, MaxPooling2D, Input, Dropout
 from keras.datasets import mnist, fashion_mnist, cifar10, cifar100
 import numpy as np
 import pandas as pd
@@ -30,6 +30,19 @@ print(x_train.shape, y_train.shape) #(50000, 32, 32, 3) (50000, 1)
 print(x_test.shape, y_test.shape) #(10000, 32, 32, 3) (10000, 1)
 print(np.unique(y_train, return_counts=True)) # [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
 print(np.unique(y_test, return_counts=True))
+
+x_train = x_train.astype('float32')
+x_test = x_test.astype('float32')
+x_train = x_train/255
+x_test = x_test/255
+
+mean = np.mean(x_train, axis=(0 , 1 , 2 , 3))
+std = np.std(x_train, axis=(0 , 1 , 2 , 3))
+x_train = (x_train-mean)/std
+x_test = (x_test-mean)/std
+
+print(x_train.shape, x_test.shape)
+
 
 
 # ###################리세이프#######################
@@ -107,22 +120,31 @@ model = Sequential()
 # model.add(Dense(10, activation='softmax'))
 
 input1 = Input(shape=(32,32,3))
-conv2D_1 = Conv2D(10,3, padding='same')(input1)
+conv2D_1 = Conv2D(100,3, padding='same')(input1)
 MaxP1 = MaxPooling2D()(conv2D_1)
-conv2D_2 = Conv2D(20,2, padding='valid',
-                  activation='relu')(MaxP1)
+drp1 = Dropout(0.2)(MaxP1)
+conv2D_2 = Conv2D(200,2,
+                  activation='relu')(drp1)
 MaxP2 = MaxPooling2D()(conv2D_2)
-flatten = Flatten()(MaxP2)
+drp2 = Dropout(0.2)(MaxP2)
+conv2D_3 = Conv2D(200,2, padding='same',
+                  activation='relu')(drp2)
+MaxP3 = MaxPooling2D()(conv2D_3)
+drp3 = Dropout(0.2)(MaxP3)
+flatten = Flatten()(drp3)
 dense1 = Dense(200)(flatten)
 batchnorm1 = BatchNormalization()(dense1)
 activ1 = Activation('relu')(batchnorm1)
-dense2 = Dense(100)(activ1)
+drp4 = Dropout(0.2)(activ1)
+dense2 = Dense(100)(drp4)
 batchnorm2 = BatchNormalization()(dense2)
 activ2 = Activation('relu')(batchnorm2)
-dense3 = Dense(100)(activ2)
+drp5 = Dropout(0.2)(activ2)
+dense3 = Dense(100)(drp5)
 batchnorm3 = BatchNormalization()(dense3)
 activ3 = Activation('relu')(batchnorm3)
-output1 = Dense(10, activation='softmax')(activ3)
+drp6 = Dropout(0.2)(activ3)
+output1 = Dense(10, activation='softmax')(drp6)
 model = Model(inputs=input1, outputs=output1)   
 
 # # (kernel_size * channels +bias) * filters = summary param # (CNN모델)
@@ -145,15 +167,15 @@ load_filepath = './_ModelCheckPoint/' + current_name + '/'
 
 filename = '{epoch:04d}-{val_loss:.4f}.hdf5'
 
-earlyStopping = EarlyStopping(monitor='val_loss', patience=10, mode='auto', verbose=1, 
+earlyStopping = EarlyStopping(monitor='val_loss', patience=20, mode='auto', verbose=1, 
                               restore_best_weights=True)        
 
 mcp = ModelCheckpoint(monitor='val_loss', mode='auto', verbose=1, save_best_only=True, 
                       filepath= "".join([save_filepath, date, '_', filename])
                       )
 
-model.fit(x_train, y_train, epochs=20, batch_size=32,
-                 validation_split=0.2,
+model.fit(x_train, y_train, epochs=40, batch_size=100,
+                 validation_split=0.15,
                  callbacks=[earlyStopping, mcp],
                  verbose=1)
 
@@ -170,5 +192,5 @@ print(y_test.shape, y_predict.shape)
 acc = accuracy_score(y_test, y_predict)
 print('acc스코어 : ', acc)
 
-# loss :  [1.3055827617645264, 0.5503000020980835]
-# acc스코어 :  0.5503
+# loss :  [0.6992968916893005, 0.7849000096321106]
+# acc스코어 :  0.7849

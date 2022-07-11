@@ -1,6 +1,6 @@
 from warnings import filters
-from tensorflow.python.keras.models import Sequential
-from tensorflow.python.keras.layers import Dense, Conv2D, Flatten, MaxPooling2D
+from tensorflow.python.keras.models import Sequential, Model
+from tensorflow.python.keras.layers import Dense, Conv2D, Flatten, MaxPooling2D, Input, Activation, Dropout
 from keras.datasets import mnist, fashion_mnist, cifar10, cifar100
 import numpy as np
 import pandas as pd
@@ -9,6 +9,7 @@ from sklearn.preprocessing import OneHotEncoder  # https://psystat.tistory.com/1
 from sklearn.metrics import r2_score, accuracy_score
 from sklearn.preprocessing import MinMaxScaler, StandardScaler, MaxAbsScaler, RobustScaler
 import matplotlib.pyplot as plt
+from keras.layers import BatchNormalization
 
 
 ###########################폴더 생성시 현재 파일명으로 자동생성###########################################
@@ -80,21 +81,50 @@ model = Sequential()
 # (input_dim + bias) * units = summary Param # (Dense 모델)
 
 
-model.add(Conv2D(filters = 200, kernel_size=(3,3), # kernel_size = 이미지 분석을위해 2x2로 잘라서 분석하겠다~
-                 padding='same', # padding : 커널 사이즈대로 자르다보면 가생이는 중복되서 분석을 못해주기때문에 행렬을 키워주는것, 패딩을 입혀준다? 이런 너낌
-                 input_shape=(32,32,3))) #  (batch_size, rows, columns, channels)            conv2d : model.add input_shape= (x, y, z) x=가로 픽셀 y=세로픽셀 z= 컬러 흑백
-model.add(MaxPooling2D())
-model.add(Conv2D(200, (2,2), 
-                 padding='same', # 디폴트 값
-                 activation='relu'))
-model.add(Conv2D(200, (2,2), 
-                 padding='valid', # 디폴트 값
-                 activation='relu'))
-model.add(Flatten())  # (N, 5408)
-model.add(Dense(300, activation='relu'))
-model.add(Dense(300, activation='relu'))
-model.add(Dense(200, activation='relu'))
-model.add(Dense(100, activation='softmax'))
+# model.add(Conv2D(filters = 200, kernel_size=(3,3), # kernel_size = 이미지 분석을위해 2x2로 잘라서 분석하겠다~
+#                  padding='same', # padding : 커널 사이즈대로 자르다보면 가생이는 중복되서 분석을 못해주기때문에 행렬을 키워주는것, 패딩을 입혀준다? 이런 너낌
+#                  input_shape=(32,32,3))) #  (batch_size, rows, columns, channels)            conv2d : model.add input_shape= (x, y, z) x=가로 픽셀 y=세로픽셀 z= 컬러 흑백
+# model.add(MaxPooling2D())
+# model.add(Conv2D(200, (2,2), 
+#                  padding='same', # 디폴트 값
+#                  activation='relu'))
+# model.add(Conv2D(200, (2,2), 
+#                  padding='valid', # 디폴트 값
+#                  activation='relu'))
+# model.add(Flatten())  # (N, 5408)
+# model.add(Dense(300, activation='relu'))
+# model.add(Dense(300, activation='relu'))
+# model.add(Dense(200, activation='relu'))
+# model.add(Dense(100, activation='softmax'))
+
+input1 = Input(shape=(32,32,3))
+conv2D_1 = Conv2D(100,3, padding='same')(input1)
+MaxP1 = MaxPooling2D()(conv2D_1)
+drp1 = Dropout(0.2)(MaxP1)
+conv2D_2 = Conv2D(200,2,
+                  activation='relu')(drp1)
+MaxP2 = MaxPooling2D()(conv2D_2)
+drp2 = Dropout(0.2)(MaxP2)
+conv2D_3 = Conv2D(200,2, padding='same',
+                  activation='relu')(drp2)
+MaxP3 = MaxPooling2D()(conv2D_3)
+drp3 = Dropout(0.2)(MaxP3)
+flatten = Flatten()(drp3)
+dense1 = Dense(200)(flatten)
+batchnorm1 = BatchNormalization()(dense1)
+activ1 = Activation('relu')(batchnorm1)
+drp4 = Dropout(0.2)(activ1)
+dense2 = Dense(100)(drp4)
+batchnorm2 = BatchNormalization()(dense2)
+activ2 = Activation('relu')(batchnorm2)
+drp5 = Dropout(0.2)(activ2)
+dense3 = Dense(100)(drp5)
+batchnorm3 = BatchNormalization()(dense3)
+activ3 = Activation('relu')(batchnorm3)
+drp6 = Dropout(0.2)(activ3)
+output1 = Dense(100, activation='softmax')(drp6)
+model = Model(inputs=input1, outputs=output1)   
+
 
 # # (kernel_size * channels +bias) * filters = summary param # (CNN모델)
 
@@ -116,14 +146,14 @@ load_filepath = './_ModelCheckPoint/' + current_name + '/'
 
 filename = '{epoch:04d}-{val_loss:.4f}.hdf5'
 
-earlyStopping = EarlyStopping(monitor='val_loss', patience=300, mode='auto', verbose=1, 
+earlyStopping = EarlyStopping(monitor='val_loss', patience=10, mode='auto', verbose=1, 
                               restore_best_weights=True)        
 
 mcp = ModelCheckpoint(monitor='val_loss', mode='auto', verbose=1, save_best_only=True, 
                       filepath= "".join([save_filepath, date, '_', filename])
                       )
 
-hist = model.fit(x_train, y_train, epochs=2000, batch_size=1000,
+hist = model.fit(x_train, y_train, epochs=10, batch_size=32,
                  validation_split=0.2,
                  callbacks=[earlyStopping, mcp],
                  verbose=1)
@@ -141,5 +171,5 @@ print(y_test.shape, y_predict.shape)
 acc = accuracy_score(y_test, y_predict)
 print('acc스코어 : ', acc)
 
-# loss :  [3.563563585281372, 0.19300000369548798]
-# acc스코어 :  0.193
+# loss :  [3.2603743076324463, 0.2418999969959259]
+# acc스코어 :  0.2419
