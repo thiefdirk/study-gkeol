@@ -10,6 +10,9 @@ from sklearn.metrics import r2_score, mean_squared_error
 from tensorflow.keras.utils import to_categorical
 from sklearn.preprocessing import OneHotEncoder
 from keras.layers import BatchNormalization
+from sklearn.ensemble import RandomForestRegressor
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.model_selection import KFold
 
 ###########################폴더 생성시 현재 파일명으로 자동생성###########################################
 import inspect, os
@@ -23,14 +26,14 @@ current_name = a.split("\\")[-1]
 
 #1. 데이터
 path = './_data/dacon_shopping/'
-train_set = pd.read_csv(path + 'train.csv', # + 명령어는 문자를 앞문자와 더해줌
-                        index_col=0) # index_col=n n번째 컬럼을 인덱스로 인식
+train_set = pd.read_csv(path + 'train.csv' # + 명령어는 문자를 앞문자와 더해줌
+                        ) # index_col=n n번째 컬럼을 인덱스로 인식
 Weekly_Sales = train_set[['Weekly_Sales']]
 print(train_set)
 print(train_set.shape) # (6255, 12)
 
-test_set = pd.read_csv(path + 'test.csv', # 예측에서 쓸거임                
-                       index_col=0)
+test_set = pd.read_csv(path + 'test.csv' # 예측에서 쓸거임                
+                       )
 print(test_set)
 print(test_set.shape) # (180, 11)
 
@@ -40,6 +43,8 @@ print(train_set.describe()) # describe 평균치, 중간값, 최소값 등등 �
 
 train_set.isnull().sum().sort_values(ascending=False)
 test_set.isnull().sum().sort_values(ascending=False)
+
+
 
 ######## 년, 월 ,일 분리 ############
 
@@ -51,11 +56,12 @@ test_set["day"] = [t.dayofweek for t in pd.DatetimeIndex(test_set.Date)]
 test_set["month"] = [t.month for t in pd.DatetimeIndex(test_set.Date)]
 test_set['year'] = [t.year for t in pd.DatetimeIndex(test_set.Date)]
 
-train_set.drop(['Date','Weekly_Sales'],axis=1,inplace=True) # 트레인 세트에서 데이트타임 드랍
-test_set.drop(['Date'],axis=1,inplace=True) # 트레인 세트에서 데이트타임 드랍
+train_set.drop(['id', 'Date','Weekly_Sales'],axis=1,inplace=True) # 트레인 세트에서 데이트타임 드랍
+test_set.drop(['id', 'Date'],axis=1,inplace=True) # 트레인 세트에서 데이트타임 드랍
 
 print(train_set)
 print(test_set)
+
 ##########################################
 
 # ####################원핫인코더###################
@@ -63,7 +69,9 @@ print(test_set)
 df = pd.concat([train_set, test_set])
 print(df)
 
-alldata = pd.get_dummies(df, columns=['day','Store','month', 'year', 'IsHoliday'])
+print(df)
+
+alldata = pd.get_dummies(df, columns=['day','Store','month', 'year'])
 print(alldata)
 
 train_set2 = alldata[:len(train_set)]
@@ -100,40 +108,41 @@ x_train, x_test, y_train, y_test = train_test_split(x,y,
                                                     )
 
 
-scaler = MinMaxScaler()
-# scaler = StandardScaler()
-# scaler = MaxAbsScaler()
-# scaler = RobustScaler()
-scaler.fit(x_train)
-x_train = scaler.transform(x_train)
-x_test = scaler.transform(x_test)
-test_set2 = scaler.transform(test_set2)
+# scaler = MinMaxScaler()
+# # scaler = StandardScaler()
+# # scaler = MaxAbsScaler()
+# # scaler = RobustScaler()
+# scaler.fit(x_train)
+# x_train = scaler.transform(x_train)
+# x_test = scaler.transform(x_test)
+# test_set2 = scaler.transform(test_set2)
 
-print(test_set2)
+# # print(test_set2)
+# print(x_train.info())
+# print(y_train.info())
+# print(train_set2.info())
+
+x_train = x_train.values
+y_train = y_train.values
+
+x_train.astype('int')
+y_train.astype('int')
+
+print(x_train.shape)
+print(y_train.shape)
 
 
 # 2. 모델구성
-input1 = Input(shape=(77,))
-dense1 = Dense(100)(input1)
-batchnorm1 = BatchNormalization()(dense1)
-activ1 = Activation('relu')(batchnorm1)
-drp4 = Dropout(0.2)(activ1)
-dense2 = Dense(100)(drp4)
-batchnorm2 = BatchNormalization()(dense2)
-activ2 = Activation('relu')(batchnorm2)
-drp5 = Dropout(0.2)(activ2)
-dense3 = Dense(150)(drp5)
-batchnorm3 = BatchNormalization()(dense3)
-activ3 = Activation('relu')(batchnorm3)
-drp6 = Dropout(0.2)(activ3)
-dense4 = Dense(100)(drp6)
-batchnorm4 = BatchNormalization()(dense4)
-activ4 = Activation('relu')(batchnorm4)
-drp7 = Dropout(0.2)(activ4)
-output1 = Dense(1)(drp7)
-model = Model(inputs=input1, outputs=output1)   
 
 
+model = RandomForestRegressor()
+model.fit(x_train, y_train)
+
+print(model.score(x_train, y_train))
+print(model.score(x_test, y_test))
+
+
+'''
 #3. 컴파일, 훈련
 
 
@@ -165,11 +174,11 @@ hist = model.fit(x_train, y_train, epochs=3000, batch_size=128,
 
 
 # model = load_model(load_filepath + '0711_1732_2300-8791202816.발리데이션0.3.hdf5')
-
+'''
 #4. 평가, 예측
 
 print("=============================1. 기본 출력=================================")
-loss = model.evaluate(x_test, y_test)
+loss = model.score(x_test, y_test)
 y_predict = model.predict(x_test)
 
 def RMSE(a, b): 
@@ -201,7 +210,7 @@ submission_set['Weekly_Sales'] = y_summit
 print(submission_set)
 
 
-submission_set.to_csv(path + 'submission.csv', index = True)
+submission_set.to_csv(path + 'submission_randomforest.csv', index = True)
 
 # 민맥스
 # loss :  [12031329280.0, 60506.640625]
@@ -242,3 +251,5 @@ submission_set.to_csv(path + 'submission.csv', index = True)
 # loss :  [11314745344.0, 59876.4375]
 # RMSE :  106370.79280402962
 # r2스코어 :  0.9663523676812774
+
+# 랜덤포레스트
