@@ -29,6 +29,20 @@ print(x_test.shape, y_test.shape) #(10000, 32, 32, 3) (10000, 1)
 print(np.unique(y_train, return_counts=True)) # [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
 print(np.unique(y_test, return_counts=True))
 
+x_train = x_train.astype('float32')
+x_test = x_test.astype('float32')
+x_train = x_train/255
+x_test = x_test/255
+
+mean = np.mean(x_train, axis=(0 , 1 , 2 , 3))
+std = np.std(x_train, axis=(0 , 1 , 2 , 3))
+x_train = (x_train-mean)/std
+x_test = (x_test-mean)/std
+
+print(x_train.shape, x_test.shape)
+
+
+
 
 # ###################리세이프#######################
 # x_train = x_train.reshape(60000, 28, 28, 1)
@@ -51,22 +65,27 @@ print(np.unique(y_test, return_counts=True))
 # print(y)
 ################################################
 
-# ####################원핫인코더###################
-# df = pd.DataFrame(y)
-# print(df)
-# oh = OneHotEncoder(sparse=False) # sparse=true 는 매트릭스반환 False는 array 반환
-# y = oh.fit_transform(df)
-# print(y)
-# ################################################
-
-###################케라스########################
-y_train = to_categorical(y_train)
-y_test = to_categorical(y_test)
-print(np.unique(y_train, return_counts=True))
-print(np.unique(y_test, return_counts=True))   # y의 라벨값 :  [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
-print(x_train.shape, y_train.shape) 
-print(x_test.shape, y_test.shape)
+####################원핫인코더###################
+df1 = pd.DataFrame(y_train)
+df2 = pd.DataFrame(y_test)
+print(df1)
+oh = OneHotEncoder(sparse=False) # sparse=true 는 매트릭스반환 False는 array 반환
+y_train = oh.fit_transform(df1)
+y_test = oh.transform(df2)
+print('====================================')
+print(y_train.shape)
+print('====================================')
+print(y_test.shape)
 ################################################
+
+# ###################케라스########################
+# y_train = to_categorical(y_train)
+# y_test = to_categorical(y_test)
+# print(np.unique(y_train, return_counts=True))
+# print(np.unique(y_test, return_counts=True))   # y의 라벨값 :  [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+# print(x_train.shape, y_train.shape) 
+# print(x_test.shape, y_test.shape)
+# ################################################
 
 
 # 맹그러바바바
@@ -153,7 +172,7 @@ mcp = ModelCheckpoint(monitor='val_loss', mode='auto', verbose=1, save_best_only
                       filepath= "".join([save_filepath, date, '_', filename])
                       )
 
-hist = model.fit(x_train, y_train, epochs=10, batch_size=32,
+hist = model.fit(x_train, y_train, epochs=20, batch_size=32,
                  validation_split=0.2,
                  callbacks=[earlyStopping, mcp],
                  verbose=1)
@@ -164,12 +183,14 @@ print('loss : ', loss)
 
 y_predict = model.predict(x_test)
 y_predict = np.argmax(y_predict, axis= 1)
-y_predict = to_categorical(y_predict)
+df3 = pd.DataFrame(y_predict)
+y_predict = oh.transform(df3)
+
 
 print(y_test, y_predict)
 print(y_test.shape, y_predict.shape)
 acc = accuracy_score(y_test, y_predict)
 print('acc스코어 : ', acc)
 
-# loss :  [3.2603743076324463, 0.2418999969959259]
-# acc스코어 :  0.2419
+# loss :  [2.4379518032073975, 0.3725000023841858]
+# acc스코어 :  0.3725

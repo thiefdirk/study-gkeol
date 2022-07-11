@@ -43,14 +43,13 @@ x_test = (x_test-mean)/std
 
 print(x_train.shape, x_test.shape)
 
+###################리세이프#######################
+x_train = x_train.reshape(50000, 3072)
+x_test = x_test.reshape(10000, 3072)
+print(x_train.shape)
+print(np.unique(y_train, return_counts=True))
+#################################################
 
-
-# ###################리세이프#######################
-# x_train = x_train.reshape(60000, 28, 28, 1)
-# x_test = x_test.reshape(10000, 28, 28, 1)
-# print(x_train.shape)
-# print(np.unique(y_train, return_counts=True))
-# #################################################
 
 #####################XXXXX스케일러XXXXX######################
 # scaler = MinMaxScaler()
@@ -95,7 +94,7 @@ print(y_test.shape)
 
 
 #2. 모델구성
-# model = Sequential()
+model = Sequential()
 # model.add(Dense(units=10, input_shape = (3,)))         #  (batch_size, input_dim)             input_shape = (10, 10, 3)
 # model.summary()
 # (input_dim + bias) * units = summary Param # (Dense 모델)
@@ -124,20 +123,8 @@ print(y_test.shape)
 
 # model.add(Dense(10, activation='softmax'))
 
-input1 = Input(shape=(32,32,3))
-conv2D_1 = Conv2D(100,3, padding='same')(input1)
-MaxP1 = MaxPooling2D()(conv2D_1)
-drp1 = Dropout(0.2)(MaxP1)
-conv2D_2 = Conv2D(200,2,
-                  activation='relu')(drp1)
-MaxP2 = MaxPooling2D()(conv2D_2)
-drp2 = Dropout(0.2)(MaxP2)
-conv2D_3 = Conv2D(200,2,
-                  activation='relu')(drp2)
-MaxP3 = MaxPooling2D()(conv2D_3)
-drp3 = Dropout(0.2)(MaxP3)
-flatten = Flatten()(drp3)
-dense1 = Dense(200)(flatten)
+input1 = Input(shape=(3072,))
+dense1 = Dense(200)(input1)
 batchnorm1 = BatchNormalization()(dense1)
 activ1 = Activation('relu')(batchnorm1)
 drp4 = Dropout(0.2)(activ1)
@@ -172,15 +159,15 @@ load_filepath = './_ModelCheckPoint/' + current_name + '/'
 
 filename = '{epoch:04d}-{val_loss:.4f}.hdf5'
 
-earlyStopping = EarlyStopping(monitor='val_loss', patience=10, mode='auto', verbose=1, 
+earlyStopping = EarlyStopping(monitor='val_loss', patience=20, mode='auto', verbose=1, 
                               restore_best_weights=True)        
 
 mcp = ModelCheckpoint(monitor='val_loss', mode='auto', verbose=1, save_best_only=True, 
                       filepath= "".join([save_filepath, date, '_', filename])
                       )
 
-model.fit(x_train, y_train, epochs=25, batch_size=128,
-                 validation_split=0.1,
+model.fit(x_train, y_train, epochs=50, batch_size=100,
+                 validation_split=0.15,
                  callbacks=[earlyStopping, mcp],
                  verbose=1)
 
@@ -198,5 +185,5 @@ print(y_test.shape, y_predict.shape)
 acc = accuracy_score(y_test, y_predict)
 print('acc스코어 : ', acc)
 
-# loss :  [0.6314413547515869, 0.791100025177002]
-# acc스코어 :  0.7911
+# loss :  [1.3374261856079102, 0.5295000076293945]
+# acc스코어 :  0.5295

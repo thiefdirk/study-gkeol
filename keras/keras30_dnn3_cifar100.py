@@ -1,7 +1,6 @@
-import tensorflow as tf
 from warnings import filters
 from tensorflow.python.keras.models import Sequential, Model
-from tensorflow.python.keras.layers import Activation, Dense, Conv2D, Flatten, MaxPooling2D, Input, Dropout
+from tensorflow.python.keras.layers import Dense, Conv2D, Flatten, MaxPooling2D, Input, Activation, Dropout
 from keras.datasets import mnist, fashion_mnist, cifar10, cifar100
 import numpy as np
 import pandas as pd
@@ -9,9 +8,8 @@ from tensorflow.keras.utils import to_categorical # https://wikidocs.net/22647 �
 from sklearn.preprocessing import OneHotEncoder  # https://psystat.tistory.com/136 싸이킷런 원핫인코딩
 from sklearn.metrics import r2_score, accuracy_score
 from sklearn.preprocessing import MinMaxScaler, StandardScaler, MaxAbsScaler, RobustScaler
+import matplotlib.pyplot as plt
 from keras.layers import BatchNormalization
-
-
 
 
 ###########################폴더 생성시 현재 파일명으로 자동생성###########################################
@@ -25,31 +23,18 @@ current_name = a.split("\\")[-1]
 
 
 #1. 데이터
-(x_train, y_train), (x_test, y_test) = cifar10.load_data()
+(x_train, y_train), (x_test, y_test) = cifar100.load_data()
 print(x_train.shape, y_train.shape) #(50000, 32, 32, 3) (50000, 1)
 print(x_test.shape, y_test.shape) #(10000, 32, 32, 3) (10000, 1)
 print(np.unique(y_train, return_counts=True)) # [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
 print(np.unique(y_test, return_counts=True))
 
-x_train = x_train.astype('float32')
-x_test = x_test.astype('float32')
-x_train = x_train/255
-x_test = x_test/255
-
-mean = np.mean(x_train, axis=(0 , 1 , 2 , 3))
-std = np.std(x_train, axis=(0 , 1 , 2 , 3))
-x_train = (x_train-mean)/std
-x_test = (x_test-mean)/std
-
-print(x_train.shape, x_test.shape)
-
-
 
 # ###################리세이프#######################
-# x_train = x_train.reshape(60000, 28, 28, 1)
-# x_test = x_test.reshape(10000, 28, 28, 1)
-# print(x_train.shape)
-# print(np.unique(y_train, return_counts=True))
+x_train = x_train.reshape(50000, 3072)
+x_test = x_test.reshape(10000, 3072)
+print(x_train.shape)
+print(np.unique(y_train, return_counts=True))
 # #################################################
 
 #####################XXXXX스케일러XXXXX######################
@@ -95,49 +80,30 @@ print(y_test.shape)
 
 
 #2. 모델구성
-# model = Sequential()
+model = Sequential()
 # model.add(Dense(units=10, input_shape = (3,)))         #  (batch_size, input_dim)             input_shape = (10, 10, 3)
 # model.summary()
 # (input_dim + bias) * units = summary Param # (Dense 모델)
 
 
-# model.add(Conv2D(filters = 64, kernel_size=(3,3), # kernel_size = 이미지 분석을위해 2x2로 잘라서 분석하겠다~
+# model.add(Conv2D(filters = 200, kernel_size=(3,3), # kernel_size = 이미지 분석을위해 2x2로 잘라서 분석하겠다~
 #                  padding='same', # padding : 커널 사이즈대로 자르다보면 가생이는 중복되서 분석을 못해주기때문에 행렬을 키워주는것, 패딩을 입혀준다? 이런 너낌
 #                  input_shape=(32,32,3))) #  (batch_size, rows, columns, channels)            conv2d : model.add input_shape= (x, y, z) x=가로 픽셀 y=세로픽셀 z= 컬러 흑백
 # model.add(MaxPooling2D())
-# model.add(Conv2D(100, (2,2), 
-#                  padding='valid', # 디폴트 값
+# model.add(Conv2D(200, (2,2), 
+#                  padding='same', # 디폴트 값
 #                  activation='relu'))
-# model.add(MaxPooling2D())
-
-# model.add(Conv2D(100, (2,2), 
+# model.add(Conv2D(200, (2,2), 
 #                  padding='valid', # 디폴트 값
 #                  activation='relu'))
 # model.add(Flatten())  # (N, 5408)
-# model.add(Dense(20))
-# model.add(BatchNormalization())
-# model.add(Activation('relu'))
+# model.add(Dense(300, activation='relu'))
+# model.add(Dense(300, activation='relu'))
+# model.add(Dense(200, activation='relu'))
+# model.add(Dense(100, activation='softmax'))
 
-# model.add(Dense(20))
-# model.add(BatchNormalization())
-# model.add(Activation('relu'))
-
-# model.add(Dense(10, activation='softmax'))
-
-input1 = Input(shape=(32,32,3))
-conv2D_1 = Conv2D(100,3, padding='same')(input1)
-MaxP1 = MaxPooling2D()(conv2D_1)
-drp1 = Dropout(0.2)(MaxP1)
-conv2D_2 = Conv2D(200,2,
-                  activation='relu')(drp1)
-MaxP2 = MaxPooling2D()(conv2D_2)
-drp2 = Dropout(0.2)(MaxP2)
-conv2D_3 = Conv2D(200,2,
-                  activation='relu')(drp2)
-MaxP3 = MaxPooling2D()(conv2D_3)
-drp3 = Dropout(0.2)(MaxP3)
-flatten = Flatten()(drp3)
-dense1 = Dense(200)(flatten)
+input1 = Input(shape=(3072,))
+dense1 = Dense(200)(input1)
 batchnorm1 = BatchNormalization()(dense1)
 activ1 = Activation('relu')(batchnorm1)
 drp4 = Dropout(0.2)(activ1)
@@ -149,15 +115,20 @@ dense3 = Dense(100)(drp5)
 batchnorm3 = BatchNormalization()(dense3)
 activ3 = Activation('relu')(batchnorm3)
 drp6 = Dropout(0.2)(activ3)
-output1 = Dense(10, activation='softmax')(drp6)
+dense4 = Dense(100)(drp6)
+batchnorm4 = BatchNormalization()(dense4)
+activ4 = Activation('relu')(batchnorm4)
+drp7 = Dropout(0.2)(activ4)
+output1 = Dense(100, activation='softmax')(drp7)
 model = Model(inputs=input1, outputs=output1)   
+
 
 # # (kernel_size * channels +bias) * filters = summary param # (CNN모델)
 
 # x = x.reshape(10,2) 현재 데이터를 순서대로 표기된 행렬로 바꿈
 
 #3. 컴파일, 훈련
-model.compile(loss='categorical_crossentropy', optimizer='nadam', metrics=['accuracy'])
+model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
 from tensorflow.python.keras.callbacks import EarlyStopping, ModelCheckpoint
 import datetime
 date = datetime.datetime.now()
@@ -167,20 +138,20 @@ print(date)
 save_filepath = './_ModelCheckPoint/' + current_name + '/'
 load_filepath = './_ModelCheckPoint/' + current_name + '/'
 
-# model = load_model(load_filepath + '0708_1814_0029-1.3267.hdf5')
+# model = load_model(load_filepath + '0708_1753_0011-0.0731.hdf5')
 
 
 filename = '{epoch:04d}-{val_loss:.4f}.hdf5'
 
-earlyStopping = EarlyStopping(monitor='val_loss', patience=10, mode='auto', verbose=1, 
+earlyStopping = EarlyStopping(monitor='val_loss', patience=40, mode='auto', verbose=1, 
                               restore_best_weights=True)        
 
 mcp = ModelCheckpoint(monitor='val_loss', mode='auto', verbose=1, save_best_only=True, 
                       filepath= "".join([save_filepath, date, '_', filename])
                       )
 
-model.fit(x_train, y_train, epochs=25, batch_size=128,
-                 validation_split=0.1,
+hist = model.fit(x_train, y_train, epochs=100, batch_size=100,
+                 validation_split=0.2,
                  callbacks=[earlyStopping, mcp],
                  verbose=1)
 
@@ -198,5 +169,5 @@ print(y_test.shape, y_predict.shape)
 acc = accuracy_score(y_test, y_predict)
 print('acc스코어 : ', acc)
 
-# loss :  [0.6314413547515869, 0.791100025177002]
-# acc스코어 :  0.7911
+# loss :  [3.2603743076324463, 0.2418999969959259]
+# acc스코어 :  0.2419

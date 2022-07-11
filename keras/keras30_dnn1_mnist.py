@@ -1,4 +1,3 @@
-import tensorflow as tf
 from warnings import filters
 from tensorflow.python.keras.models import Sequential, Model
 from tensorflow.python.keras.layers import Activation, Dense, Conv2D, Flatten, MaxPooling2D, Input, Dropout
@@ -12,8 +11,6 @@ from sklearn.preprocessing import MinMaxScaler, StandardScaler, MaxAbsScaler, Ro
 from keras.layers import BatchNormalization
 
 
-
-
 ###########################폴더 생성시 현재 파일명으로 자동생성###########################################
 import inspect, os
 a = inspect.getfile(inspect.currentframe()) #현재 파일이 위치한 경로 + 현재 파일 명
@@ -25,32 +22,16 @@ current_name = a.split("\\")[-1]
 
 
 #1. 데이터
-(x_train, y_train), (x_test, y_test) = cifar10.load_data()
-print(x_train.shape, y_train.shape) #(50000, 32, 32, 3) (50000, 1)
-print(x_test.shape, y_test.shape) #(10000, 32, 32, 3) (10000, 1)
-print(np.unique(y_train, return_counts=True)) # [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
-print(np.unique(y_test, return_counts=True))
+(x_train, y_train), (x_test, y_test) = mnist.load_data()
+print(x_train.shape, y_train.shape) #(60000, 28, 28) (60000,)
+print(x_test.shape, y_test.shape) #(10000, 28, 28) (10000,)
 
-x_train = x_train.astype('float32')
-x_test = x_test.astype('float32')
-x_train = x_train/255
-x_test = x_test/255
-
-mean = np.mean(x_train, axis=(0 , 1 , 2 , 3))
-std = np.std(x_train, axis=(0 , 1 , 2 , 3))
-x_train = (x_train-mean)/std
-x_test = (x_test-mean)/std
-
-print(x_train.shape, x_test.shape)
-
-
-
-# ###################리세이프#######################
-# x_train = x_train.reshape(60000, 28, 28, 1)
-# x_test = x_test.reshape(10000, 28, 28, 1)
-# print(x_train.shape)
-# print(np.unique(y_train, return_counts=True))
-# #################################################
+###################리세이프#######################
+x_train = x_train.reshape(60000, 784)
+x_test = x_test.reshape(10000, 784)
+print(x_train.shape)
+print(np.unique(y_train, return_counts=True))
+#################################################
 
 #####################XXXXX스케일러XXXXX######################
 # scaler = MinMaxScaler()
@@ -95,49 +76,14 @@ print(y_test.shape)
 
 
 #2. 모델구성
-# model = Sequential()
+model = Sequential()
 # model.add(Dense(units=10, input_shape = (3,)))         #  (batch_size, input_dim)             input_shape = (10, 10, 3)
 # model.summary()
 # (input_dim + bias) * units = summary Param # (Dense 모델)
 
 
-# model.add(Conv2D(filters = 64, kernel_size=(3,3), # kernel_size = 이미지 분석을위해 2x2로 잘라서 분석하겠다~
-#                  padding='same', # padding : 커널 사이즈대로 자르다보면 가생이는 중복되서 분석을 못해주기때문에 행렬을 키워주는것, 패딩을 입혀준다? 이런 너낌
-#                  input_shape=(32,32,3))) #  (batch_size, rows, columns, channels)            conv2d : model.add input_shape= (x, y, z) x=가로 픽셀 y=세로픽셀 z= 컬러 흑백
-# model.add(MaxPooling2D())
-# model.add(Conv2D(100, (2,2), 
-#                  padding='valid', # 디폴트 값
-#                  activation='relu'))
-# model.add(MaxPooling2D())
-
-# model.add(Conv2D(100, (2,2), 
-#                  padding='valid', # 디폴트 값
-#                  activation='relu'))
-# model.add(Flatten())  # (N, 5408)
-# model.add(Dense(20))
-# model.add(BatchNormalization())
-# model.add(Activation('relu'))
-
-# model.add(Dense(20))
-# model.add(BatchNormalization())
-# model.add(Activation('relu'))
-
-# model.add(Dense(10, activation='softmax'))
-
-input1 = Input(shape=(32,32,3))
-conv2D_1 = Conv2D(100,3, padding='same')(input1)
-MaxP1 = MaxPooling2D()(conv2D_1)
-drp1 = Dropout(0.2)(MaxP1)
-conv2D_2 = Conv2D(200,2,
-                  activation='relu')(drp1)
-MaxP2 = MaxPooling2D()(conv2D_2)
-drp2 = Dropout(0.2)(MaxP2)
-conv2D_3 = Conv2D(200,2,
-                  activation='relu')(drp2)
-MaxP3 = MaxPooling2D()(conv2D_3)
-drp3 = Dropout(0.2)(MaxP3)
-flatten = Flatten()(drp3)
-dense1 = Dense(200)(flatten)
+input1 = Input(shape=(784,))
+dense1 = Dense(200)(input1)
 batchnorm1 = BatchNormalization()(dense1)
 activ1 = Activation('relu')(batchnorm1)
 drp4 = Dropout(0.2)(activ1)
@@ -157,7 +103,7 @@ model = Model(inputs=input1, outputs=output1)
 # x = x.reshape(10,2) 현재 데이터를 순서대로 표기된 행렬로 바꿈
 
 #3. 컴파일, 훈련
-model.compile(loss='categorical_crossentropy', optimizer='nadam', metrics=['accuracy'])
+model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
 from tensorflow.python.keras.callbacks import EarlyStopping, ModelCheckpoint
 import datetime
 date = datetime.datetime.now()
@@ -167,20 +113,20 @@ print(date)
 save_filepath = './_ModelCheckPoint/' + current_name + '/'
 load_filepath = './_ModelCheckPoint/' + current_name + '/'
 
-# model = load_model(load_filepath + '0708_1814_0029-1.3267.hdf5')
+# model = load_model(load_filepath + '0708_1753_0011-0.0731.hdf5')
 
 
 filename = '{epoch:04d}-{val_loss:.4f}.hdf5'
 
-earlyStopping = EarlyStopping(monitor='val_loss', patience=10, mode='auto', verbose=1, 
+earlyStopping = EarlyStopping(monitor='val_loss', patience=50, mode='auto', verbose=1, 
                               restore_best_weights=True)        
 
 mcp = ModelCheckpoint(monitor='val_loss', mode='auto', verbose=1, save_best_only=True, 
                       filepath= "".join([save_filepath, date, '_', filename])
                       )
 
-model.fit(x_train, y_train, epochs=25, batch_size=128,
-                 validation_split=0.1,
+hist = model.fit(x_train, y_train, epochs=300, batch_size=50,
+                 validation_split=0.2,
                  callbacks=[earlyStopping, mcp],
                  verbose=1)
 
@@ -193,10 +139,9 @@ y_predict = np.argmax(y_predict, axis= 1)
 df3 = pd.DataFrame(y_predict)
 y_predict = oh.transform(df3)
 
-print(y_test, y_predict)
-print(y_test.shape, y_predict.shape)
+
 acc = accuracy_score(y_test, y_predict)
 print('acc스코어 : ', acc)
 
-# loss :  [0.6314413547515869, 0.791100025177002]
-# acc스코어 :  0.7911
+# loss :  [0.1137540265917778, 0.9713000059127808]
+# acc스코어 :  0.9713

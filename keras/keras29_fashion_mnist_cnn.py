@@ -47,22 +47,27 @@ print(np.unique(y_train, return_counts=True))
 # print(y)
 ################################################
 
-# ####################원핫인코더###################
-# df = pd.DataFrame(y)
-# print(df)
-# oh = OneHotEncoder(sparse=False) # sparse=true 는 매트릭스반환 False는 array 반환
-# y = oh.fit_transform(df)
-# print(y)
-# ################################################
-
-###################케라스########################
-y_train = to_categorical(y_train)
-y_test = to_categorical(y_test)
-print(np.unique(y_train, return_counts=True))
-print(np.unique(y_test, return_counts=True))   # y의 라벨값 :  [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
-print(x_train.shape, y_train.shape) 
-print(x_test.shape, y_test.shape)
+####################원핫인코더###################
+df1 = pd.DataFrame(y_train)
+df2 = pd.DataFrame(y_test)
+print(df1)
+oh = OneHotEncoder(sparse=False) # sparse=true 는 매트릭스반환 False는 array 반환
+y_train = oh.fit_transform(df1)
+y_test = oh.transform(df2)
+print('====================================')
+print(y_train.shape)
+print('====================================')
+print(y_test.shape)
 ################################################
+
+# ###################케라스########################
+# y_train = to_categorical(y_train)
+# y_test = to_categorical(y_test)
+# print(np.unique(y_train, return_counts=True))
+# print(np.unique(y_test, return_counts=True))   # y의 라벨값 :  [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+# print(x_train.shape, y_train.shape) 
+# print(x_test.shape, y_test.shape)
+# ################################################
 
 
 # 맹그러바바바
@@ -143,14 +148,14 @@ load_filepath = './_ModelCheckPoint/' + current_name + '/'
 
 filename = '{epoch:04d}-{val_loss:.4f}.hdf5'
 
-earlyStopping = EarlyStopping(monitor='val_loss', patience=50, mode='auto', verbose=1, 
+earlyStopping = EarlyStopping(monitor='val_loss', patience=40, mode='auto', verbose=1, 
                               restore_best_weights=True)        
 
 mcp = ModelCheckpoint(monitor='val_loss', mode='auto', verbose=1, save_best_only=True, 
                       filepath= "".join([save_filepath, date, '_', filename])
                       )
 
-hist = model.fit(x_train, y_train, epochs=100, batch_size=100,
+hist = model.fit(x_train, y_train, epochs=200, batch_size=128,
                  validation_split=0.3,
                  callbacks=[earlyStopping, mcp],
                  verbose=1)
@@ -161,7 +166,8 @@ print('loss : ', loss)
 
 y_predict = model.predict(x_test)
 y_predict = np.argmax(y_predict, axis= 1)
-y_predict = to_categorical(y_predict)
+df3 = pd.DataFrame(y_predict)
+y_predict = oh.transform(df3)
 
 
 acc = accuracy_score(y_test, y_predict)
