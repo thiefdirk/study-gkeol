@@ -8,8 +8,9 @@ from tensorflow.python.keras.layers import Activation, Dense, Conv2D, Flatten, M
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import r2_score, mean_squared_error
 from tensorflow.keras.utils import to_categorical
-from sklearn.preprocessing import OneHotEncoder
-from keras.layers import BatchNormalization
+from sklearn.preprocessing import OneHotEncoder, LabelEncoder
+from keras.layers import BatchNormalization, LSTM
+from lightgbm import LGBMClassifier
 
 ###########################폴더 생성시 현재 파일명으로 자동생성###########################################
 import inspect, os
@@ -51,8 +52,10 @@ test_set["day"] = [t.dayofweek for t in pd.DatetimeIndex(test_set.Date)]
 test_set["month"] = [t.month for t in pd.DatetimeIndex(test_set.Date)]
 test_set['year'] = [t.year for t in pd.DatetimeIndex(test_set.Date)]
 
-train_set.drop(['Date','Weekly_Sales'],axis=1,inplace=True) # 트레인 세트에서 데이트타임 드랍
-test_set.drop(['Date'],axis=1,inplace=True) # 트레인 세트에서 데이트타임 드랍
+train_set.drop(['Date','Weekly_Sales','month','Temperature','Fuel_Price',
+                'Promotion1','Promotion2','Promotion3','Promotion4','Promotion5'],axis=1,inplace=True) # 트레인 세트에서 데이트타임 드랍
+test_set.drop(['Date','month','Temperature','Fuel_Price','Promotion1',
+               'Promotion2','Promotion3','Promotion4','Promotion5'],axis=1,inplace=True) # 트레인 세트에서 데이트타임 드랍
 
 print(train_set)
 print(test_set)
@@ -63,11 +66,11 @@ print(test_set)
 df = pd.concat([train_set, test_set])
 print(df)
 
-alldata = pd.get_dummies(df, columns=['day','Store','month', 'year', 'IsHoliday'])
-print(alldata)
+# alldata = pd.get_dummies(df, columns=['day','Store','month', 'year', 'IsHoliday'])
+# print(alldata)
 
-train_set2 = alldata[:len(train_set)]
-test_set2 = alldata[len(train_set):]
+train_set2 = df[:len(train_set)]
+test_set2 = df[len(train_set):]
 
 print(train_set2)
 print(test_set2)
@@ -113,20 +116,20 @@ print(test_set2)
 
 
 # 2. 모델구성
-input1 = Input(shape=(77,))
-dense1 = Dense(100)(input1)
+input1 = Input(shape=(5,))
+dense1 = Dense(250)(input1)
 batchnorm1 = BatchNormalization()(dense1)
-activ1 = Activation('relu')(batchnorm1)
+activ1 = Activation('swish')(batchnorm1)
 drp4 = Dropout(0.2)(activ1)
-dense2 = Dense(100)(drp4)
+dense2 = Dense(350)(drp4)
 batchnorm2 = BatchNormalization()(dense2)
-activ2 = Activation('relu')(batchnorm2)
+activ2 = Activation('swish')(batchnorm2)
 drp5 = Dropout(0.2)(activ2)
-dense3 = Dense(150)(drp5)
+dense3 = Dense(200)(drp5)
 batchnorm3 = BatchNormalization()(dense3)
-activ3 = Activation('relu')(batchnorm3)
+activ3 = Activation('swish')(batchnorm3)
 drp6 = Dropout(0.2)(activ3)
-dense4 = Dense(100)(drp6)
+dense4 = Dense(350)(drp6)
 batchnorm4 = BatchNormalization()(dense4)
 activ4 = Activation('relu')(batchnorm4)
 drp7 = Dropout(0.2)(activ4)
@@ -158,7 +161,7 @@ mcp = ModelCheckpoint(monitor='val_loss', mode='auto', verbose=1, save_best_only
                       filepath= "".join([save_filepath, date, '_', filename])
                       )
 
-hist = model.fit(x_train, y_train, epochs=3000, batch_size=128,
+hist = model.fit(x_train, y_train, epochs=3000, batch_size=130,
                  validation_split=0.3,
                  callbacks=[earlyStopping, mcp],
                  verbose=1)
@@ -201,7 +204,7 @@ submission_set['Weekly_Sales'] = y_summit
 print(submission_set)
 
 
-submission_set.to_csv(path + 'submission.csv', index = True)
+submission_set.to_csv(path + 'submission_drop.csv', index = True)
 
 # 민맥스
 # loss :  [12031329280.0, 60506.640625]
@@ -239,6 +242,6 @@ submission_set.to_csv(path + 'submission.csv', index = True)
 # r2스코어 :  0.9591639270145448
 
 
-# loss :  [11314745344.0, 59876.4375]
-# RMSE :  106370.79280402962
-# r2스코어 :  0.9663523676812774
+# loss :  [178265260032.0, 322368.625]
+# RMSE :  422214.71219399193
+# r2스코어 :  0.46987725014398085
