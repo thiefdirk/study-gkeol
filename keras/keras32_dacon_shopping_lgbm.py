@@ -133,7 +133,7 @@ y_test=y_test.astype('int')
 def RMSE(a, b): 
     return np.sqrt(mean_squared_error(a, b))
 
-lgbm_wrapper = LGBMClassifier(n_estimators=80, num_leaves=70, max_depth = 7,min_child_samples=200 )
+lgbm_wrapper = LGBMClassifier(n_estimators=50, num_leaves=4, max_depth = 2,min_child_samples=400 )
 lgbm_wrapper.fit(x_train, y_train)
 
 # train rmse

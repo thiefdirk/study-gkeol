@@ -71,7 +71,7 @@ print(np.unique(y_train, return_counts=True))
 model = Sequential()
 model.add(Conv2D(filters = 200, kernel_size=(3,3), # kernel_size = 이미지 분석을위해 2x2로 잘라서 분석하겠다~
                    padding='same', # padding : 커널 사이즈대로 자르다보면 가생이는 중복되서 분석을 못해주기때문에 행렬을 키워주는것, 패딩을 입혀준다? 이런 너낌
-                   input_shape=(8,8,1)))
+                   input_shape=(9,2,3)))
 model.add(Conv2D(filters = 200, kernel_size=(3,3), # kernel_size = 이미지 분석을위해 2x2로 잘라서 분석하겠다~
                    padding='same'))
 model.add(Flatten())
