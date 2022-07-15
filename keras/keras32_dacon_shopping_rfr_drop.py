@@ -10,12 +10,12 @@ from sklearn.metrics import r2_score, mean_squared_error
 from tensorflow.keras.utils import to_categorical
 from sklearn.preprocessing import OneHotEncoder
 from keras.layers import BatchNormalization
-from sklearn.ensemble import RandomForestRegressor
+from sklearn.ensemble import RandomForestRegressor, HistGradientBoostingRegressor
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import KFold
 from sklearn.ensemble import GradientBoostingClassifier
 from sklearn.linear_model import LogisticRegression
-from xgboost import XGBClassifier
+from xgboost import XGBClassifier, XGBRegressor
 from sklearn.model_selection import GridSearchCV
 import math
 import matplotlib.pyplot as plt
@@ -144,7 +144,7 @@ print(y_test)
 print(x_vaild)
 print(y_vaild)
 
-rf_run = RandomForestRegressor(random_state=66, max_features=80 ,n_estimators=120)
+rf_run = HistGradientBoostingRegressor(random_state=66)
 rf_run.fit(x_train, y_train)
 
 # train rmse
@@ -252,48 +252,56 @@ print("RMSE':{}".format(math.sqrt(mean_squared_error(test_predict, y_test))) )
 # ################################################################################################
 
 
-# #4. 평가, 예측
+#4. 평가, 예측
 
-# print("=============================1. 기본 출력=================================")
-# loss = rf_run.score(x_test, y_test)
-# y_predict = rf_run.predict(x_test)
+print("=============================1. 기본 출력=================================")
+loss = rf_run.score(x_test, y_test)
+y_predict = rf_run.predict(x_test)
 
-# def RMSE(a, b): 
-#     return np.sqrt(mean_squared_error(a, b))
+def RMSE(a, b): 
+    return np.sqrt(mean_squared_error(a, b))
 
-# rmse = RMSE(y_test, y_predict)
-
-
-# from sklearn.metrics import r2_score
-# r2 = r2_score(y_test, y_predict)
-
-# print('loss : ', y_predict)
-# print("RMSE : ", rmse)
-# print('r2스코어 : ', r2)
-
-# print(test_set2)
-
-# y_summit = rf_run.predict(test_set2)
-
-# print(y_summit)
-# print(y_summit.shape) # (180, 1)
-
-# submission_set = pd.read_csv(path + 'sample_submission.csv', # + 명령어는 문자를 앞문자와 더해줌
-#                              index_col=0) # index_col=n n번째 컬럼을 인덱스로 인식
-
-# print(submission_set)
-
-# submission_set['Weekly_Sales'] = y_summit
-# print(submission_set)
+rmse = RMSE(y_test, y_predict)
 
 
-# submission_set.to_csv(path + 'submission_rfr_no_ohe2.csv', index = True)
+from sklearn.metrics import r2_score
+r2 = r2_score(y_test, y_predict)
 
-# # 함수형 모델 노원핫
-# # loss :  [11314745344.0, 59876.4375]
-# # RMSE :  106370.79280402962
-# # r2스코어 :  0.9663523676812774
+print('loss : ', y_predict)
+print("RMSE : ", rmse)
+print('r2스코어 : ', r2)
 
-# # 랜덤포레스트 노원핫
-# # RMSE :  152949.89116708862
-# # r2스코어 :  0.9288168031932656
+print(test_set2)
+
+y_summit = rf_run.predict(test_set2)
+
+print(y_summit)
+print(y_summit.shape) # (180, 1)
+
+submission_set = pd.read_csv(path + 'sample_submission.csv', # + 명령어는 문자를 앞문자와 더해줌
+                             index_col=0) # index_col=n n번째 컬럼을 인덱스로 인식
+
+print(submission_set)
+
+submission_set['Weekly_Sales'] = y_summit
+print(submission_set)
+
+
+submission_set.to_csv(path + 'submission_hgbm.csv', index = True)
+
+# 함수형 모델 노원핫
+# loss :  [11314745344.0, 59876.4375]
+# RMSE :  106370.79280402962
+# r2스코어 :  0.9663523676812774
+
+# 랜덤포레스트 노원핫
+# RMSE :  152949.89116708862
+# r2스코어 :  0.9288168031932656
+
+# GBM
+# RMSE :  150707.8035210591
+# r2스코어 :  0.9303601625862427
+
+# xgb
+# RMSE :  167713.20190282408
+# r2스코어 :  0.9137576129333757

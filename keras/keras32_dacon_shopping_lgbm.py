@@ -20,7 +20,10 @@ from sklearn.model_selection import GridSearchCV
 import math
 import matplotlib.pyplot as plt
 import numpy as np
-from lightgbm import LGBMClassifier
+from lightgbm import LGBMRegressor
+import BayesianOptimization
+from sklearn.model_selection import cross_val_score, KFold
+
 
 
 xgb = XGBClassifier()
@@ -125,18 +128,25 @@ x_train, x_test, y_train, y_test = train_test_split(x,y,
                                                     )
 
 
-x_train=x_train.astype('int')
-y_train=y_train.astype('int')
-x_test=x_test.astype('int')
-y_test=y_test.astype('int')
+# x_train=x_train.astype('int')
+# y_train=y_train.astype('int')
+# x_test=x_test.astype('int')
+# y_test=y_test.astype('int')
 
 def RMSE(a, b): 
     return np.sqrt(mean_squared_error(a, b))
 
-lgbm_wrapper = LGBMClassifier(n_estimators=50, num_leaves=4, max_depth = 2,min_child_samples=400 )
+lgbm_wrapper = LGBMRegressor(n_estimators=350)
 lgbm_wrapper.fit(x_train, y_train)
 
-# train rmse
+# scores = cross_val_score(lgbm_wrapper, x_train, y_train, cv=5)
+# print("Mean cross-validation score: %.2f" % scores.mean())
+# kfold = KFold(n_splits=10, shuffle=True)
+# kf_cv_scores = cross_val_score(lgbm_wrapper, x_train, y_train, cv=kfold)
+# print("K-fold CV average score: %.2f" % kf_cv_scores.mean())
+
+# y_predict = lgbm_wrapper.predict(test_set2)
+# # train rmse
 train_predict = lgbm_wrapper.predict(x_train)
 print("RMSE':{}".format(RMSE(train_predict, y_train)))
 

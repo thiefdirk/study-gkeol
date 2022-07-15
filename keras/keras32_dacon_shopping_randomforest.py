@@ -10,7 +10,7 @@ from sklearn.metrics import r2_score, mean_squared_error
 from tensorflow.keras.utils import to_categorical
 from sklearn.preprocessing import OneHotEncoder
 from keras.layers import BatchNormalization
-from sklearn.ensemble import RandomForestRegressor
+from sklearn.ensemble import GradientBoostingRegressor, RandomForestRegressor
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import KFold
 from sklearn.ensemble import GradientBoostingClassifier
@@ -21,11 +21,12 @@ import math
 import matplotlib.pyplot as plt
 import numpy as np
 import mglearn
-
+from sklearn.svm import SVC
+from sklearn.model_selection import cross_validate
 
 
 xgb = XGBClassifier()
-gbm = GradientBoostingClassifier()
+gbm = GradientBoostingRegressor()
 lreg = LogisticRegression()
 rfr = RandomForestRegressor()
 ###########################폴더 생성시 현재 파일명으로 자동생성###########################################
@@ -148,10 +149,10 @@ test_set2 = scaler.transform(test_set2)
 # x_train = x_train.values
 # y_train = y_train.values
 
-x_train=x_train.astype('int')
-y_train=y_train.astype('int')
-x_test=x_test.astype('int')
-y_test=y_test.astype('int')
+# x_train=x_train.astype('int')
+# y_train=y_train.astype('int')
+# x_test=x_test.astype('int')
+# y_test=y_test.astype('int')
 
 # print(x_train.shape)
 # print(y_train.shape)
@@ -170,8 +171,9 @@ y_test=y_test.astype('int')
 # print('최적 하이퍼 파라미터:', grid_cv.best_params_)
 # print('최적 예측 정확도: {0:.4f}'.format(grid_cv.best_score_))
 
-rf_run = RandomForestRegressor(random_state=66, max_features=200 ,n_estimators=120)
-rf_run.fit(x_train, y_train)
+gbm_run = GradientBoostingRegressor(random_state=66,n_estimators=500)
+gbm_run.fit(x_train, y_train)
+
 
 # # train rmse
 # train_predict = rf_run.predict(x_train)
@@ -187,94 +189,94 @@ rf_run.fit(x_train, y_train)
 
 # https://woolulu.tistory.com/28
 
-n_feature = x_train.shape[1]
+# n_feature = x_train.shape[1]
 
-score_n_tr_est = []
+# score_n_tr_est = []
 
-score_n_te_est = []
+# score_n_te_est = []
 
-score_m_tr_mft = []
+# score_m_tr_mft = []
 
-score_m_te_mft = []
-
-
-for i in np.arange(1, n_feature+1): # n_estimators와 mat_features는 모두 0보다 큰 정수여야 하므로 1부터 시작합니다.
-
-    params_n = {'n_estimators':i, 'max_features':'auto', 'n_jobs':-1} # **kwargs parameter
-
-    params_m = {'n_estimators':10, 'max_features':i, 'n_jobs':-1}
+# score_m_te_mft = []
 
 
+# for i in np.arange(1, n_feature+1): # n_estimators와 mat_features는 모두 0보다 큰 정수여야 하므로 1부터 시작합니다.
 
-    forest_n = RandomForestClassifier(**params_n).fit(x_train, y_train)
+#     params_n = {'n_estimators':i, 'max_features':'auto', 'n_jobs':-1} # **kwargs parameter
 
-    forest_m = RandomForestClassifier(**params_m).fit(x_train, y_train)
+#     params_m = {'n_estimators':10, 'max_features':i, 'n_jobs':-1}
+
+
+
+#     forest_n = RandomForestClassifier(**params_n).fit(x_train, y_train)
+
+#     forest_m = RandomForestClassifier(**params_m).fit(x_train, y_train)
 
     
 
-    score_n_tr = forest_n.score(x_train, y_train)
+#     score_n_tr = forest_n.score(x_train, y_train)
 
-    score_n_te = forest_n.score(x_test, y_test)
+#     score_n_te = forest_n.score(x_test, y_test)
 
-    score_m_tr = forest_m.score(x_train, y_train)
+#     score_m_tr = forest_m.score(x_train, y_train)
 
-    score_m_te = forest_m.score(x_test, y_test)
-
-
-
-    score_n_tr_est.append(score_n_tr)
-
-    score_n_te_est.append(score_n_te)
-
-    score_m_tr_mft.append(score_m_tr)
-
-    score_m_te_mft.append(score_m_te)
+#     score_m_te = forest_m.score(x_test, y_test)
 
 
 
-index = np.arange(len(score_n_tr_est))
+#     score_n_tr_est.append(score_n_tr)
 
-plt.plot(index, score_n_tr_est, label='n_estimators train score', color='lightblue', ls='--') # ls: linestyle
+#     score_n_te_est.append(score_n_te)
 
-plt.plot(index, score_m_tr_mft, label='max_features train score', color='orange', ls='--')
+#     score_m_tr_mft.append(score_m_tr)
 
-plt.plot(index, score_n_te_est, label='n_estimators test score', color='lightblue')
-
-plt.plot(index, score_m_te_mft, label='max_features test score', color='orange')
-
-plt.legend(loc='upper center', bbox_to_anchor=(0.5, 1.1),
-
-           ncol=2, fancybox=True, shadow=False) # fancybox: 박스모양, shadow: 그림자
-
-plt.xlabel('number of parameter', size=15)
-
-plt.ylabel('score', size=15)
-
-plt.show()
+#     score_m_te_mft.append(score_m_te)
 
 
 
-n_feature = x.shape[1]
+# index = np.arange(len(score_n_tr_est))
 
-index = np.arange(n_feature)
+# plt.plot(index, score_n_tr_est, label='n_estimators train score', color='lightblue', ls='--') # ls: linestyle
+
+# plt.plot(index, score_m_tr_mft, label='max_features train score', color='orange', ls='--')
+
+# plt.plot(index, score_n_te_est, label='n_estimators test score', color='lightblue')
+
+# plt.plot(index, score_m_te_mft, label='max_features test score', color='orange')
+
+# plt.legend(loc='upper center', bbox_to_anchor=(0.5, 1.1),
+
+#            ncol=2, fancybox=True, shadow=False) # fancybox: 박스모양, shadow: 그림자
+
+# plt.xlabel('number of parameter', size=15)
+
+# plt.ylabel('score', size=15)
+
+# plt.show()
 
 
 
-forest = RandomForestClassifier(n_estimators=100, n_jobs=-1)
+# n_feature = x.shape[1]
 
-forest.fit(x_train, y_train)
+# index = np.arange(n_feature)
 
-plt.barh(index, forest.feature_importances_, align='center')
 
-plt.yticks(index)
 
-plt.ylim(-1, n_feature)
+# forest = RandomForestClassifier(n_estimators=100, n_jobs=-1)
 
-plt.xlabel('feature importance', size=15)
+# forest.fit(x_train, y_train)
 
-plt.ylabel('feature', size=15)
+# plt.barh(index, forest.feature_importances_, align='center')
 
-plt.show()
+# plt.yticks(index)
+
+# plt.ylim(-1, n_feature)
+
+# plt.xlabel('feature importance', size=15)
+
+# plt.ylabel('feature', size=15)
+
+# plt.show()
 
 
 
@@ -310,42 +312,42 @@ plt.show()
 
 # # model = load_model(load_filepath + '0711_1732_2300-8791202816.발리데이션0.3.hdf5')
 
-# #4. 평가, 예측
+#4. 평가, 예측
 
-# print("=============================1. 기본 출력=================================")
-# # loss = model.score(x_test, y_test)
-# y_predict = rf_run.predict(x_test)
+print("=============================1. 기본 출력=================================")
+# loss = model.score(x_test, y_test)
+y_predict = gbm_run.predict(x_test)
 
-# def RMSE(a, b): 
-#     return np.sqrt(mean_squared_error(a, b))
+def RMSE(a, b): 
+    return np.sqrt(mean_squared_error(a, b))
 
-# rmse = RMSE(y_test, y_predict)
-
-
-# from sklearn.metrics import r2_score
-# r2 = r2_score(y_test, y_predict)
-
-# print('loss : ', y_predict)
-# print("RMSE : ", rmse)
-# print('r2스코어 : ', r2)
-
-# print(test_set2)
-
-# y_summit = rf_run.predict(test_set2)
-
-# print(y_summit)
-# print(y_summit.shape) # (180, 1)
-
-# submission_set = pd.read_csv(path + 'sample_submission.csv', # + 명령어는 문자를 앞문자와 더해줌
-#                              index_col=0) # index_col=n n번째 컬럼을 인덱스로 인식
-
-# print(submission_set)
-
-# submission_set['Weekly_Sales'] = y_summit
-# print(submission_set)
+rmse = RMSE(y_test, y_predict)
 
 
-# submission_set.to_csv(path + 'submission_rfr_no_ohe.csv', index = True)
+from sklearn.metrics import r2_score
+r2 = r2_score(y_test, y_predict)
+
+print('loss : ', y_predict)
+print("RMSE : ", rmse)
+print('r2스코어 : ', r2)
+
+print(test_set2)
+
+y_summit = gbm_run.predict(test_set2)
+
+print(y_summit)
+print(y_summit.shape) # (180, 1)
+
+submission_set = pd.read_csv(path + 'sample_submission.csv', # + 명령어는 문자를 앞문자와 더해줌
+                             index_col=0) # index_col=n n번째 컬럼을 인덱스로 인식
+
+print(submission_set)
+
+submission_set['Weekly_Sales'] = y_summit
+print(submission_set)
+
+
+submission_set.to_csv(path + 'submission_gbm.csv', index = True)
 
 # # 민맥스
 # # loss :  [12031329280.0, 60506.640625]
