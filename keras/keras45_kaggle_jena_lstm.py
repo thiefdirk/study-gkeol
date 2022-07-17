@@ -7,14 +7,15 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 from sklearn.datasets import load_breast_cancer
-from tensorflow.python.keras.models import Sequential, Model
-from tensorflow.python.keras.layers import MaxPooling1D, Activation, Dense, Conv1D, Reshape, LSTM, Conv2D, Flatten, MaxPooling2D, Input, Dropout
+from tensorflow.keras.models import Sequential, Model
+from tensorflow.keras.layers import MaxPooling1D, GRU, Activation, Dense, Conv1D, Reshape, LSTM, Conv2D, Flatten, MaxPooling2D, Input, Dropout
 from sklearn.model_selection import train_test_split
 from tensorflow.python.keras.callbacks import EarlyStopping
 from sklearn.metrics import r2_score, accuracy_score
 from tensorflow.keras.utils import to_categorical
 from sklearn.preprocessing import OneHotEncoder
 from keras.layers import BatchNormalization
+from tensorflow.keras.layers import Bidirectional
 import time
 start = time.time()
 
@@ -57,6 +58,13 @@ print(y)
 print(x.shape) #(14, 420550)
 print(y.shape) #(14,)
 
+scaler = MinMaxScaler()
+# scaler = StandardScaler()
+# scaler = MaxAbsScaler()
+# scaler = RobustScaler()
+scaler.fit(x)
+x = scaler.transform(x)
+df_test = scaler.transform(df_test)
 
 ###################리세이프#######################
 x = x.reshape(14, 647, 650)
@@ -68,21 +76,23 @@ print(x.shape)
 
 #2. 모델구성
 model = Sequential()
-model.add(Conv1D(20,3, input_shape=(647,650)))
+model.add(Conv1D(120,3, input_shape=(647,650)))
 model.add(MaxPooling1D())
-model.add(LSTM(16))
+model.add(Conv1D(120,3))
+model.add(MaxPooling1D())
+model.add(Bidirectional(GRU(160, return_sequences=True)))
+model.add(Bidirectional(GRU(160, return_sequences=True)))
+model.add(Bidirectional(LSTM(60)))
+model.add(Dense(180, activation='relu'))
 model.add(BatchNormalization())
-model.add(Dropout(0.2))
-model.add(Dense(16, activation='relu'))
-model.add(Dropout(0.2))
-model.add(Dense(8, activation='relu'))
+model.add(Dense(120, activation='relu'))
 model.add(Dense(1))
 model.summary()  
 
 
 
 #3. 컴파일, 훈련
-model.compile(loss='mse', optimizer='adam', metrics=['accuracy'])
+model.compile(loss='mse', optimizer='adam', metrics=['mae'])
 from tensorflow.python.keras.callbacks import EarlyStopping, ModelCheckpoint
 import datetime
 date = datetime.datetime.now()
@@ -97,14 +107,14 @@ print(date)
 
 filename = '{epoch:04d}-{val_loss:.4f}.hdf5'
 
-earlyStopping = EarlyStopping(monitor='val_loss', patience=10, mode='auto', verbose=1, 
+earlyStopping = EarlyStopping(monitor='val_loss', patience= 1000, mode='auto', verbose=1, 
                               restore_best_weights=True)        
 
 # mcp = ModelCheckpoint(monitor='val_loss', mode='auto', verbose=1, save_best_only=True, 
 #                       filepath= "".join([save_filepath, date, '_', filename])
 #                       )
 
-hist = model.fit(x, y, epochs=1, batch_size=300,
+hist = model.fit(x, y, epochs=2000, batch_size=300,
                  validation_split=0.2,
                  callbacks=[earlyStopping],
                  verbose=1)
@@ -124,3 +134,20 @@ print('loss : ', loss)
 print('2017.01.01 00:10:00의 날씨 : ', y_summit)
 # print('acc스코어 : ', acc)
 print("time :", time.time() - start)
+
+# loss :  [22863.59375, 70.29228210449219]
+# 2017.01.01 00:10:00의 날씨 :  [[755.8922   ]
+#  [  1.1051936]
+#  [381.86182  ]
+#  [  1.1230409]
+#  [194.21     ]
+#  [  1.0766816]
+#  [  1.1120933]
+#  [  1.1378328]
+#  [  1.1280632]
+#  [  1.112122 ]
+#  [813.15186  ]
+#  [  1.1300436]
+#  [  1.1392704]
+#  [184.54192  ]]
+# time : 108.2067084312439
