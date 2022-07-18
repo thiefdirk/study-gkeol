@@ -25,12 +25,6 @@ path = './_data/kaggle_jena/'
 datasets = pd.read_csv(path + 'jena_climate_2009_2016.csv') # index_col=n n번째 컬럼을 인덱스로 인식
 # print(train_set)
 
-# datasets['Date Time'] = datasets['Date Time'].astype('str')
-# datasets['Date Time'].dtypes
-# date_list = datasets['Date Time'].str.split('-')
-# date_list.head()
-
-# datasets['month']
 # df = pd.DataFrame(datasets)
 datasets = datasets.drop(['Date Time'],axis=1)
 datasets = np.transpose(datasets)
@@ -135,19 +129,19 @@ print('2017.01.01 00:10:00의 날씨 : ', y_summit)
 # print('acc스코어 : ', acc)
 print("time :", time.time() - start)
 
-# loss :  [22863.59375, 70.29228210449219]
-# 2017.01.01 00:10:00의 날씨 :  [[755.8922   ]
-#  [  1.1051936]
-#  [381.86182  ]
-#  [  1.1230409]
-#  [194.21     ]
-#  [  1.0766816]
-#  [  1.1120933]
-#  [  1.1378328]
-#  [  1.1280632]
-#  [  1.112122 ]
-#  [813.15186  ]
-#  [  1.1300436]
-#  [  1.1392704]
-#  [184.54192  ]]
-# time : 108.2067084312439
+# loss :  [21256.982421875, 84.56919860839844]
+# 2017.01.01 00:10:00의 날씨 :  [[ 8.1451886e+02]
+#  [ 6.2019844e+01]
+#  [ 2.2929376e+02]
+#  [ 4.2648554e+00]
+#  [ 1.8814545e+01]
+#  [ 9.4997200e+01]
+#  [ 8.4294777e+01]
+#  [ 2.7188948e+01]
+#  [ 5.6226387e+01]
+#  [ 8.4773148e+01]
+#  [ 8.1811212e+02]
+#  [-5.3784049e-01]
+#  [ 7.8916097e+00]
+#  [ 1.8258789e+02]]
+# time : 143.62269639968872
