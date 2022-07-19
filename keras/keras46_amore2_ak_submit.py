@@ -125,11 +125,11 @@ datasets2d = datasets2.drop(['일자','신용비','개인','기관',
 
 datasets2d = np.array(datasets2d)
 
-datasets2_50x = datasets2d[:1035,:]
-datasets2_1x = datasets2d[1035:1771,:]
+datasets2_50x = datasets2d[-1035:,:]
+datasets2_1x = datasets2d[-1771:-1035,:]
 print(datasets2.shape)
-print(datasets2_50x.shape)
-print(datasets2_1x)
+print(datasets2_50x.shape) #(1035, 8)
+print(datasets2_1x.shape) #(736, 8)
 datasets2_1x = datasets2_1x*(50)
 print(datasets2_1x)
 datasets2_50x = pd.DataFrame(datasets2_50x)
@@ -160,7 +160,8 @@ print(datasets1.columns)
 #        '개인', '기관', '외인(수량)', '외국계', '프로그램', '외인비', '일자_연', '일자_월', '일자_일',
 #        '일자_요일'],
 #       dtype='object')
-y = datasets1[['종가']]
+y1 = datasets1[['종가']]
+y2 = datasets2[['종가']]
 
 # print(datasets1.isnull().sum())
 # print(datasets2.isnull().sum())
@@ -255,7 +256,7 @@ print(datasets1)
 
 datasets1 = datasets1.drop([datasets1.columns[18]], axis=1)
 datasets1 = datasets1.drop([datasets1.columns[3]], axis=1)
-datasets2 = datasets2.drop(['일자_요일'], axis=1)
+datasets2 = datasets2.drop(['일자_요일', '종가','일자_연','일자_월','일자_일'], axis=1)
 print(datasets1)
 print(datasets2)
 # print('====================================')
@@ -269,15 +270,17 @@ datasets1.columns = ['시가','고가','저가',
                      '신용비','개인','기관','외인(수량)','외국계',
                      '프로그램','외인비', '일자_연', '일자_월', '일자_일']
 
-datasets2.columns = ['시가','고가','저가','종가',
-                     '전일비','등락률','거래량','금액(백만)',
-                     '일자_연', '일자_월', '일자_일']
+datasets2.columns = ['시가','고가','저가',
+                     '전일비','등락률','거래량','금액(백만)']
+
+datasets1 = datasets1.drop(['신용비','개인','기관','외인(수량)','외국계','프로그램','외인비'], axis=1)
 
 
-
+print(datasets1)
+print(datasets2)
 
 datasets1 = pd.concat([datasets1,df_요일1], axis=1)
-datasets2 = pd.concat([datasets2,df_요일2], axis=1)
+# datasets2 = pd.concat([datasets2,df_요일2], axis=1)
 print('====================================')
 
 print(datasets1)
@@ -313,57 +316,70 @@ datasets2 = datasets2[-1771:,:]
 print(datasets1.shape, datasets2.shape) #(1771, 22) (1771, 16)
 print(datasets1, datasets2)
 
-predict_set1 = datasets1[-301:-1,:]
-predict_set2 = datasets2[-301:-1,:]
+# predict_set1 = datasets1[-301:-1,:]
+# predict_set2 = datasets2[-301:-1,:]
 
-summit_set1 = datasets1[-300:,:]
-summit_set2 = datasets2[-300:,:]
-print(predict_set1.shape, predict_set2.shape) #(300, 22) (300, 16)
-print(summit_set1.shape, summit_set2.shape) # (300, 22) (300, 16)
+# summit_set1 = datasets1[-300:,:]
+# summit_set2 = datasets2[-300:,:]
+# print(predict_set1.shape, predict_set2.shape) #(300, 22) (300, 16)
+# print(summit_set1.shape, summit_set2.shape) # (300, 22) (300, 16)
 print('====================================')
 
 print(datasets1)
 print(datasets2)
-print(predict_set1)
-print(predict_set2)
-print(summit_set1)
-print(summit_set2)
+# print(predict_set1)
+# print(predict_set2)
+# print(summit_set1)
+# print(summit_set2)
 
-size = 20
+datasets1 = pd.DataFrame(datasets1)
+datasets2 = pd.DataFrame(datasets2)
+y1 = np.array(y1)
+y1 = y1[-1771:,:]
+y1 = pd.DataFrame(y1)
 
-def split_x(dataset, size):
-    aaa = []
-    for i in range(len(dataset) - size + 1):
-        subset = dataset[i : (i+size)]
-        aaa.append(subset)
-    return np.array(aaa)
+print(y2.shape) #(1771, 1)
+y2 = np.array(y2)
+y2 = y2[-1771:,:]
+y2 = pd.DataFrame(y2)
 
-x1 = split_x(datasets1, size)
+datasets1 = pd.concat([datasets1,y1], axis=1)
+datasets1 = np.array(datasets1)
+
+datasets2 = pd.concat([datasets2,y2], axis=1)
+datasets2 = np.array(datasets2)
+
+print(datasets1)
+print(datasets2)
+
+def split_xy3(dataset, time_step, y_columns):
+    x, y = list(), list()
+    for i in range(len(dataset)):
+        x_end_number = i + time_step
+        y_end_number = x_end_number + y_columns - 1
+        if y_end_number > len(dataset):
+            break
+        tmp_x = dataset[i:x_end_number, : -1]
+        tmp_y = dataset[x_end_number-1:y_end_number, -1]
+        x.append(tmp_x)
+        y.append(tmp_y)
+    return np.array(x), np.array(y)
+
+x1, y1 = split_xy3(datasets1, 20, 3)
 print(x1)
 print(x1.shape) # (1752, 20, 18)
 
 
-x2 = split_x(datasets2, size)
+x2, y2 = split_xy3(datasets2, 20, 3)
 print(x2)
 print(x2.shape) # (1752, 20, 12)
 
-print(x1.shape, x2.shape) # (1752, 20, 18) (1752, 20, 12)
-print(y.shape) # (3170, 1)
+print(x1.shape, x2.shape) # (1750, 20, 18) (1750, 20, 11)
+print(y1.shape, y2.shape) # (1771, 1) (1750, 3)
 
-y = np.array(y)
-y = y[-1771:,:]
-print(y)
-print(y.shape)
 
-# y2 = y[-301:-1,:]
-# print(y2)
-# print(y2.shape)
 
-print(y.shape) #(1771, 1)
-y = split_x(y, size)
-# y2 = split_x(y2, size)
-print(y.shape) #(1752, 20, 1)
-# print(y2.shape)
+
 
 
 
@@ -390,83 +406,84 @@ print(y.shape) #(1752, 20, 1)
 # #################################################
 
 x1_train, x1_test, x2_train, x2_test, \
-y_train, y_test = train_test_split(x1,x2,y,train_size=0.7,
+y1_train, y1_test = train_test_split(x1,x2,y1,train_size=0.7,
                                                     shuffle=False
                                                     )
 
-print(x1_train.shape, x1_test.shape) # (1226, 20, 18) (526, 20, 18)
-print(x2_train.shape, x2_test.shape) # (1226, 20, 12) (526, 20, 12)
-print(y_train.shape, y_test.shape) # (1226, 20, 1) (526, 20, 1)
+print(x1_train.shape, x1_test.shape) # (1225, 20, 11) (525, 20, 11)
+print(x2_train.shape, x2_test.shape) # (1225, 20, 7) (525, 20, 7)
+print(y1_train.shape, y1_test.shape) # (1225, 3) (525, 3)
+# print(y2_train.shape, y2_test.shape) # (1225, 3) (525, 3)
 
 
-#2. 모델
+# #2. 모델
 
-#2-1. 모델1
-input1 = Input(shape=(20,18))
-conv1D_0 = Conv1D(400, 2, activation='relu')(input1)
-conv1D_1 = Bidirectional(LSTM(100, return_sequences=True))(conv1D_0)
-conv1D_2 = Bidirectional(LSTM(80))(conv1D_1)
-dense1 = Dense(20)(conv1D_2)
-batchnorm1 = BatchNormalization()(dense1)
-activ1 = Activation('relu')(batchnorm1)
-dense2 = Dense(100, activation='relu')(activ1)
-output1 = Dense(50)(dense2)
-model = Model(inputs=input1, outputs=output1)   
+# #2-1. 모델1
+# input1 = Input(shape=(20,18))
+# conv1D_0 = Conv1D(400, 2, activation='relu')(input1)
+# conv1D_1 = Bidirectional(LSTM(100, return_sequences=True))(conv1D_0)
+# conv1D_2 = Bidirectional(LSTM(80))(conv1D_1)
+# dense1 = Dense(20)(conv1D_2)
+# batchnorm1 = BatchNormalization()(dense1)
+# activ1 = Activation('relu')(batchnorm1)
+# dense2 = Dense(100, activation='relu')(activ1)
+# output1 = Dense(50)(dense2)
+# model = Model(inputs=input1, outputs=output1)   
 
-#2-2. 모델2
-input2 = Input(shape=(20,12))
-conv1D_10 = Conv1D(400, 2, activation='relu')(input2)
-conv1D_11 = Bidirectional(LSTM(100))(conv1D_10)
-dense11 = Dense(20)(conv1D_11)
-batchnorm11 = BatchNormalization()(dense11)
-activ11 = Activation('relu')(batchnorm11)
-dense12 = Dense(100, activation='relu')(activ11)
-output2 = Dense(30)(dense12)
-model = Model(inputs=input2, outputs=output2)   
+# #2-2. 모델2
+# input2 = Input(shape=(20,12))
+# conv1D_10 = Conv1D(400, 2, activation='relu')(input2)
+# conv1D_11 = Bidirectional(LSTM(100))(conv1D_10)
+# dense11 = Dense(20)(conv1D_11)
+# batchnorm11 = BatchNormalization()(dense11)
+# activ11 = Activation('relu')(batchnorm11)
+# dense12 = Dense(100, activation='relu')(activ11)
+# output2 = Dense(30)(dense12)
+# model = Model(inputs=input2, outputs=output2)   
 
-from tensorflow.python.keras.layers import concatenate, Concatenate # 앙상블모델
-merge1 = concatenate([output1, output2], name='mg1')
-merge2 = Dense(120, activation='relu', name='mg2')(merge1)
-merge3 = Dense(30, name='mg3')(merge2)
-last_output = Dense(1, name='last')(merge3)
+# from tensorflow.python.keras.layers import concatenate, Concatenate # 앙상블모델
+# merge1 = concatenate([output1, output2], name='mg1')
+# merge2 = Dense(120, activation='relu', name='mg2')(merge1)
+# merge3 = Dense(30, name='mg3')(merge2)
+# last_output = Dense(1, name='last')(merge3)
 
-print(merge1.shape)
+# print(merge1.shape)
 
-model = Model(inputs=[input1, input2], outputs=last_output)
-
-
-#3. 컴파일, 훈련
-model.compile(loss='mse', optimizer='adam', metrics=['mae'])
-from tensorflow.python.keras.callbacks import EarlyStopping, ModelCheckpoint
-import datetime
-date = datetime.datetime.now()
-date = date.strftime("%m%d_%H%M") # 0707_1723
-print(date)
-
-save_filepath = './_ModelCheckPoint/' + current_name + '/'
-load_filepath = './_ModelCheckPoint/' + current_name + '/'
-
-# model = load_model('./_test/0718_2055_0031-303197376.0000.hdf5')
+# model = Model(inputs=[input1, input2], outputs=last_output)
 
 
-filename = '{epoch:04d}-{val_loss:.4f}.hdf5'
+# #3. 컴파일, 훈련
+# model.compile(loss='mse', optimizer='adam', metrics=['mae'])
+# from tensorflow.python.keras.callbacks import EarlyStopping, ModelCheckpoint
+# import datetime
+# date = datetime.datetime.now()
+# date = date.strftime("%m%d_%H%M") # 0707_1723
+# print(date)
 
-earlyStopping = EarlyStopping(monitor='val_loss', patience=300, mode='auto', verbose=1, 
-                              restore_best_weights=True)        
+# save_filepath = './_ModelCheckPoint/' + current_name + '/'
+# load_filepath = './_ModelCheckPoint/' + current_name + '/'
 
-mcp = ModelCheckpoint(monitor='val_loss', mode='auto', verbose=1, save_best_only=True, 
-                      filepath= "".join([save_filepath, date, '_', filename])
-                      )
+model = load_model('./_ModelCheckPoint/keras46_amore2_ak_save.py/0719_1940_0011-1897107456.0000.hdf5')
 
-hist = model.fit([x1_train,x2_train] ,y_train, epochs=1000, batch_size=100,
-                 validation_split=0.2,
-                 callbacks=[earlyStopping,mcp],
-                 verbose=1)
+
+# filename = '{epoch:04d}-{val_loss:.4f}.hdf5'
+
+# earlyStopping = EarlyStopping(monitor='val_loss', patience=300, mode='auto', verbose=1, 
+#                               restore_best_weights=True)        
+
+# mcp = ModelCheckpoint(monitor='val_loss', mode='auto', verbose=1, save_best_only=True, 
+#                       filepath= "".join([save_filepath, date, '_', filename])
+#                       )
+
+# hist = model.fit([x1_train,x2_train] ,y_train, epochs=1000, batch_size=100,
+#                  validation_split=0.2,
+#                  callbacks=[earlyStopping,mcp],
+#                  verbose=1)
 
 #4. 평가, 예측
 
-loss = model.evaluate([x1_test,x2_test],y_test)
-y_predict = model.predict([x1_test,x2_test])
+loss = model.evaluate([x1_test,x2_test],y1_test)
+y_predict2 = model.predict([x1_test,x2_test])
 # y_summit = model.predict([summit_set1,summit_set2])
 # y_predict=np.array(y_predict)
 # y_predict = np.array(y_predict) #(2, 20, 1)
@@ -474,19 +491,23 @@ y_predict = model.predict([x1_test,x2_test])
 # print(y_test.shape)
 # print(np.array(y_test))
 # y_test=np.array(y_test)
-print(y_predict)
-print(y)
-print(y.shape)
-print(y_test.shape)
-print(y_predict.shape)
-y_test = y_test.reshape(526, 20)
+# print(y_predict)
+# print(y)
+# print(y.shape)
+# print(y_test.shape)
+# print(y_predict.shape)
+# y_test = y_test.reshape(526, 20)
 
 # r2 = r2_score(y_test, y_predict)
 print('loss: ', loss)
 # print('r2스코어 : ', r2)
-print('내일 종가 : ', y_predict[-1:])
+print('내일 종가 : ', y_predict2[-1:])
 print("time :", time.time() - start)
 
 # loss:  [1542844544.0, 31428.939453125]
 # 내일 종가 :  [[135789.28]]
 # time : 114.78367066383362
+
+# loss:  [7308519424.0, 66982.984375]
+# 내일 종가 :  [[131833.27]]
+# time : 7.877325057983398
