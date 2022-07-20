@@ -463,7 +463,7 @@ print(y1_train.shape, y1_test.shape) # (1225, 3) (525, 3)
 # save_filepath = './_ModelCheckPoint/' + current_name + '/'
 # load_filepath = './_ModelCheckPoint/' + current_name + '/'
 
-model = load_model('./_ModelCheckPoint/keras46_amore2_ak_save.py/0719_1940_0011-1897107456.0000.hdf5')
+model = load_model('./_data/0719_1940_0011-1897107456.0000.hdf5')
 
 
 # filename = '{epoch:04d}-{val_loss:.4f}.hdf5'
@@ -504,10 +504,6 @@ print('loss: ', loss)
 print('내일 종가 : ', y_predict2[-1:])
 print("time :", time.time() - start)
 
-# loss:  [1542844544.0, 31428.939453125]
-# 내일 종가 :  [[135789.28]]
-# time : 114.78367066383362
-
-# loss:  [7308519424.0, 66982.984375]
-# 내일 종가 :  [[131833.27]]
-# time : 7.877325057983398
+# loss:  [5397249024.0, 61081.75390625]
+# 내일 종가 :  [[133858.52]]
+# time : 6.0799171924591064
