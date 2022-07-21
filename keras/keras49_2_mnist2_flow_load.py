@@ -84,14 +84,14 @@ load_filepath = './_ModelCheckPoint/' + current_name + '/'
 
 filename = '{epoch:04d}-{val_loss:.4f}.hdf5'
 
-earlyStopping = EarlyStopping(monitor='val_loss', patience=100, mode='auto', verbose=1, 
+earlyStopping = EarlyStopping(monitor='val_loss', patience=10, mode='auto', verbose=1, 
                               restore_best_weights=True)        
 
 mcp = ModelCheckpoint(monitor='val_loss', mode='auto', verbose=1, save_best_only=True, 
                       filepath= "".join([save_filepath, date, '_', filename])
                       )
 
-hist = model.fit(x_train, y_train, epochs=300, batch_size=32,
+hist = model.fit(x_train, y_train, epochs=40, batch_size=500,
                  validation_split=0.2,
                  callbacks=[earlyStopping],
                  verbose=1)
@@ -112,7 +112,7 @@ print('accuracy : ', acc[-1])
 # loss :  [0.04215491563081741, 0.9890000224113464]
 # acc스코어 :  0.989
 
-# loss :  0.005316931754350662
-# accuracy :  1.0
+# loss :  0.020334603264927864
+# accuracy :  0.9938125014305115
 
 # acc = accuracy_score(y_test, y_predict)

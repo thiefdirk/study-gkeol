@@ -69,9 +69,9 @@ print(xy_test[0][1].shape)
 # print(type(xy_train[0][0])) #<class 'numpy.ndarray'>
 # print(type(xy_train[0][1])) #<class 'numpy.ndarray'>
 
-np.save('d:/study_data/_save/_npy/keras47_1_train_x.npy', arr=xy_train[0][0])
-np.save('d:/study_data/_save/_npy/keras47_1_train_y.npy', arr=xy_train[0][1])
-np.save('d:/study_data/_save/_npy/keras47_1_test_x.npy', arr=xy_test[0][0])
-np.save('d:/study_data/_save/_npy/keras47_1_test_y.npy', arr=xy_test[0][1])
+# np.save('d:/study_data/_save/_npy/keras47_1_train_x.npy', arr=xy_train[0][0])
+# np.save('d:/study_data/_save/_npy/keras47_1_train_y.npy', arr=xy_train[0][1])
+# np.save('d:/study_data/_save/_npy/keras47_1_test_x.npy', arr=xy_test[0][0])
+# np.save('d:/study_data/_save/_npy/keras47_1_test_y.npy', arr=xy_test[0][1])
 
 
