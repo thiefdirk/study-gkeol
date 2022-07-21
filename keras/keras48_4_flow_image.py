@@ -19,6 +19,13 @@ train_datagen = ImageDataGenerator(
     fill_mode='nearest'
 )
 
+
+test_datagen = ImageDataGenerator(
+    rescale=1./255,
+
+)
+
+
 augument_size = 10 # 증폭
 randindx = np.random.randint(x_train.shape[0], size = augument_size)
 print(randindx,randindx.shape) # (40000,)
@@ -61,9 +68,9 @@ print(np.tile(x_train1[0].reshape(28*28),augument_size).reshape(-1,28,28,1).shap
 print(np.zeros(augument_size))
 print(np.zeros(augument_size).shape) #(100,)
 
-x_data = train_datagen.flow(
+x_data = test_datagen.flow(
     x_train1.reshape(-1,28,28,1), # x
-    np.zeros(20),                                              # y
+    np.zeros(20),                 # y
     batch_size=20,
     shuffle=False,
 ).next()

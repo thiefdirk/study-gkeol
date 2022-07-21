@@ -27,6 +27,20 @@ current_name = a.split("\\")[-1]
 print(x_test.shape) # (40000,)
 
 
+####################원핫인코더###################
+y_train = pd.DataFrame(y_train)
+y_test = pd.DataFrame(y_test)
+# print(df1)
+oh = OneHotEncoder(sparse=False) # sparse=true 는 매트릭스반환 False는 array 반환
+y_train = oh.fit_transform(y_train)
+y_test = oh.transform(y_test)
+print('====================================')
+print(y_train.shape)
+print('====================================')
+print(y_test.shape)
+################################################
+
+
 train_datagen = ImageDataGenerator(
     rescale=1./255,
     horizontal_flip=True,
@@ -59,15 +73,16 @@ x_test = x_test.reshape(x_test.shape[0], x_test.shape[1], x_test.shape[2], 1)
 x_augumented = x_augumented.reshape(x_augumented.shape[0], 
                                     x_augumented.shape[1], x_augumented.shape[2], 1)
 
-xy_augumented = train_datagen.flow(x_augumented, y_augumented,
+x_augumented = train_datagen.flow(x_augumented, y_augumented,
                                   batch_size=augument_size,
-                                  shuffle=False)
+                                  shuffle=False).next()[0]
+
+x_train = np.concatenate((x_train, x_augumented))
+y_train = np.concatenate((y_train, y_augumented))
 
 xy_train = test_datagen.flow(x_train, y_train,
-                                  batch_size=augument_size,
+                                  batch_size=64,
                                   shuffle=False)
-
-datasets = np.concatenate((xy_train, xy_augumented))
 
 
 # x_train = np.concatenate((x_train, x_augumented))
@@ -79,57 +94,26 @@ datasets = np.concatenate((xy_train, xy_augumented))
 print(x_augumented)
 print(x_augumented.shape) #(40000, 28, 28, 1)
 
-x_train = np.concatenate((x_train, x_augumented))
-y_train = np.concatenate((y_train, y_augumented))
+
 
 print(x_train.shape, y_train.shape) # (100000, 28, 28, 1) (100000,)
 
 
-####################원핫인코더###################
-df1 = pd.DataFrame(y_train)
-df2 = pd.DataFrame(y_test)
-print(df1)
-oh = OneHotEncoder(sparse=False) # sparse=true 는 매트릭스반환 False는 array 반환
-y_train = oh.fit_transform(df1)
-y_test = oh.transform(df2)
-print('====================================')
-print(y_train.shape)
-print('====================================')
-print(y_test.shape)
-################################################
 
 #### 모델구성 ####
 
 
 #2. 모델구성
 model = Sequential()
-input1 = Input(shape=(28,28,1))
-conv2D_1 = Conv2D(100,3, padding='same')(input1)
-MaxP1 = MaxPooling2D()(conv2D_1)
-drp1 = Dropout(0.2)(MaxP1)
-conv2D_2 = Conv2D(200,2,
-                  activation='relu')(drp1)
-MaxP2 = MaxPooling2D()(conv2D_2)
-drp2 = Dropout(0.2)(MaxP2)
-conv2D_3 = Conv2D(200,2, padding='same',
-                  activation='relu')(drp2)
-MaxP3 = MaxPooling2D()(conv2D_3)
-drp3 = Dropout(0.2)(MaxP3)
-flatten = Flatten()(drp3)
-dense1 = Dense(200)(flatten)
-batchnorm1 = BatchNormalization()(dense1)
-activ1 = Activation('relu')(batchnorm1)
-drp4 = Dropout(0.2)(activ1)
-dense2 = Dense(100)(drp4)
-batchnorm2 = BatchNormalization()(dense2)
-activ2 = Activation('relu')(batchnorm2)
-drp5 = Dropout(0.2)(activ2)
-dense3 = Dense(100)(drp5)
-batchnorm3 = BatchNormalization()(dense3)
-activ3 = Activation('relu')(batchnorm3)
-drp6 = Dropout(0.2)(activ3)
-output1 = Dense(10, activation='softmax')(drp6)
-model = Model(inputs=input1, outputs=output1)   
+model.add(Conv2D(15,(2,2), input_shape=(28,28,1), activation='relu'))
+model.add(MaxPooling2D())
+model.add(Conv2D(10,(3,3), activation='relu'))
+model.add(MaxPooling2D())
+model.add(Conv2D(10,(3,3), activation='relu'))
+model.add(Conv2D(10,(3,3), activation='relu'))
+model.add(Flatten())
+model.add(Dense(20, activation='relu'))
+model.add(Dense(10, activation='softmax'))
 
 # # (kernel_size * channels +bias) * filters = summary param # (CNN모델)
 
@@ -159,8 +143,7 @@ mcp = ModelCheckpoint(monitor='val_loss', mode='auto', verbose=1, save_best_only
                       filepath= "".join([save_filepath, date, '_', filename])
                       )
 
-hist = model.fit(x_train, y_train, epochs=200, batch_size=128,
-                 validation_split=0.3,
+hist = model.fit(xy_train, epochs=30, batch_size=200,
                  callbacks=[earlyStopping],
                  verbose=1)
 
