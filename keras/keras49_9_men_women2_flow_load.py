@@ -117,7 +117,10 @@ print("time :", time.time() - start)
 # 성별 :  [0]
 # time : 46.279412031173706
 
-# import matplotlib.pyplot as plt
-# # plt.imshow(acc, 'gray')
-# plt.plot(acc, 'gray')
-# plt.show()
+# loss :  0.6827794313430786
+# val_loss :  0.976878821849823
+# accuracy :  0.9928355813026428
+# val_accuracy :  0.759036123752594
+# loss:  [0.5758450031280518, 0.6827794313430786]
+# 성별 :  [0]
+# time : 27.231499195098877
