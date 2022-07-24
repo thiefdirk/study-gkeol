@@ -4,6 +4,8 @@ import pandas as pd
 from tensorflow.python.keras.callbacks import EarlyStopping, ModelCheckpoint
 from tensorflow.python.keras.models import Sequential
 from tensorflow.python.keras.layers import Dense, LSTM, Embedding
+from tensorflow.keras.utils import to_categorical # https://wikidocs.net/22647 케라스 원핫인코딩
+
 
 #1. 데이터
 datasets = pd.read_csv("D:\study_data\_temp/datasets1.csv", names=["topic", "quote"])
@@ -29,7 +31,6 @@ print(type(x_data), type(y_data)) #<class 'numpy.ndarray'> <class 'numpy.ndarray
 token = Tokenizer()
 token.fit_on_texts(x_data)
 token.fit_on_texts(y_data)
-print(token.word_index)
 # {'너무': 1, '참': 2, '재미없다': 3, '정말': 4, '재밋어요': 5, '최고
 # 에요': 6, '잘': 7, '만든': 8, '영화에요': 9, '추천하고': 10, '싶은': 11,
 # '영화입니다': 12, '한': 13, '번': 14, '더': 15, '보고': 16, '싶
@@ -46,14 +47,19 @@ print(y)
 #  [18, 19], [20, 21], [22], [2, 23], [1, 24], [25, 26, 27, 28], [29, 30]]
 
 print(max(len(i) for i in y)) 
-
+max_len=15
 from keras.preprocessing.sequence import pad_sequences # 0채워서 와꾸맞춰줌
 # pad_x = pad_sequences(x, padding='pre', maxlen=5) #'post'도있음, 뒤 / truncating= 잘라내기 
-pad_y = pad_sequences(y, padding='pre', maxlen=15, truncating='pre') #'post'도있음, 뒤 / truncating= 잘라내기 
+pad_y = pad_sequences(y, padding='pre', maxlen=max_len, truncating='pre') #'post'도있음, 뒤 / truncating= 잘라내기 
 
 print(pad_y, pad_y.shape) # (44, 43)
+word_size = len(token.word_index)+1 
+pad_y = to_categorical(pad_y, num_classes=word_size)
+x = to_categorical(x, num_classes=word_size)
 x = np.array(x)
 print(x, x.shape) # (44, 43)
+print(pad_y, pad_y.shape) # (44, 43)
+
 # print(pad_test_set, pad_test_set.shape) # (1, 5)
 
 # [[ 0  0  0  2  3]
@@ -71,7 +77,7 @@ print(x, x.shape) # (44, 43)
 #  [ 0 25 26 27 28]
 #  [ 0  0  0 29 30]] 
 
-word_size = len(token.word_index) # len(x,word_index) x의 인덱스 길이, 수
+# len(x,word_index) x의 인덱스 길이, 수
 print("word_size : ", word_size)   # 단어사전의 갯수 : 423
 
 print(np.unique(pad_y, return_counts=True))
@@ -101,7 +107,7 @@ model.add(Dense(32, activation='relu'))
 model.add(Dense(32, activation='relu'))
 model.add(Dense(32, activation='relu'))
 model.add(Dense(32, activation='relu'))
-model.add(Dense(15, activation='softmax'))
+model.add(Dense(word_size, activation='softmax'))
 model.summary()
 
 # Model: "sequential"
@@ -132,19 +138,28 @@ model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accur
 model.fit(x, pad_y, epochs=2000, batch_size=128 ,callbacks=[es])
 
 #4. 평가, 예측
-acc = model.evaluate(x, pad_y)[1]
-print('acc : ', acc)
 
-#### [실습] ####
-# 결과는???
+def sentence_generator(model, token, current_word, max_len, n) :
+    init_word=current_word
+    sentence=''
+    
+    for _ in range(n) : 
+        encoded=token.texts_to_sequences([current_word])
+        encoded=pad_sequences(encoded, maxlen=max_len, padding='pre')
+        
+        predicted=model.predict(encoded)
+        predicted=np.argmax(predicted, axis=1)
+        
+        for word, index in token.word_index.items():
+            if index==predicted:
+                break
+            
+            
+        current_word=current_word+' '+word
+        
+        sentence=sentence+' '+word
+        
+    sentence=init_word+sentence
+    return sentence
 
-y_predict = model.predict([1])
-print(y_predict)
-
-
-y_predict = token.sequences_to_texts(y_predict)
-
-
-print(y_predict)
-
-# [[0.78815293]]
+print(sentence_generator(model, token, 'i', max_len, 10))        
