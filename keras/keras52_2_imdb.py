@@ -75,4 +75,4 @@ model.fit(x_train, y_train, epochs=20, batch_size=500 ,validation_split=0.2,call
 acc = model.evaluate(x_test, y_test)[1]
 print('acc : ', acc)
 
-# acc :  0.8352000117301941
+# acc :  0.8347600102424622
