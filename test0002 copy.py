@@ -5,7 +5,7 @@ from tensorflow.python.keras.callbacks import EarlyStopping, ModelCheckpoint
 from tensorflow.python.keras.models import Sequential
 from tensorflow.python.keras.layers import Dense, LSTM, Embedding
 from tensorflow.keras.utils import to_categorical # https://wikidocs.net/22647 케라스 원핫인코딩
-
+from transformers import AutoTokenizer, pipeline
 
 #1. 데이터
 datasets = pd.read_csv("D:\study_data\_temp/marrage.csv", names=["topic", "quote"])
@@ -102,7 +102,6 @@ model = Sequential()
 model.add(Embedding(word_size, 20))
 model.add(LSTM(32, return_sequences=True))
 model.add(LSTM(32))
-
 model.add(Dense(word_size, activation='softmax'))
 model.summary()
 
