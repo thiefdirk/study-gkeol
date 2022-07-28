@@ -17,13 +17,15 @@ datasets = pd.DataFrame(datasets)
 x_data = datasets["topic"]
 y_data = datasets["quote"]
 
+y_data = tokenizer(y_data)
+
 x_data = np.array(x_data)
 y_data = np.array(y_data)
 
 print(type(x_data[0]), type(y_data[0])) #<class 'numpy.ndarray'> <class 'numpy.ndarray'>
 
-X = torch.tensor(x_data, dtype=torch.float32).to("cuda:0")
-Y = torch.tensor(y_data, dtype=torch.int64).to("cuda:0")
+X = torch.tensor(x_data).to("cuda:0")
+Y = torch.tensor(y_data).to("cuda:0")
 
 ds = TensorDataset(X, Y)
 

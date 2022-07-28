@@ -12,6 +12,7 @@ from transformers import AutoTokenizer, AutoModelForCausalLM, Trainer, pipeline,
 from torch.utils.data import TensorDataset, DataLoader, random_split
 import torchtext
 from torchtext.data.utils import get_tokenizer
+from torchtext.data import TabularDataset
 # from sklearn.utils import gen_batches
 
 
