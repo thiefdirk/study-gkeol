@@ -11,7 +11,7 @@ from konlpy.tag import Okt
 okt=Okt()  
 path = 'D:\study_data\_temp/'
 
-datasets = pd.read_csv("D:\study_data\_temp/marrage.csv")
+datasets = pd.read_csv("/Users/gkeol/Documents/study-gkeol/marrage.csv")
 
 print(f'Length of text: {len(datasets)} characters')
 
@@ -21,7 +21,7 @@ vocab = sorted(set(datasets))
 
 print(f'{len(vocab)} unique characters')
 
-print(okt.morphs(datasets))
+print(okt.morphs(datasets[1]))
 print(okt.pos(datasets))  
 print(okt.nouns(datasets))  
 
