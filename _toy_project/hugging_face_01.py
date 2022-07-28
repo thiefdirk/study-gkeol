@@ -18,7 +18,7 @@ datasets = pd.DataFrame(datasets)
 # x_data = str(x_data)
 # y_data = str(y_data)
 
-text = '수업이'
+text = '수업이 재밌다'
 input_ids= tokenizer.encode(text, return_tensors='pt')
 input_ids = input_ids[:,1:]
 

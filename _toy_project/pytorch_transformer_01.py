@@ -9,7 +9,11 @@ from torch.nn import TransformerEncoder, TransformerEncoderLayer
 import torchtext
 from torchtext.data.utils import get_tokenizer
 
+from torchtext.datasets import WikiText2
+
 import torch
+
+print(type(WikiText2))
 class Transformer(nn.Module):
     def __init__(self, num_token, num_inputs, num_heads, num_hidden, num_layers, dropout=0.3):
         super(Transformer, self).__init__()
@@ -106,68 +110,86 @@ transformer_model = Transformer(num_tokens, embedding_size, num_heads, num_hidde
 optim_module = torch.optim.SGD(transformer_model.parameters(), lr=lrate)
 sched_module = torch.optim.lr_scheduler.StepLR(optim_module, 1.0, gamma=0.88)
 
-def train_model():
-    transformer_model.train()
-    loss_total = 0.
-    time_start = time.time()
-    num_tokens = len(TEXT.vocab.stoi)
-    for b, i in enumerate(range(0, training_data.size(0) - 1, max_seq_len)):
-        train_data_batch, train_label_batch = return_batch(training_data, i)
-        optim_module.zero_grad()
-        op = transformer_model(train_data_batch)
-        loss_curr = loss_func(op.view(-1, num_tokens), train_label_batch)
-        loss_curr.backward()
-        torch.nn.utils.clip_grad_norm_(transformer_model.parameters(), 0.6)
-        optim_module.step()
+# def train_model():
+#     transformer_model.train()
+#     loss_total = 0.
+#     time_start = time.time()
+#     num_tokens = len(TEXT.vocab.stoi)
+#     for b, i in enumerate(range(0, training_data.size(0) - 1, max_seq_len)):
+#         train_data_batch, train_label_batch = return_batch(training_data, i)
+#         optim_module.zero_grad()
+#         op = transformer_model(train_data_batch)
+#         loss_curr = loss_func(op.view(-1, num_tokens), train_label_batch)
+#         loss_curr.backward()
+#         torch.nn.utils.clip_grad_norm_(transformer_model.parameters(), 0.6)
+#         optim_module.step()
 
-        loss_total += loss_curr.item()
-        interval = 100
-        if b % interval == 0 and b > 0:
-            loss_interval = loss_total / interval
-            time_delta = time.time() - time_start
-            print(f"epoch {ep}, {b}/{len(training_data)//max_seq_len} batches, training loss {loss_interval:.2f}, training perplexity {math.exp(loss_interval):.2f}")
-            loss_total = 0
-            time_start = time.time()
+#         loss_total += loss_curr.item()
+#         interval = 100
+#         if b % interval == 0 and b > 0:
+#             loss_interval = loss_total / interval
+#             time_delta = time.time() - time_start
+#             print(f"epoch {ep}, {b}/{len(training_data)//max_seq_len} batches, training loss {loss_interval:.2f}, training perplexity {math.exp(loss_interval):.2f}")
+#             loss_total = 0
+#             time_start = time.time()
 
-def eval_model(eval_model_obj, eval_data_source):
-    eval_model_obj.eval() 
-    loss_total = 0.
-    num_tokens = len(TEXT.vocab.stoi)
-    with torch.no_grad():
-        for j in range(0, eval_data_source.size(0) - 1, max_seq_len):
-            eval_data, eval_label = return_batch(eval_data_source, j)
-            op = eval_model_obj(eval_data)
-            op_flat = op.view(-1, num_tokens)
-            loss_total += len(eval_data) * loss_func(op_flat, eval_label).item()
-    return loss_total / (len(eval_data_source) - 1)
+# def eval_model(eval_model_obj, eval_data_source):
+#     eval_model_obj.eval() 
+#     loss_total = 0.
+#     num_tokens = len(TEXT.vocab.stoi)
+#     with torch.no_grad():
+#         for j in range(0, eval_data_source.size(0) - 1, max_seq_len):
+#             eval_data, eval_label = return_batch(eval_data_source, j)
+#             op = eval_model_obj(eval_data)
+#             op_flat = op.view(-1, num_tokens)
+#             loss_total += len(eval_data) * loss_func(op_flat, eval_label).item()
+#     return loss_total / (len(eval_data_source) - 1)
 
-min_validation_loss = float("inf")
-eps = 50
-best_model_so_far = None
+# min_validation_loss = float("inf")
+# eps = 50
+# best_model_so_far = None
 
-for ep in range(1, eps + 1):
-    ep_time_start = time.time()
-    train_model()
-    validation_loss = eval_model(transformer_model, validation_data)
-    print()
-    print(f"epoch {ep:}, validation loss {validation_loss:.2f}, validation perplexity {math.exp(validation_loss):.2f}")
-    print()
+# for ep in range(1, eps + 1):
+#     ep_time_start = time.time()
+#     train_model()
+#     validation_loss = eval_model(transformer_model, validation_data)
+#     print()
+#     print(f"epoch {ep:}, validation loss {validation_loss:.2f}, validation perplexity {math.exp(validation_loss):.2f}")
+#     print()
 
-    if validation_loss < min_validation_loss:
-        min_validation_loss = validation_loss
-        best_model_so_far = transformer_model
+#     if validation_loss < min_validation_loss:
+#         min_validation_loss = validation_loss
+#         best_model_so_far = transformer_model
 
-    sched_module.step()
+#     sched_module.step()
 
-testing_loss = eval_model(best_model_so_far, testing_data)
-print(f"testing loss {testing_loss:.2f}, testing perplexity {math.exp(testing_loss):.2f}")
+# testing_loss = eval_model(best_model_so_far, testing_data)
+# print(f"testing loss {testing_loss:.2f}, testing perplexity {math.exp(testing_loss):.2f}")
 
 
 
     
 mdl_pth = './_transformer.pth'
-torch.save(best_model_so_far.state_dict(), mdl_pth)
+# torch.save(best_model_so_far.state_dict(), mdl_pth)
 
 transformer_cached = Transformer(num_tokens, embedding_size, num_heads, num_hidden_params, num_layers, 
                                      dropout).to(device)
 transformer_cached.load_state_dict(torch.load(mdl_pth))
+
+ln = 30
+sntc = 'It will _'
+sntc_split = sntc.split()
+torch.manual_seed(850)
+with torch.no_grad():
+    for i in range(ln):
+        sntc = ' '.join(sntc_split)
+        txt_ds = TEXT.numericalize([sntc_split])
+        num_b = txt_ds.size(0)
+        txt_ds = txt_ds.narrow(0, 0, num_b)
+        txt_ds = txt_ds.view(1, -1).t().contiguous().to(device)
+        ev_X, _ = return_batch(txt_ds, i+1)
+        op = transformer_cached(ev_X)
+        op_flat = op.view(-1, num_tokens)
+        res = TEXT.vocab.itos[op_flat.argmax(1)[0]]
+        sntc_split.insert(-1, res)
+print(sntc[:-2])
