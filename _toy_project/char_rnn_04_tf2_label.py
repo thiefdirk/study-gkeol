@@ -3,8 +3,8 @@ import numpy as np
 import os, sys
 import time
 
-filename = "D:/study_data/_data/project/quote_generator/input_nolabel/input.txt"
-#filename = "D:\study_data\_data\project\quote_generator/input_label/input.txt"
+# filename = "D:/study_data/_data/project/quote_generator/input_nolabel/input.txt"
+filename = "D:\study_data\_data\project\quote_generator/input_label/input.txt"
 
 # 문서 파일을 읽는다.
 text = open(filename, 'rb').read().decode(encoding='utf-8')
@@ -39,7 +39,7 @@ print ('{} ---- 문자들이 다음의 정수로 매핑되었습니다 ----> {}'
 
 # 훈련 샘플과 타깃 만들기
 # 단일 입력에 대해 원하는 문장의 최대 길이
-seq_length = 100
+seq_length = 80
 examples_per_epoch = len(text) # seq_length
 print(examples_per_epoch)
 
@@ -93,7 +93,7 @@ print(dataset)
 # 문자로 된 어휘 사전의 크기
 vocab_size = len(vocab)
 print(vocab_size)
-embedding_dim = 256
+embedding_dim = vocab_size
 rnn_units = 1024
 
 def build_model(vocab_size, embedding_dim, rnn_units, batch_size):
@@ -157,19 +157,19 @@ model.compile(optimizer='adam', loss=loss)
 
 # 체크포인트를 사용하여 훈련 중 체크포인트가 저장되도록 합니다.
 # 체크포인트가 저장될 폴더
-checkpoint_dir = './_ModelCheckPoint'
+checkpoint_dir = 'D:\study_data\_save/_ModelCheckPoint/char_rnn_project/label'
 # 체크 포인트 파일이름
 checkpoint_filename = os.path.join(checkpoint_dir, "ckpt_{epoch}")
 
 checkpoint_callback = tf.keras.callbacks.ModelCheckpoint(
-    filepath = checkpoint_filename, save_weights_only=True, save_best_only=True,)
+    filepath = checkpoint_filename, save_weights_only=True)
 
 # 훈련실행
-epochs = 100
-keep_training = 0 # 1: 모델을 불러와서 훈련을 계속할 때 0: 훈련을 처음할 때
+epochs = 70
+keep_training = 1 # 1: 모델을 불러와서 훈련을 계속할 때 0: 훈련을 처음할 때
 
 # 문장 생성 모드
-do_generate = 1  # 1: 문장 생성을 할 때, 0: 문장 생성 안 할 때
+do_generate = 0  # 1: 문장 생성을 할 때, 0: 문장 생성 안 할 때
 
 # 문장 생성을 할 때는 모델을 불러오지 않는다. 훈련을 하지도, 따라서 훈련 결과를 저장하지도 않는다.
 # 지금까지 실행된 코드 결과(만들어진 변수값)를 기반으로, 
@@ -181,10 +181,10 @@ if do_generate == 0:
   if keep_training:
     # If you load model only for prediction (without training), you need to set compile flag to False:
     # model = load_model('saved_model/my_model', compile=False)
-    model = tf.keras.models.load_model('saved_model/my_model', custom_objects={'loss':loss})
+    model = tf.keras.models.load_model('D:\study_data\_save/_ModelCheckPoint/char_rnn_project/label', custom_objects={'loss':loss})
 
   history = model.fit(dataset, epochs=epochs, callbacks=[checkpoint_callback])    
-  model.save('saved_model/my_model')
+  model.save('D:\study_data\_save/_ModelCheckPoint/char_rnn_project/label')
 
 # 텍스트 생성
 # 최근 체크포인트 복원
@@ -205,7 +205,7 @@ if do_generate:
 def generate_text(model, start_string):
   # 평가 단계 (학습된 모델을 사용하여 텍스트 생성)
   # 생성할 문자의 수
-  num_generate = 40
+  num_generate = 200
 
   # 시작 문자열을 숫자로 변환(벡터화)
   input_eval =  [char2idx[s] for s in start_string]        # ex. ROMEO
@@ -217,7 +217,7 @@ def generate_text(model, start_string):
   # 온도가 낮으면 더 예측 가능한 텍스트가 됩니다.
   # 온도가 높으면 더 의외의 텍스트가 됩니다.
   # 최적의 세팅을 찾기 위한 실험
-  temperature = 1.0
+  temperature = 1.2
 
   # 여기에서 배치 크기 == 1
   model.reset_states()
@@ -248,6 +248,45 @@ def generate_text(model, start_string):
 # print(myinput[0])
 # print(tf.squeeze(myinput))
 
+
 if do_generate:
-  article = generate_text(model, start_string=u"출력: \n")
-  print("\n", article)
+  article = generate_text(model, start_string=u"행복 ")
+  print(article)
+
+# label epochs 400, temperture 0.4, 100자 생성, 인생
+# 인생 
+# 지능 평균 지능을 과소평가한다는 것은 있을 수 없다.
+# 지도자 지도자는 물과 같이 외유내강(外柔內剛)해야 한다.
+# 지도자 남을 따르는 법을 알지 못하는 사람은 좋은 지도자
+
+# label epochs 400, temperture 0.6, 100자 생성, 인생
+# 인생 사람의 일이 그에 맞지 않으면 구두의 경우와 흔히 같으니, 너무 크
+# 면 비틀거릴 것이요, 너무 작으면 부르틀 것이다.
+
+# label epochs 400, temperture 1.1, 100자 생성, 인생
+# 인생 사람의 분노의 폭군에 의존하고 있는 일이 있으니 계산해 보면 부귀
+# 한 처지에 있을 때에는 마땅히 빈천한 처지의 고통을 알아야 하고, 젊을 
+# 때는 모름지기 노쇠한 처지의 괴로움을 생각해
+
+# label epochs 400, temperture 1.2, 70자 생성, 인생
+# 인생 ""예술 가능 사람에게 입을 다물고 있더라도 지금 당장 수행할수 있
+# 는 좋은 계획이, 다음주 까지 기다려야 하는 완벽한 계획보다
+
+
+# label epochs 400, temperture 1.4, 70자 생성, 인생
+# 인생 습관을 씨뿌리면 성품이 결실된다. 완성은 휴식은 어리석은 것이 전
+# 한 일이 사람, 또는 바구로 낭비하지 않으면 안된다.
+
+# label epochs 700, temperture 1.1, 70자 생성, 인생
+# 인생 살 수 있다. 우리는 불행을 자기를 위하여 이용할 수는 있는 것이다
+# .  "
+# 불화 마음을 합하여 같이 행동할 수 있다고 믿었던
+
+# label epochs 700, temperture 0.9, 130자 생성, 가난
+# 가난 못했다고 할 것 같으면 성공의 달성도 필경은 그 인간의 권태의 제
+# 물로 만드는데 지나지 않게 된다.  "
+# "성공, 근면 내가 성공한 원인은 오직 근면에 있었다. 나는 평생에 단 한
+#  번 전쟁이 일어난 이상은, 모든 가능한 방법을 동원하
+
+# label epochs 700, temperture 1.5, 130자 생성, 가족
+# 가족 각자 남보다 한 두가지 나은 점은 있지만, 열가지가 다가오면 생겨 보람이요, 마음의 기쁨이다.
