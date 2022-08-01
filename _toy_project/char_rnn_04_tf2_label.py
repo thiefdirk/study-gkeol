@@ -165,11 +165,11 @@ checkpoint_callback = tf.keras.callbacks.ModelCheckpoint(
     filepath = checkpoint_filename, save_weights_only=True)
 
 # 훈련실행
-epochs = 70
+epochs = 200
 keep_training = 1 # 1: 모델을 불러와서 훈련을 계속할 때 0: 훈련을 처음할 때
 
 # 문장 생성 모드
-do_generate = 0  # 1: 문장 생성을 할 때, 0: 문장 생성 안 할 때
+do_generate = 1  # 1: 문장 생성을 할 때, 0: 문장 생성 안 할 때
 
 # 문장 생성을 할 때는 모델을 불러오지 않는다. 훈련을 하지도, 따라서 훈련 결과를 저장하지도 않는다.
 # 지금까지 실행된 코드 결과(만들어진 변수값)를 기반으로, 
@@ -217,7 +217,7 @@ def generate_text(model, start_string):
   # 온도가 낮으면 더 예측 가능한 텍스트가 됩니다.
   # 온도가 높으면 더 의외의 텍스트가 됩니다.
   # 최적의 세팅을 찾기 위한 실험
-  temperature = 1.2
+  temperature = 0.5
 
   # 여기에서 배치 크기 == 1
   model.reset_states()
