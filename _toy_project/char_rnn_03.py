@@ -20,7 +20,7 @@ batch_size = 100 # Training : 50, Sampling : 1
 seq_length = 30 # Training : 50, Sampling : 1
 hidden_size = 30   # 히든 레이어의 노드 개수
 learning_rate = 0.002
-num_epochs = 100
+num_epochs = 30
 num_hidden_layers = 10
 grad_clip = 5   # Gradient Clipping에 사용할 임계값
 
@@ -117,8 +117,8 @@ with tf.Session() as sess:
 
     # 샘플링 시작
     print("샘플링을 시작합니다!")
-    num_sampling = 25  # 생성할 글자(Character)의 개수를 지정합니다. 
-    prime = u'인생 '         # 시작 글자를 ' '(공백)으로 지정합니다.
+    num_sampling = 30  # 생성할 글자(Character)의 개수를 지정합니다. 
+    prime = u' '         # 시작 글자를 ' '(공백)으로 지정합니다.
     sampling_type = 1    # 샘플링 타입을 설정합니다.
     state = sess.run(cell.zero_state(1, tf.float32)) # RNN의 최초 state값을 0으로 초기화합니다.
 
@@ -196,6 +196,11 @@ with tf.Session() as sess:
 # 각도
 
 # no-label
+
 # 반복(epoch): 10
 # 샘플링 결과:
 # 떤.  쯤바이렵 고전는 .지다 입 록하용지과사
+
+# 반복(epoch): 100
+# 샘플링 결과:
+# 인생 기. 리  " 히  는 른류사 .고않  을왔
