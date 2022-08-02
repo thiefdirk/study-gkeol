@@ -2,6 +2,42 @@ import tensorflow as tf
 import numpy as np
 import os, sys
 import time
+from tensorflow.keras.layers import Dense, Embedding, Bidirectional, LSTM, Concatenate, Dropout, Flatten
+from tensorflow.keras import Input, Model
+from tensorflow.keras import optimizers
+import os
+from keras_self_attention import SeqSelfAttention
+from attention import Attention
+
+
+class BahdanauAttention(tf.keras.Model):
+  def __init__(self, units):
+    super(BahdanauAttention, self).__init__()
+    self.W1 = Dense(units)
+    self.W2 = Dense(units)
+    self.V = Dense(1)
+
+  def call(self, values, query): # 단, key와 value는 같음
+    # query shape == (batch_size, hidden size)
+    # hidden_with_time_axis shape == (batch_size, 1, hidden size)
+    # score 계산을 위해 뒤에서 할 덧셈을 위해서 차원을 변경해줍니다.
+    hidden_with_time_axis = tf.expand_dims(query, 1)
+
+    # score shape == (batch_size, max_length, 1)
+    # we get 1 at the last axis because we are applying score to self.V
+    # the shape of the tensor before applying self.V is (batch_size, max_length, units)
+    score = self.V(tf.nn.tanh(
+        self.W1(values) + self.W2(hidden_with_time_axis)))
+
+    # attention_weights shape == (batch_size, max_length, 1)
+    attention_weights = tf.nn.softmax(score, axis=1)
+
+    # context_vector shape after sum == (batch_size, hidden_size)
+    context_vector = attention_weights * values
+    context_vector = tf.reduce_sum(context_vector, axis=1)
+
+    return context_vector, attention_weights
+
 
 # filename = "D:/study_data/_data/project/quote_generator/input_nolabel/input.txt"
 filename = "D:\study_data\_data\project\quote_generator/input_label/input.txt"
@@ -101,6 +137,9 @@ def build_model(vocab_size, embedding_dim, rnn_units, batch_size):
     tf.keras.layers.Embedding(vocab_size, embedding_dim, batch_input_shape=[batch_size, None]),
     tf.keras.layers.LSTM(rnn_units, return_sequences=True,
                          stateful=True, kernel_initializer='glorot_uniform'),  # Xavier 정규분포 초기값 설정기
+    Attention(vocab_size),
+    # Flatten(),
+    # Attention(64,use_scale=True),
     tf.keras.layers.Dense(vocab_size)
   ])
   return model
@@ -111,15 +150,32 @@ model = build_model(
   rnn_units=rnn_units,
   batch_size=BATCH_SIZE)  
 
+# embedded_sequences = Embedding(len(vocab), 128,  mask_zero = True, batch_input_shape=[BATCH_SIZE, None])(vocab_size)
+# lstm = Bidirectional(LSTM(rnn_units, dropout=0.5, return_sequences = True,
+#                           stateful=True, kernel_initializer='glorot_uniform'))(embedded_sequences)
+# lstm, forward_h, forward_c, backward_h, backward_c = Bidirectional \
+#   (LSTM(rnn_units, dropout=0.5, return_sequences=True, return_state=True,
+#         stateful=True, kernel_initializer='glorot_uniform'))(lstm)
+# print(lstm.shape, forward_h.shape, forward_c.shape, backward_h.shape, backward_c.shape)
+# state_h = Concatenate()([forward_h, backward_h]) # 은닉 상태
+# state_c = Concatenate()([forward_c, backward_c]) # 셀 상태
+# attention = BahdanauAttention(64) # 가중치 크기 정의
+# context_vector, attention_weights = attention(lstm, state_h)
+# dense1 = Dense(20, activation="relu")(context_vector)
+# dropout = Dropout(0.5)(dense1)
+# output = Dense(vocab_size)(dropout)
+# model = Model(inputs=vocab_size, outputs=output)
+
   # 모델 사용
 for input_example_batch, target_example_batch in dataset.take(1):
   example_batch_pred = model(input_example_batch)
-  print(example_batch_pred.shape)  
+  print(example_batch_pred.shape)  #(64, 80, 1172) (64, 1172)
   print(example_batch_pred[0])
 
   print(input_example_batch)
   print(target_example_batch)
   example_batch_pred = model(input_example_batch)
+
 
 # 출력은 (batch_size, sequence length, vocab_size)
 # 위 예제에서는 시퀀스 길이를 100으로 설정했으면 임의의 길이를 입력해서 모델을 실행할 수 있다.
@@ -157,7 +213,7 @@ model.compile(optimizer='adam', loss=loss)
 
 # 체크포인트를 사용하여 훈련 중 체크포인트가 저장되도록 합니다.
 # 체크포인트가 저장될 폴더
-checkpoint_dir = 'D:\study_data\_save/_ModelCheckPoint/char_rnn_project/label'
+checkpoint_dir = 'D:\study_data\_save/_ModelCheckPoint/char_rnn_project/label/attention'
 # 체크 포인트 파일이름
 checkpoint_filename = os.path.join(checkpoint_dir, "ckpt_{epoch}")
 
@@ -165,11 +221,11 @@ checkpoint_callback = tf.keras.callbacks.ModelCheckpoint(
     filepath = checkpoint_filename, save_weights_only=True)
 
 # 훈련실행
-epochs = 200
+epochs = 100
 keep_training = 0 # 1: 모델을 불러와서 훈련을 계속할 때 0: 훈련을 처음할 때
 
 # 문장 생성 모드
-do_generate = 1  # 1: 문장 생성을 할 때, 0: 문장 생성 안 할 때
+do_generate = 0  # 1: 문장 생성을 할 때, 0: 문장 생성 안 할 때
 
 # 문장 생성을 할 때는 모델을 불러오지 않는다. 훈련을 하지도, 따라서 훈련 결과를 저장하지도 않는다.
 # 지금까지 실행된 코드 결과(만들어진 변수값)를 기반으로, 
@@ -181,10 +237,10 @@ if do_generate == 0:
   if keep_training:
     # If you load model only for prediction (without training), you need to set compile flag to False:
     # model = load_model('saved_model/my_model', compile=False)
-    model = tf.keras.models.load_model('D:\study_data\_save/_ModelCheckPoint/char_rnn_project/label', custom_objects={'loss':loss})
+    model = tf.keras.models.load_model('D:\study_data\_save/_ModelCheckPoint/char_rnn_project/label/attention', custom_objects={'loss':loss})
 
   history = model.fit(dataset, epochs=epochs, callbacks=[checkpoint_callback])    
-  model.save('D:\study_data\_save/_ModelCheckPoint/char_rnn_project/label')
+  model.save('D:\study_data\_save/_ModelCheckPoint/char_rnn_project/label/attention')
 
 # 텍스트 생성
 # 최근 체크포인트 복원
@@ -196,6 +252,7 @@ if do_generate:
   print("latest_checkpoint: ", tf.train.latest_checkpoint(checkpoint_dir))
 
   model = build_model(vocab_size, embedding_dim, rnn_units, batch_size=1)
+
   model.load_weights(tf.train.latest_checkpoint(checkpoint_dir))
   #model.load_weights("./training_checkpoints\ckpt_100")
 
@@ -217,7 +274,7 @@ def generate_text(model, start_string):
   # 온도가 낮으면 더 예측 가능한 텍스트가 됩니다.
   # 온도가 높으면 더 의외의 텍스트가 됩니다.
   # 최적의 세팅을 찾기 위한 실험
-  temperature = 1.4
+  temperature = 1.5
 
   # 여기에서 배치 크기 == 1
   model.reset_states()
@@ -253,81 +310,19 @@ if do_generate:
   article = generate_text(model, start_string=u"가족 ")
   print(article)
 
-# label epochs 400, temperture 0.4, 100자 생성, 인생
-# 인생 
-# 지능 평균 지능을 과소평가한다는 것은 있을 수 없다.
-# 지도자 지도자는 물과 같이 외유내강(外柔內剛)해야 한다.
-# 지도자 남을 따르는 법을 알지 못하는 사람은 좋은 지도자
 
-# label epochs 400, temperture 0.6, 100자 생성, 인생
-# 인생 사람의 일이 그에 맞지 않으면 구두의 경우와 흔히 같으니, 너무 크
-# 면 비틀거릴 것이요, 너무 작으면 부르틀 것이다.
+# label epochs 700, temperture 1.4, 200자 생성, 가족, self-attention
+# 스칼라 손실:      7.065503
+# 가족 필필필필필필필필필필필필필필필필필필필필필
+# 필필필필필필필필필필필필필필필필필필필필필필필필
+# 필필필필필필필필필필필필필필필필필필필필필필필필
+# 필필필필필필필필필필필필필필필필필필필필필필필필
+# 필필필필필필필필필필필필필필필필필필필필필필필필
+# 필필필필필필필필필필필필필필필필필필필필필필필필
+# 필필필필필필필필필필필필필필필필필필필필필필필필
+# 필필필필필필필필필필필필필필필필필필필필필필필필
+# 필필필필필필필필필필필
 
-# label epochs 400, temperture 1.1, 100자 생성, 인생
-# 인생 사람의 분노의 폭군에 의존하고 있는 일이 있으니 계산해 보면 부귀
-# 한 처지에 있을 때에는 마땅히 빈천한 처지의 고통을 알아야 하고, 젊을 
-# 때는 모름지기 노쇠한 처지의 괴로움을 생각해
-
-# label epochs 400, temperture 1.2, 70자 생성, 인생
-# 인생 ""예술 가능 사람에게 입을 다물고 있더라도 지금 당장 수행할수 있
-# 는 좋은 계획이, 다음주 까지 기다려야 하는 완벽한 계획보다
-
-
-# label epochs 400, temperture 1.4, 70자 생성, 인생
-# 인생 습관을 씨뿌리면 성품이 결실된다. 완성은 휴식은 어리석은 것이 전
-# 한 일이 사람, 또는 바구로 낭비하지 않으면 안된다.
-
-# label epochs 700, temperture 1.1, 70자 생성, 인생
-# 인생 살 수 있다. 우리는 불행을 자기를 위하여 이용할 수는 있는 것이다
-# .  "
-# 불화 마음을 합하여 같이 행동할 수 있다고 믿었던
-
-# label epochs 700, temperture 0.9, 130자 생성, 가난
-# 가난 못했다고 할 것 같으면 성공의 달성도 필경은 그 인간의 권태의 제
-# 물로 만드는데 지나지 않게 된다.  "
-# "성공, 근면 내가 성공한 원인은 오직 근면에 있었다. 나는 평생에 단 한
-#  번 전쟁이 일어난 이상은, 모든 가능한 방법을 동원하
-
-# label epochs 700, temperture 1.5, 130자 생성, 가족
-# 가족 각자 남보다 한 두가지 나은 점은 있지만, 열가지가 다가오면 생겨 보람이요, 마음의 기쁨이다.
-
-# label epochs 700, temperture 1.5, 200자 생성, 가족, no_attention
-# 스칼라 손실:      7.0693793      
-# 가족 학문은 잠시도 쉬어 버린다.  
-# "
-# "삶, 삶 나는 백약의 장. 불행까지 미리 걱정한다. 
-# 그러나 정말 불행을 막는 사람은 드물다.  그러나의
-#  비결은 자기 혼자서 일을 하는 게 아니다. 정함도 
-# 사랑은 인간이 지닌 가장 강한 국을 근로는다.  "  
-# 노력 나는 대단한 인물이다. 그러나 그 승리를 지  
-# 인간, 의견 구는 행복을 즐겨야 하는 것이다.      
-# 삶 충실
-
-# Model: "sequential"
-# _________________________________________________________________
-#  Layer (type)                Output Shape       
-#        Param #
-# =================================================================
-#  embedding (Embedding)       (64, None, 1172)   
-#        1373584
-
-
-#  lstm (LSTM)                 (64, None, 1024)   
-#        8998912
-
-
-#  seq_self_attention (SeqSelf  (64, None, 1024)  
-#        65601
-#  Attention)
-
-
-
-#  dense (Dense)               (64, None, 1172)   
-#        1201300
-
-
-# =================================================================
-# Total params: 11,639,397
-# Trainable params: 11,639,397
-# Non-trainable params: 0
-# _________________________________________________________________
+# WARNING:absl:Found untraced functions such as lstm_cell_layer_call_fn
+# , lstm_cell_layer_call_and_return_conditional_losses while saving (showing 
+# 2 of 2). These functions will not be directly callable after loading.
