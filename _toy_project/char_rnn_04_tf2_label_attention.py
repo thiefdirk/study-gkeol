@@ -137,10 +137,13 @@ def build_model(vocab_size, embedding_dim, rnn_units, batch_size):
     tf.keras.layers.Embedding(vocab_size, embedding_dim, batch_input_shape=[batch_size, None]),
     tf.keras.layers.LSTM(rnn_units, return_sequences=True,
                          stateful=True, kernel_initializer='glorot_uniform'),  # Xavier 정규분포 초기값 설정기
-    Attention(vocab_size),
+    Attention(80),
+    tf.keras.layers.Reshape(target_shape=(80, 1)),
     # Flatten(),
     # Attention(64,use_scale=True),
     tf.keras.layers.Dense(vocab_size)
+    
+  
   ])
   return model
 
@@ -204,7 +207,7 @@ print("예측된 다음 문자: \n", repr("".join(idx2char[sampled_indices])))
 # 옵티마이저와 손실함수 넣기
 def loss(labels, logits):
   return tf.keras.losses.sparse_categorical_crossentropy(labels, logits, from_logits=True)
-example_batch_loss = loss(target_example_batch, example_batch_pred)
+example_batch_loss = loss(target_example_batch, example_batch_pred) 
 print("예측 배열 크기(shape): ", example_batch_pred.shape, " # (배치 크기, 시퀀스 길이, 어휘사전 크기)")
 print("스칼라 손실:     ", example_batch_loss.numpy().mean())
 
@@ -221,11 +224,11 @@ checkpoint_callback = tf.keras.callbacks.ModelCheckpoint(
     filepath = checkpoint_filename, save_weights_only=True)
 
 # 훈련실행
-epochs = 100
+epochs = 700
 keep_training = 0 # 1: 모델을 불러와서 훈련을 계속할 때 0: 훈련을 처음할 때
 
 # 문장 생성 모드
-do_generate = 0  # 1: 문장 생성을 할 때, 0: 문장 생성 안 할 때
+do_generate = 1  # 1: 문장 생성을 할 때, 0: 문장 생성 안 할 때
 
 # 문장 생성을 할 때는 모델을 불러오지 않는다. 훈련을 하지도, 따라서 훈련 결과를 저장하지도 않는다.
 # 지금까지 실행된 코드 결과(만들어진 변수값)를 기반으로, 
@@ -274,7 +277,7 @@ def generate_text(model, start_string):
   # 온도가 낮으면 더 예측 가능한 텍스트가 됩니다.
   # 온도가 높으면 더 의외의 텍스트가 됩니다.
   # 최적의 세팅을 찾기 위한 실험
-  temperature = 1.5
+  temperature = 1.4
 
   # 여기에서 배치 크기 == 1
   model.reset_states()
