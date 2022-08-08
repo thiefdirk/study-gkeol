@@ -18,16 +18,15 @@ from sklearn.model_selection import train_test_split
 
 
 
-
 # 결과비교
 # 1. DecisionTree
 # 기존 acc
 # 컬럼삭제후 acc
 import numpy as np
-from sklearn.datasets import load_iris, load_diabetes
+from sklearn.datasets import load_iris, load_diabetes, load_breast_cancer, load_wine
 
-# 데이터
-datasets = load_iris()
+#1. 데이터
+datasets = load_wine()
 x = datasets.data
 y = datasets.target
 
@@ -87,3 +86,14 @@ for i in range(len(model_list)):
     else :
         plt.title(model_list[i])
 plt.show()
+
+    
+
+# DecisionTreeRegressor 의 스코어:  0.020045778350520127
+# DecisionTreeRegressor 의 드랍후 스코어:  0.12163069242548197
+# RandomForestRegressor 의 스코어:  0.4470425048290939
+# RandomForestRegressor 의 드랍후 스코어:  0.42309633688606896
+# GradientBoostingRegressor 의 스코어:  0.4170813764532981
+# GradientBoostingRegressor 의 드랍후 스코어:  0.40757725388083565
+# XGB 의 스코어:  0.2602960708365062
+# XGB 의 드랍후 스코어:  0.30612842840969323

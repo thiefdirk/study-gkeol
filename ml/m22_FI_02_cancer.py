@@ -14,6 +14,7 @@ from sklearn.pipeline import make_pipeline # pipeline을 사용하기 위한 함
 from sklearn.preprocessing import StandardScaler, MinMaxScaler
 from sklearn.metrics import accuracy_score, r2_score
 import matplotlib.pyplot as plt
+from sklearn.model_selection import train_test_split
 
 
 
@@ -24,60 +25,22 @@ import matplotlib.pyplot as plt
 import numpy as np
 from sklearn.datasets import load_iris, load_diabetes, load_breast_cancer
 
-# 데이터
+#1. 데이터
 datasets = load_breast_cancer()
 x = datasets.data
 y = datasets.target
 
-# 컬럼명 확인
-print(datasets.feature_names)
-# 컬럼 제거
-
+allfeature = round(x.shape[1]*0.2, 0)
+print('자를 갯수: ', int(allfeature))
 # x = x[:, [2, 3]] # 첫번째, 두번째 컬럼 제거
 
-
-from sklearn.model_selection import train_test_split
-
-x_train, x_test,y_train, y_test= train_test_split(x,y, train_size=0.8, shuffle=True, random_state=1234)
-
-
-#2. 모델구성 
-
-# model1 = DecisionTreeRegressor()
-# model2 = RandomForestRegressor()
-# model3 = GradientBoostingRegressor()
-# model4 = XGBRegressor()
-
+#2. 모델구성
 model1 = DecisionTreeClassifier()
 model2 = RandomForestClassifier()
 model3 = GradientBoostingClassifier()
 model4 = XGBClassifier()
 
 model_list = [model1, model2, model3, model4]
-
-#3. 훈련
-
-# model1.fit(x_train,y_train)
-# model2.fit(x_train,y_train)
-# model3.fit(x_train,y_train)
-# model4.fit(x_train,y_train)
-
-#3. 훈련, 평가예측
-
-for i in range(len(model_list)) :
-    model_list[i].fit(x_train,y_train)
-    result = model_list[i].score(x_test, y_test)
-    print("model.score:",result)
-    y_predict =model_list[i].predict(x_test)
-    acc = accuracy_score(y_test,y_predict)
-    print('accuracy_score:', acc)
-
-print("===================================")
-print(model1,':',model1.feature_importances_)
-print(model2,':',model2.feature_importances_)
-print(model3,':',model3.feature_importances_)
-print(model4,':',model4.feature_importances_)
-
 
 def plot_feature_importances(model) : 
     n_features = datasets.data.shape[1]
@@ -88,6 +51,7 @@ def plot_feature_importances(model) :
     plt.ylim(-1, n_features)
     plt.title(model)
 
+x_train, x_test,y_train, y_test= train_test_split(x,y, train_size=0.8, shuffle=True, random_state=1234)
 
 plt.figure(figsize=(8,8))
 for i in range(len(model_list)):
@@ -97,37 +61,41 @@ for i in range(len(model_list)):
         plt.title('XGBClassifier()')
     else :
         plt.title(model_list[i])
+plt.show()
+   
 
+
+#3. 훈련, 컴파일
 for model in model_list:
-    model_drop_cal = []
     model.fit(x_train, y_train)
-    score_bf = model.score(x_test, y_test)
+    score = model.score(x_test, y_test)
     if str(model).startswith('XGB'):
-        print('XGB 의 스코어: ', score_bf)
+        print('XGB 의 스코어: ', score)
     else:
-        print(str(model).strip('()'), '의 스코어: ', score_bf)
-    for i in range(len(model.feature_importances_)):
-        if model.feature_importances_[i]<=0.03:
-            model_drop_cal.append(i)
-        np.delete(x, model_drop_cal, axis=1)
-    model.fit(x_train, y_train)
-    score_af = model.score(x_test, y_test)    
-    # print('중요도낮은칼럼: ', model_drop_cal)
-    # print('모든칼럼중요도: ', model.feature_importances_)
-    print('중요도낮은칼럼제외후점수: ', score_bf)
-    print('중요도낮은칼럼제외후점수: ', score_af)
+        print(str(model).strip('()'), '의 스코어: ', score)
+        
+    featurelist = []
+    for a in range(int(allfeature)):
+        featurelist.append(np.argsort(model.feature_importances_)[a])
+        
+    x_bf = np.delete(x, featurelist, axis=1)
+    x_train2, x_test2, y_train2, y_test2 = train_test_split(x_bf, y, shuffle=True, train_size=0.8, random_state=1234)
+    model.fit(x_train2, y_train2)
+    score = model.score(x_test2, y_test2)
+    if str(model).startswith('XGB'):
+        print('XGB 의 드랍후 스코어: ', score)
+    else:
+        print(str(model).strip('()'), '의 드랍후 스코어: ', score)
+    
     
 
+    
 
-plt.show()
-
-
-# DecisionTreeClassifier() : 1.0
-# RandomForestClassifier() : 1.0
-# GradientBoostingClassifier() : 1.0
-# XGBClassifier() : 1.0
-########################################컬럼 삭제 전, 후##############################################
-# DecisionTreeClassifier() : 0.9666666666666667
-# RandomForestClassifier() : 0.9666666666666667
-# GradientBoostingClassifier() : 0.9666666666666667
-# XGBClassifier() : 0.9666666666666667
+# DecisionTreeClassifier 의 스코어:  0.8859649122807017
+# DecisionTreeClassifier 의 드랍후 스코어:  0.8947368421052632
+# RandomForestClassifier 의 스코어:  0.9122807017543859
+# RandomForestClassifier 의 드랍후 스코어:  0.9210526315789473
+# GradientBoostingClassifier 의 스코어:  0.9122807017543859
+# GradientBoostingClassifier 의 드랍후 스코어:  0.9210526315789473
+# XGB 의 스코어:  0.9385964912280702
+# XGB 의 드랍후 스코어:  0.9385964912280702

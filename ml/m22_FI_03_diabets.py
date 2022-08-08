@@ -18,16 +18,15 @@ from sklearn.model_selection import train_test_split
 
 
 
-
 # 결과비교
 # 1. DecisionTree
 # 기존 acc
 # 컬럼삭제후 acc
 import numpy as np
-from sklearn.datasets import load_iris, load_diabetes
+from sklearn.datasets import load_iris, load_diabetes, load_breast_cancer
 
-# 데이터
-datasets = load_iris()
+#1. 데이터
+datasets = load_diabetes()
 x = datasets.data
 y = datasets.target
 
@@ -36,10 +35,10 @@ print('자를 갯수: ', int(allfeature))
 # x = x[:, [2, 3]] # 첫번째, 두번째 컬럼 제거
 
 #2. 모델구성
-model1 = DecisionTreeClassifier()
-model2 = RandomForestClassifier()
-model3 = GradientBoostingClassifier()
-model4 = XGBClassifier()
+model1 = DecisionTreeRegressor()
+model2 = RandomForestRegressor()
+model3 = GradientBoostingRegressor()
+model4 = XGBRegressor()
 
 model_list = [model1, model2, model3, model4]
 
@@ -82,8 +81,19 @@ plt.figure(figsize=(8,8))
 for i in range(len(model_list)):
     plt.subplot(2,2,i+1) # 2행 2열에서 i+1번째 칸에 그림을 그림
     plot_feature_importances(model_list[i])
-    if str(model_list[i]).startswith('XGBClassifier'):
-        plt.title('XGBClassifier()')
+    if str(model_list[i]).startswith('XGBRegressor'):
+        plt.title('XGBRegressor()')
     else :
         plt.title(model_list[i])
 plt.show()
+
+    
+
+# DecisionTreeClassifier 의 스코어:  0.8859649122807017
+# DecisionTreeClassifier 의 드랍후 스코어:  0.8947368421052632
+# RandomForestClassifier 의 스코어:  0.9122807017543859
+# RandomForestClassifier 의 드랍후 스코어:  0.9210526315789473
+# GradientBoostingClassifier 의 스코어:  0.9122807017543859
+# GradientBoostingClassifier 의 드랍후 스코어:  0.9210526315789473
+# XGB 의 스코어:  0.9385964912280702
+# XGB 의 드랍후 스코어:  0.9385964912280702
