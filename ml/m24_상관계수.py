@@ -21,7 +21,8 @@ print(df.corr()) # 상관계수 계산
 import matplotlib.pyplot as plt
 import seaborn as sns
 sns.set(font_scale=1.2)
-sns.heatmap(df.corr(), annot=True, square=True, cbar=True) # 상관계수 히트맵 출력, square annot=True : 상관계수 값 출력, cmap='RdYlGn' : 색상 지정
+sns.heatmap(df.corr(), annot=True, square=True, cbar=True) # 상관계수 히트맵 출력, annot=True : 상관계수 값 출력, cmap='RdYlGn' : 색상 지정,
+                                                           # square=True : 정사각형으로 출력, cbar=True : 상관계수 값 출력
 
 plt.show() # 출력
 

@@ -9,6 +9,7 @@ from sklearn.preprocessing import OneHotEncoder  # https://psystat.tistory.com/1
 from sklearn.metrics import r2_score, accuracy_score
 from sklearn.preprocessing import MinMaxScaler, StandardScaler, MaxAbsScaler, RobustScaler
 from keras.layers import BatchNormalization
+import time
 
 
 ###########################폴더 생성시 현재 파일명으로 자동생성###########################################
@@ -124,10 +125,10 @@ earlyStopping = EarlyStopping(monitor='val_loss', patience=50, mode='auto', verb
 mcp = ModelCheckpoint(monitor='val_loss', mode='auto', verbose=1, save_best_only=True, 
                       filepath= "".join([save_filepath, date, '_', filename])
                       )
-
-hist = model.fit(x_train, y_train, epochs=300, batch_size=50,
+start = time.time()
+hist = model.fit(x_train, y_train, epochs=300, batch_size=300,
                  validation_split=0.2,
-                 callbacks=[earlyStopping, mcp],
+                 callbacks=[earlyStopping],
                  verbose=1)
 
 #4. 평가, 예측
@@ -139,9 +140,11 @@ y_predict = np.argmax(y_predict, axis= 1)
 df3 = pd.DataFrame(y_predict)
 y_predict = oh.transform(df3)
 
+end = time.time() - start
+
 
 acc = accuracy_score(y_test, y_predict)
 print('acc스코어 : ', acc)
-
+print('실행시간 : ', end)
 # loss :  [0.1137540265917778, 0.9713000059127808]
 # acc스코어 :  0.9713

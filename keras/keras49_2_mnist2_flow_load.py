@@ -4,7 +4,7 @@
 # 넘파이에서 불러와서 모델구성
 # 성능비교
 from warnings import filters
-from tensorflow.python.keras.models import Sequential, Model
+from tensorflow.python.keras.models import Sequential, Model, load_model
 from tensorflow.python.keras.layers import Activation, Dense, Conv2D, Flatten, MaxPooling2D, Input, Dropout
 from keras.datasets import mnist, fashion_mnist, cifar10, cifar100
 import numpy as np
@@ -16,6 +16,7 @@ from sklearn.preprocessing import MinMaxScaler, StandardScaler, MaxAbsScaler, Ro
 from keras.layers import BatchNormalization
 from keras.preprocessing.image import ImageDataGenerator
 oh = OneHotEncoder(sparse=False) # sparse=true 는 매트릭스반환 False는 array 반환
+import datetime
 ###########################폴더 생성시 현재 파일명으로 자동생성###########################################
 import inspect, os
 a = inspect.getfile(inspect.currentframe()) #현재 파일이 위치한 경로 + 현재 파일 명
@@ -90,6 +91,7 @@ earlyStopping = EarlyStopping(monitor='val_loss', patience=10, mode='auto', verb
 mcp = ModelCheckpoint(monitor='val_loss', mode='auto', verbose=1, save_best_only=True, 
                       filepath= "".join([save_filepath, date, '_', filename])
                       )
+start = datetime.datetime.now()
 
 hist = model.fit(x_train, y_train, epochs=40, batch_size=500,
                  validation_split=0.2,
@@ -106,6 +108,10 @@ val_accuracy = hist.history['val_accuracy']
 loss = hist.history['loss']
 val_loss = hist.history['val_loss']
 
+end = datetime.datetime.now()
+time = end - start
+
+print('소요 시간 : ', time)
 print('loss : ', loss[-1])
 print('accuracy : ', acc[-1])
 
