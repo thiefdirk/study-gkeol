@@ -169,4 +169,4 @@ print('acc스코어 : ', acc)
 # LogisticRegression : 0.7821229050279329
 # KNeighborsClassifier : 0.7039106145251397
 # DecisionTreeClassifier : 0.8156424581005587
-# RandomForestClassifier : 0.8166666666666667
+# RandomForestClassifier : 0.8435754189944135

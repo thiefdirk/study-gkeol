@@ -118,8 +118,7 @@ result = model.score(x_test, y_test)
 
 print('model.score : ', result) 
 
-# LinearSVC : 0.7318435754189944
-# LogisticRegression : 0.7821229050279329
-# KNeighborsClassifier : 0.7039106145251397
-# DecisionTreeClassifier : 0.8156424581005587
+
 # RandomForestClassifier : 0.8435754189944135
+
+# model.score :  0.8547486033519553

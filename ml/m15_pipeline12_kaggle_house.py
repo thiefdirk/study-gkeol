@@ -256,7 +256,6 @@ result = model.score(x_test, y_test)
 
 print('model.score : ', result) 
 
+# model.score :  0.8490066615625375
 
-# loss :  [783083008.0, 19001.142578125]
-# RMSE :  27983.620414585308
 # r2스코어 :  0.8335024951495981

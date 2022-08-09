@@ -67,7 +67,7 @@ for i in range(len(model_list)):
     plt.subplot(2,2,i+1) # 2행 2열에서 i+1번째 칸에 그림을 그림
     plot_feature_importances(model_list[i])
     if str(model_list[i]).startswith('XGBClassifier'):
-        plt.title('XGB()')
+        plt.title('XGBClassifier()')
     else :
         plt.title(model_list[i])
 

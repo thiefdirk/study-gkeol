@@ -65,3 +65,4 @@ print('결과 : ', y_predict)
 # LogisticRegression : 0.9883040935672515
 # KNeighborsClassifier : 0.9590643274853801
 # DecisionTreeClassifier : 0.9590643274853801
+# RandomForestClassifier : 0.9649122807017544

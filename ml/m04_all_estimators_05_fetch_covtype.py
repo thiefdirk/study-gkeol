@@ -30,6 +30,7 @@ y = datasets.target
 print(x.shape, y.shape) # (581012, 54) (581012,)
 print(np.unique(y)) # [1 2 3 4 5 6 7]
 
+#cross_validation 
 
 x_train, x_test, y_train, y_test = train_test_split(x,y,
                                                     train_size=0.7,
@@ -60,7 +61,7 @@ print(len(allAlgorithms)) # 모든 모델의 갯수를 보여줌, 총 갯수는 
 
 
 for (name, algorithm) in allAlgorithms: # key, value로 나누어서 보여줌
-    try: 
+    try:
         model = algorithm()
         model.fit(x_train, y_train)
         y_predict = model.predict(x_test)
@@ -71,6 +72,49 @@ for (name, algorithm) in allAlgorithms: # key, value로 나누어서 보여줌
         continue    # 예외가 발생하면 다음 모델으로 넘어가게 하는 코드
 # TypeError: __init__() missing 1 required positional argument: 'base_estimator', 이런 에러가 뜸
 # 예외처리 해야함
+
+# AdaBoostClassifier 의 정답률 : 0.5342160822471085
+# BaggingClassifier 의 정답률 : 0.9588248118230218
+# BernoulliNB 의 정답률 : 0.6303412428859922    
+# BaggingClassifier 의 정답률 : 0.9588248118230218
+# BernoulliNB 의 정답률 : 0.6303412428859922    
+# CalibratedClassifierCV 의 정답률 : 0.6684470809619975
+# CategoricalNB 은 안나온 놈!!!
+# ClassifierChain 은 안나온 놈!!!
+# ComplementNB 은 안나온 놈!!!
+# DecisionTreeClassifier 의 정답률 : 0.9349297778593721
+# DummyClassifier 의 정답률 : 0.48640880301083167
+# ExtraTreeClassifier 의 정답률 : 0.8503419313383513
+# ExtraTreesClassifier 의 정답률 : 0.9509305581053791
+# GaussianNB 의 정답률 : 0.46058610244171105    
+# GaussianProcessClassifier 은 안나온 놈!!!     
+# GradientBoostingClassifier 의 정답률 : 0.7742679456581605
+# HistGradientBoostingClassifier 의 정답률 : 0.7824834771433816
+# KNeighborsClassifier 의 정답률 : 0.9659847163576281
+# LabelPropagation 은 안나온 놈!!!
+# LabelSpreading 은 안나온 놈!!!
+# LinearDiscriminantAnalysis 의 정답률 : 0.6787451808334863
+# LinearSVC 의 정답률 : 0.32425532403157703     
+# LogisticRegression 의 정답률 : 0.6187695061501745
+# LogisticRegressionCV 의 정답률 : 0.6709599320727005
+# MLPClassifier 의 정답률 : 0.77542684046264    
+# MultiOutputClassifier 은 안나온 놈!!!
+# MultinomialNB 은 안나온 놈!!!
+# NearestCentroid 의 정답률 : 0.19382802460069762
+# NuSVC 은 안나온 놈!!!
+# OneVsOneClassifier 은 안나온 놈!!!
+# OneVsRestClassifier 은 안나온 놈!!!
+# OutputCodeClassifier 은 안나온 놈!!!
+# PassiveAggressiveClassifier 의 정답률 : 0.41645630622360935
+# Perceptron 의 정답률 : 0.5785409399669543     
+# QuadraticDiscriminantAnalysis 의 정답률 : 0.08309046263998532
+# RadiusNeighborsClassifier 은 안나온 놈!!!     
+# RandomForestClassifier 의 정답률 : 0.9525082614283091
+# RidgeClassifier 의 정답률 : 0.7003166880851845RidgeClassifierCV 의 정답률 : 0.7005117495869286
+# SGDClassifier 의 정답률 : 0.5229943087938315  
+# SVC 의 정답률 : 0.7124391867082798
+# StackingClassifier 은 안나온 놈!!!
+# VotingClassifier 은 안나온 놈!!!
 
 #3. 컴파일 훈련
 

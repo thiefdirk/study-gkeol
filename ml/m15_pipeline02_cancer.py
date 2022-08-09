@@ -30,4 +30,4 @@ model.fit(x_train, y_train)
 #4. 평가, 예측
 result = model.score(x_test, y_test)
 
-print('model.score : ', result) # model.score :  1.0
+print('model.score : ', result) # model.score :  0.9210526315789473

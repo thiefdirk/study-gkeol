@@ -23,10 +23,10 @@ from sklearn.model_selection import train_test_split
 # 기존 acc
 # 컬럼삭제후 acc
 import numpy as np
-from sklearn.datasets import load_iris, load_diabetes, load_breast_cancer, load_wine, fetch_covtype
+from sklearn.datasets import load_iris, load_diabetes, load_breast_cancer, load_wine, fetch_covtype, load_digits
 
 #1. 데이터
-datasets = fetch_covtype()
+datasets = load_digits()
 x = datasets.data
 y = datasets.target
 print(np.unique(y)) # [1 2 3 4 5 6 7]
@@ -91,9 +91,11 @@ plt.show()
 
     
 
-# DecisionTreeClassifier 의 스코어:  0.9409395626618934      
-# DecisionTreeClassifier 의 드랍후 스코어:  0.9406469712485909
-# RandomForestClassifier 의 스코어:  0.9561371048940217      
-# RandomForestClassifier 의 드랍후 스코어:  0.9569116115762932
-# GradientBoostingClassifier 의 스코어:  0.7737579924786796  
-# GradientBoostingClassifier 의 드랍후 스코어:  0.7737493868488765
+# DecisionTreeClassifier 의 스코어:  0.8694444444444445
+# DecisionTreeClassifier 의 드랍후 스코어:  0.8583333333333333
+# RandomForestClassifier 의 스코어:  0.9777777777777777
+# RandomForestClassifier 의 드랍후 스코어:  0.9777777777777777
+# GradientBoostingClassifier 의 스코어:  0.975
+# GradientBoostingClassifier 의 드랍후 스코어:  0.975
+# XGB 의 스코어:  0.975
+# XGB 의 드랍후 스코어:  0.975

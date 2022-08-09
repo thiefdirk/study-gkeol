@@ -87,3 +87,12 @@ for i in range(len(model_list)):
     else :
         plt.title(model_list[i])
 plt.show()
+
+# DecisionTreeClassifier 의 스코어:  1.0
+# DecisionTreeClassifier 의 드랍후 스코어:  1.0
+# RandomForestClassifier 의 스코어:  1.0
+# RandomForestClassifier 의 드랍후 스코어:  1.0
+# GradientBoostingClassifier 의 스코어:  1.0
+# GradientBoostingClassifier 의 드랍후 스코어:  1.0
+# XGB 의 스코어:  1.0
+# XGB 의 드랍후 스코어:  1.0

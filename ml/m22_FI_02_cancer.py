@@ -53,17 +53,6 @@ def plot_feature_importances(model) :
 
 x_train, x_test,y_train, y_test= train_test_split(x,y, train_size=0.8, shuffle=True, random_state=1234)
 
-plt.figure(figsize=(8,8))
-for i in range(len(model_list)):
-    plt.subplot(2,2,i+1) # 2행 2열에서 i+1번째 칸에 그림을 그림
-    plot_feature_importances(model_list[i])
-    if str(model_list[i]).startswith('XGBClassifier'):
-        plt.title('XGBClassifier()')
-    else :
-        plt.title(model_list[i])
-plt.show()
-   
-
 
 #3. 훈련, 컴파일
 for model in model_list:
@@ -88,6 +77,15 @@ for model in model_list:
         print(str(model).strip('()'), '의 드랍후 스코어: ', score)
     
     
+plt.figure(figsize=(8,8))
+for i in range(len(model_list)):
+    plt.subplot(2,2,i+1) # 2행 2열에서 i+1번째 칸에 그림을 그림
+    plot_feature_importances(model_list[i])
+    if str(model_list[i]).startswith('XGBClassifier'):
+        plt.title('XGBClassifier()')
+    else :
+        plt.title(model_list[i])
+plt.show()
 
     
 

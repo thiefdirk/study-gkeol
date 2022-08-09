@@ -81,4 +81,4 @@ print('acc스코어 : ', acc)
 # LogisticRegression accuracy : 0.6187695061501745
 # KNeighborsClassifier accuracy : 0.9659847163576281
 # DecisionTreeClassifier accuracy : 0.935377271892785
-# RandomForestClassifier accuracy : 0.935377271892785
+# RandomForestClassifier accuracy : 0.952967229667707

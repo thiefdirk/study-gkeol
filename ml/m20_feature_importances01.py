@@ -36,10 +36,9 @@ print('accuracy_score:', acc)
 
 print("===================================")
 print(model,':',model.feature_importances_)
-print(model)
 
 
 # DecisionTreeClassifier() : [0.         0.01669101 0.07659085 0.90671814]
 # GradientBoostingClassifier() : [0.0090424  0.01098409 0.2769728  0.70300071]
 # RandomForestClassifier() : [0.08730228 0.0265098  0.44368654 0.44250138]
-#  XGBClassifier [0.00912187 0.0219429  0.678874   0.29006115]
+#  XGBClassifier [0.00912187 0.0219429  0.678874   0.29006115]  

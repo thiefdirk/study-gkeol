@@ -72,7 +72,7 @@ print('acc스코어 : ', acc)
 # loss :  0.05714249983429909
 # accuracy :  1.0
 
-# 
+# LinearSVC 모델의 정확도 :  0.9666666666666667
 # LogisticRegression 모델의 정확도 :  1.0
 # KNN 모델의 정확도 :  0.9666666666666667
 # DecisionTreeClassifier 모델의 정확도 :  0.9333333333333333

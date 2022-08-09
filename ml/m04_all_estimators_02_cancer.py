@@ -60,6 +60,45 @@ for (name, algorithm) in allAlgorithms: # key, value로 나누어서 보여줌
         continue    # 예외가 발생하면 다음 모델으로 넘어가게 하는 코드
 # TypeError: __init__() missing 1 required positional argument: 'base_estimator', 이런 에러가 뜸
 # 예외처리 해야함
+
+# AdaBoostClassifier 의 정답률 : 0.9532163742690059
+# BaggingClassifier 의 정답률 : 0.9649122807017544
+# BernoulliNB 의 정답률 : 0.6432748538011696
+# CalibratedClassifierCV 의 정답률 : 0.8947368421052632
+# CategoricalNB 은 안나온 놈!!!
+# ClassifierChain 은 안나온 놈!!!
+# ComplementNB 의 정답률 : 0.8888888888888888   
+# DecisionTreeClassifier 의 정답률 : 0.9415204678362573
+# DummyClassifier 의 정답률 : 0.6432748538011696ExtraTreeClassifier 의 정답률 : 0.935672514619883
+# ExtraTreesClassifier 의 정답률 : 0.9707602339181286
+# GaussianNB 의 정답률 : 0.9473684210526315
+# GaussianProcessClassifier 의 정답률 : 0.8947368421052632
+# GradientBoostingClassifier 의 정답률 : 0.9590643274853801
+# HistGradientBoostingClassifier 의 정답률 : 0.9707602339181286
+# KNeighborsClassifier 의 정답률 : 0.9064327485380117
+# LabelPropagation 의 정답률 : 0.3684210526315789
+# LabelSpreading 의 정답률 : 0.3684210526315789
+# LinearDiscriminantAnalysis 의 정답률 : 0.9649122807017544
+# LinearSVC 의 정답률 : 0.8070175438596491
+# LogisticRegression 의 정답률 : 0.9239766081871345
+# LogisticRegressionCV 의 정답률 : 0.935672514619883
+# MLPClassifier 의 정답률 : 0.9181286549707602
+# MultiOutputClassifier 은 안나온 놈!!!
+# MultinomialNB 의 정답률 : 0.8830409356725146  
+# NearestCentroid 의 정답률 : 0.8713450292397661NuSVC 의 정답률 : 0.8713450292397661
+# OneVsOneClassifier 은 안나온 놈!!!
+# OneVsRestClassifier 은 안나온 놈!!!
+# OutputCodeClassifier 은 안나온 놈!!!
+# PassiveAggressiveClassifier 의 정답률 : 0.8654970760233918
+# Perceptron 의 정답률 : 0.8304093567251462     
+# QuadraticDiscriminantAnalysis 의 정답률 : 0.9473684210526315
+# RadiusNeighborsClassifier 은 안나온 놈!!!     
+# RandomForestClassifier 의 정답률 : 0.9707602339181286
+# RidgeClassifier 의 정답률 : 0.9649122807017544RidgeClassifierCV 의 정답률 : 0.9649122807017544
+# SGDClassifier 의 정답률 : 0.8128654970760234  
+# SVC 의 정답률 : 0.8888888888888888
+# StackingClassifier 은 안나온 놈!!!
+# VotingClassifier 은 안나온 놈!!!
             
 #3. 컴파일, 훈련
 

@@ -32,3 +32,11 @@ result = model.score(x_test, y_test)
 
 print('model.score : ', result) 
 
+# LinearSVR R2 : 0.2576231559485177
+# LinearRegression R2 : 0.8111288663608656
+# KNeighborsRegressor R2 : 0.5900872726222293
+# DecisionTreeRegressor R2 : 0.8025232565231835
+# RandomForestRegressor R2 : 0.9168000585742672
+
+# model.score :  0.8166022803107107
+

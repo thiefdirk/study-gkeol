@@ -63,4 +63,4 @@ print('r2스코어 : ', r2)
 # LinearRegression R2 : 0.6161406602616111
 # KNeighborsRegressor R2 : 0.1585059607598721
 # DecisionTreeRegressor R2 : 0.6221909245352698
-# RandomForestRegressor R2 : 0.6221909245352698
+# RandomForestRegressor R2 : 0.8239004366598537

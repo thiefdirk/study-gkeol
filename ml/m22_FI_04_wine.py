@@ -89,11 +89,11 @@ plt.show()
 
     
 
-# DecisionTreeRegressor 의 스코어:  0.020045778350520127
-# DecisionTreeRegressor 의 드랍후 스코어:  0.12163069242548197
-# RandomForestRegressor 의 스코어:  0.4470425048290939
-# RandomForestRegressor 의 드랍후 스코어:  0.42309633688606896
-# GradientBoostingRegressor 의 스코어:  0.4170813764532981
-# GradientBoostingRegressor 의 드랍후 스코어:  0.40757725388083565
-# XGB 의 스코어:  0.2602960708365062
-# XGB 의 드랍후 스코어:  0.30612842840969323
+# DecisionTreeClassifier 의 스코어:  0.8888888888888888
+# DecisionTreeClassifier 의 드랍후 스코어:  0.8888888888888888
+# RandomForestClassifier 의 스코어:  0.9444444444444444
+# RandomForestClassifier 의 드랍후 스코어:  0.9444444444444444
+# GradientBoostingClassifier 의 스코어:  0.8611111111111112
+# GradientBoostingClassifier 의 드랍후 스코어:  0.8611111111111112
+# XGB 의 스코어:  0.8888888888888888
+# XGB 의 드랍후 스코어:  0.8888888888888888

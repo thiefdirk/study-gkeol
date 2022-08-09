@@ -33,6 +33,19 @@ print(datasets.feature_names) #싸이킷런에만 있는 명령어
 print(datasets.DESCR)
 '''
 
+# # scaler = MinMaxScaler()
+# # scaler = StandardScaler()
+# # scaler = MaxAbsScaler()
+# scaler = RobustScaler()
+# scaler.fit(x_train)
+# x_train = scaler.transform(x_train)
+# x_test = scaler.transform(x_test)
+# print(np.min(x_train))  # 0.0
+# print(np.max(x_train))  # 1.0
+
+# print(np.min(x_test))  # 1.0
+# print(np.max(x_test))  # 1.0
+
 #2. 모델구성
 from sklearn.svm import LinearSVR, SVC
 from sklearn.linear_model import Perceptron, LinearRegression # 로지스틱분류, 분류
@@ -63,4 +76,4 @@ print('acc : ' , results)
 # LinearRegression : 0.6579197606548162
 # KNeighborsRegressor : 0.5403351561734346
 # DecisionTreeRegressor : 0.09974953394661623
-# RandomForestRegressor : 0.09974953394661623
+# RandomForestRegressor : 0.5413415904728223

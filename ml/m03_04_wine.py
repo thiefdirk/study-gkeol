@@ -72,4 +72,4 @@ y_predict = model.predict(x_test)
 # LogisticRegression의 정확도 : 0.9629629629629629
 # KNeighborsClassifier의 정확도 : 0.6851851851851852
 # DecisionTreeClassifier의 정확도 : 0.9629629629629629
-# RandomForestClassifier의 정확도 : 0.9629629629629629
+# RandomForestClassifier의 정확도 : 1.0

@@ -132,18 +132,18 @@ print(vocab_size)
 embedding_dim = vocab_size
 rnn_units = 1024
 
+# 어텐션 레이어 삽입
+
 def build_model(vocab_size, embedding_dim, rnn_units, batch_size):
   model = tf.keras.Sequential([
     tf.keras.layers.Embedding(vocab_size, embedding_dim, batch_input_shape=[batch_size, None]),
     tf.keras.layers.LSTM(rnn_units, return_sequences=True,
                          stateful=True, kernel_initializer='glorot_uniform'),  # Xavier 정규분포 초기값 설정기
-    Attention(80),
-    tf.keras.layers.Reshape(target_shape=(80, 1)),
+    Attention(80), 
+    tf.keras.layers.Reshape(target_shape=(80, 1)),  
     # Flatten(),
     # Attention(64,use_scale=True),
-    tf.keras.layers.Dense(vocab_size)
-    
-  
+    tf.keras.layers.Dense(vocab_size) 
   ])
   return model
 
@@ -315,17 +315,14 @@ if do_generate:
 
 
 # label epochs 700, temperture 1.4, 200자 생성, 가족, self-attention
-# 스칼라 손실:      7.065503
-# 가족 필필필필필필필필필필필필필필필필필필필필필
-# 필필필필필필필필필필필필필필필필필필필필필필필필
-# 필필필필필필필필필필필필필필필필필필필필필필필필
-# 필필필필필필필필필필필필필필필필필필필필필필필필
-# 필필필필필필필필필필필필필필필필필필필필필필필필
-# 필필필필필필필필필필필필필필필필필필필필필필필필
-# 필필필필필필필필필필필필필필필필필필필필필필필필
-# 필필필필필필필필필필필필필필필필필필필필필필필필
-# 필필필필필필필필필필필
-
-# WARNING:absl:Found untraced functions such as lstm_cell_layer_call_fn
-# , lstm_cell_layer_call_and_return_conditional_losses while saving (showing 
-# 2 of 2). These functions will not be directly callable after loading.
+# 스칼라 손실:      7.066456
+# 가족 남무불손집놓울소나문것있편.흙교떨을욕향고
+# 혁서것황.항며하세가리력,였기!냐긁형최 항은은기
+# 대바정종는열람애야탄화값 불병로간스얻채돌벗이 
+# 의람히유아했
+# 이
+# 간드"인종타게휴라 사 끼쁨심라부를며논공장 다개
+# 주왜  견보고 부를생폭효약보있겪함에아도백나애 
+# 낚열무는력는이딸해사뜻연의들는는배로진철훨닦의
+# 적2결허 뿌라스
+# 관있을껴나니의감배키건

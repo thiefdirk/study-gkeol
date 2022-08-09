@@ -5,6 +5,8 @@ from sklearn.experimental import enable_halving_search_cv
 from sklearn.model_selection import HalvingGridSearchCV, HalvingRandomSearchCV
 from sklearn.preprocessing import StandardScaler, MinMaxScaler
 from sklearn.metrics import accuracy_score, r2_score
+from xgboost import XGBClassifier, XGBRegressor
+
 
 #1. 데이터
 datasets = fetch_covtype()
@@ -34,7 +36,7 @@ from sklearn.ensemble import RandomForestClassifier, RandomForestRegressor
 from sklearn.svm import LinearSVC, SVC
 from sklearn.pipeline import make_pipeline, Pipeline # pipeline을 사용하기 위한 함수
 
-pipe = Pipeline([('minmax', MinMaxScaler()), ('RF', RandomForestClassifier())], verbose=1)
+pipe = Pipeline([('minmax', MinMaxScaler()), ('RF', XGBClassifier())], verbose=1)
 
 # model = SVC()
 # model = make_pipeline(MinMaxScaler(), RandomForestClassifier()) # pipeline을 사용하면 여러개의 모델을 한번에 학습시키기 때문에 성능이 좋아진다.

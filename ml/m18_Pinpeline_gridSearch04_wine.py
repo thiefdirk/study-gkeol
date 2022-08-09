@@ -71,15 +71,15 @@ print('최적 튠  ACC :',accuracy_score(y_test,y_predict))
 
 print("걸린 시간 :",round(end,2),"초")
 
-# model.score :  0.9210526315789473
+# model.score :  1.0
 # 최적의 매개변수 : Pipeline(steps=[('minmax', MinMaxScaler()),
 #                 ('RF',
-#                  RandomForestClassifier(max_depth=6, min_samples_split=4,
+#                  RandomForestClassifier(max_depth=8, min_samples_split=20,
 #                                         n_jobs=5))],
 #          verbose=1)
-# 최적의 파라미터 : {'RF__max_depth': 6, 'RF__min_samples_split': 4, 'RF__n_jobs': 5}
-# best_score : 0.9692307692307693
-# model_score : 0.9210526315789473
-# accuracy_score : 0.9210526315789473
-# 최적 튠  ACC : 0.9210526315789473
-# 걸린 시간 : 18.77 초
+# 최적의 파라미터 : {'RF__max_depth': 8, 'RF__min_samples_split': 20, 'RF__n_jobs': 5}        
+# best_score : 0.9788177339901478
+# model_score : 1.0
+# accuracy_score : 1.0
+# 최적 튠  ACC : 1.0
+# 걸린 시간 : 15.75 초

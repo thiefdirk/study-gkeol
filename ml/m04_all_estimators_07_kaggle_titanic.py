@@ -6,7 +6,9 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from sklearn.datasets import load_breast_cancer
 from sklearn.model_selection import train_test_split
-from tensorflow.python.keras.callbacks import EarlyStopping
+from sklearn.utils import all_estimators
+import warnings
+warnings.filterwarnings('ignore') # warning 무시
 from sklearn.metrics import r2_score, accuracy_score
 from tensorflow.keras.utils import to_categorical
 from sklearn.preprocessing import OneHotEncoder
@@ -114,17 +116,26 @@ x_train, x_test, y_train, y_test = train_test_split(x,y,
 
 
 #2. 모델구성
-from sklearn.svm import LinearSVC, SVC
-from sklearn.linear_model import Perceptron, LogisticRegression # 로지스틱분류, 분류
-from sklearn.neighbors import KNeighborsClassifier # KNN
-from sklearn.tree import DecisionTreeClassifier # 의사결정트리
-from sklearn.ensemble import RandomForestClassifier # 랜덤포레스트
+allAlgorithms = all_estimators(type_filter='classifier') # 분류모델만 추출
+# allAlgorithms = all_estimators(type_filter='regresser') # 회귀모델만 추출
+# [('AdaBoostClassifier', <class 'sklearn.ensemble._weight_boosting.AdaBoostClassifier'>)
 
-# model = LinearSVC() 
-# model = LogisticRegression() # 로지스틱분류
-# model = KNeighborsClassifier() 
-# model = DecisionTreeClassifier() 
-model = RandomForestClassifier() 
+print(allAlgorithms) # 모든 모델을 보여줌
+print(len(allAlgorithms)) # 모든 모델의 갯수를 보여줌, 총 갯수는 총 모델의 갯수 + 1, 41
+
+
+for (name, algorithm) in allAlgorithms: # key, value로 나누어서 보여줌
+    try: 
+        model = algorithm()
+        model.fit(x_train, y_train)
+        y_predict = model.predict(x_test)
+        acc = accuracy_score(y_test, y_predict)
+        print(name, '의 정답률 :', accuracy_score(y_test, y_predict))
+    except: # 모델에 오류가 있을 경우 예외를 발생시킴
+        print(name, '은 안나온 놈!!!')
+        continue    # 예외가 발생하면 다음 모델으로 넘어가게 하는 코드
+# TypeError: __init__() missing 1 required positional argument: 'base_estimator', 이런 에러가 뜸
+# 예외처리 해야함
                                                          
 #3. 컴파일, 훈련
 model.fit(x_train, y_train)
@@ -169,4 +180,4 @@ print('acc스코어 : ', acc)
 # LogisticRegression : 0.7821229050279329
 # KNeighborsClassifier : 0.7039106145251397
 # DecisionTreeClassifier : 0.8156424581005587
-# RandomForestClassifier : 0.8166666666666667
+# RandomForestClassifier : 0.8435754189944135

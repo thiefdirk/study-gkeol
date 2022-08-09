@@ -71,6 +71,62 @@ for (name, algorithm) in allAlgorithms: # key, value로 나누어서 보여줌
 # TypeError: __init__() missing 1 required positional argument: 'base_estimator', 이런 에러가 뜸
 # 예외처리 해야함
 
+# ARDRegression 의 정답률 : 0.6530571637755074  
+# AdaBoostRegressor 의 정답률 : 0.6047549268511743
+# BaggingRegressor 의 정답률 : 0.49537492265901795
+# BayesianRidge 의 정답률 : 0.6530732433967228  
+# CCA 은 안나온 놈!!!
+# DecisionTreeRegressor 의 정답률 : 0.005273984862447012
+# DummyRegressor 의 정답률 : -0.014400454257647022
+# ElasticNet 의 정답률 : -0.005328266814577098  
+# ElasticNetCV 의 정답률 : 0.5416195896166865
+# ExtraTreeRegressor 의 정답률 : 0.04312920514405627
+# ExtraTreesRegressor 의 정답률 : 0.5763416145837457
+# GammaRegressor 의 정답률 : -0.007823542660838623
+# GaussianProcessRegressor 의 정답률 : -19.89811178013024
+# GradientBoostingRegressor 의 정답률 : 0.5188665050919943
+# HistGradientBoostingRegressor 의 정답률 : 0.530828319596758
+# HuberRegressor 의 정답률 : 0.6577980156650767
+# IsotonicRegression 은 안나온 놈!!!
+# KNeighborsRegressor 의 정답률 : 0.5403351561734346
+# KernelRidge 의 정답률 : -3.4081572282782817   
+# Lars 의 정답률 : 0.6579197606548157
+# LarsCV 의 정답률 : 0.6564476184179993
+# Lasso 의 정답률 : 0.3785224007954726
+# LassoCV 의 정답률 : 0.6586221904334045
+# LassoLars 의 정답률 : 0.4154761894569349      
+# LassoLarsCV 의 정답률 : 0.6579197606548157
+# LassoLarsIC 의 정답률 : 0.6590994359358212    
+# LinearRegression 의 정답률 : 0.6579197606548162
+# LinearSVR 의 정답률 : -0.4518705170583017     
+# MLPRegressor 의 정답률 : -3.227330644315061
+# MultiOutputRegressor 은 안나온 놈!!!
+# MultiTaskElasticNet 은 안나온 놈!!!
+# MultiTaskElasticNetCV 은 안나온 놈!!!
+# MultiTaskLasso 은 안나온 놈!!!
+# MultiTaskLassoCV 은 안나온 놈!!!
+# NuSVR 의 정답률 : 0.15030443671279659
+# OrthogonalMatchingPursuit 의 정답률 : 0.4157059575736308
+# OrthogonalMatchingPursuitCV 의 정답률 : 0.6538201252570435
+# PLSCanonical 은 안나온 놈!!!
+# PLSRegression 의 정답률 : 0.6545408930519411  
+# PassiveAggressiveRegressor 의 정답률 : 0.5650034697100033
+# PoissonRegressor 의 정답률 : 0.39364665773613516
+# QuantileRegressor 의 정답률 : -0.06628628382122415
+# RANSACRegressor 의 정답률 : 0.25629978581643387
+# RadiusNeighborsRegressor 의 정답률 : -0.014400454257647022
+# RandomForestRegressor 의 정답률 : 0.5276695422102141
+# RegressorChain 은 안나온 놈!!!
+# Ridge 의 정답률 : 0.5059105205948112
+# RidgeCV 의 정답률 : 0.6432606908795868        
+# SGDRegressor 의 정답률 : 0.4844467727737021
+# SVR 의 정답률 : 0.14455754772757579
+# StackingRegressor 은 안나온 놈!!!
+# TheilSenRegressor 의 정답률 : 0.6478364160862691
+# TransformedTargetRegressor 의 정답률 : 0.6579197606548162
+# TweedieRegressor 의 정답률 : -0.007497539132948372
+# VotingRegressor 은 안나온 놈!!!
+
 #3. 컴파일, 훈련
 
 hist = model.fit(x_train, y_train)
