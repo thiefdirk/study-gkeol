@@ -34,11 +34,11 @@ cumsum = np.cumsum(pca_EVR) # 중요도를 이용해 주요하지 않은 변수�
 # print(np.argmax(cumsum >= 0.99)+1) #331
 # print(np.argmax(cumsum >= 0.999)+1) #486
 # print(np.argmax(cumsum+1)) #712
-x_train, x_test, y_train, y_test = train_test_split(x,y, train_size=0.8, shuffle=True, random_state=66)
+x_train, x_test, y_train, y_test = train_test_split(x,y, train_size=0.8, shuffle=True, random_state=66, stratify=y) # stratify : 데이터를 군집화할 때 사용하는 열의 값을 지정한다.
 
 
-model = RandomForestClassifier()
-# model = XGBClassifier()
+# model = RandomForestClassifier()
+model = XGBClassifier(tree_method='gpu_hist', predictor='gpu_predictor', gpu_id=0, n_jobs=1, n_estimators=100, learning_rate=0.1, max_depth=5, min_child_weight=1, gamma=0, subsample=0.8, colsample_bytree=0.8, reg_alpha=0, reg_lambda=1, scale_pos_weight=1, seed=0, missing=None) # tree_method : 트리의 타입을 지정한다. gpu_hist : GPU에서 트리를 구성한다. gpu_predictor : GPU에서 트리를 구성한다.
 
 model.fit(x_train, y_train)
 
@@ -71,6 +71,10 @@ print('accuracy :', result)
 # 소요 시간 :  0:02:27.802960
 
 #3. pca 0.95
+# rfr
+# 실행 시간 : 76.30856990814209
+# accuracy : 0.9417142857142857
+
 # xgb
 # 실행 시간 : 252.82144570350647
 # accuracy : 0.9622142857142857
@@ -79,12 +83,23 @@ print('accuracy :', result)
 # rfr
 # 실행 시간 : 117.63256239891052
 # accuracy : 0.9327142857142857
+# xgb
+# 실행 시간 : 549.6632714271545
+# accuracy : 0.96
 
 #5. pca 0.999
 # rfr
 # 실행 시간 : 150.89516067504883
 # accuracy : 0.9142857142857143
+# xgb
+# 실행 시간 : 781.0130097866058
+# accuracy : 0.9618571428571429
+
 
 #6. pca 1.0
-# time=?
-# acc=?
+# rfr
+# 실행 시간 : 193.8530797958374
+# accuracy : 0.9017857142857143
+# xgb
+# 실행 시간 : 29.9390549659729
+# accuracy : 0.9612142857142857
