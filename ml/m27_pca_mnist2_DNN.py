@@ -38,7 +38,7 @@ x_train, x_test, y_train, y_test = train_test_split(x,y, train_size=0.8, shuffle
 
 
 # model = RandomForestClassifier()
-model = XGBClassifier(tree_method='gpu_hist', predictor='gpu_predictor', gpu_id=0, n_jobs=1, n_estimators=100, learning_rate=0.1, max_depth=5, min_child_weight=1, gamma=0, subsample=0.8, colsample_bytree=0.8, reg_alpha=0, reg_lambda=1, scale_pos_weight=1, seed=0, missing=None) # tree_method : 트리의 타입을 지정한다. gpu_hist : GPU에서 트리를 구성한다. gpu_predictor : GPU에서 트리를 구성한다.
+model = XGBClassifier(tree_method='gpu_hist', predictor='gpu_predictor', gpu_id=0, n_jobs=1,)
 
 model.fit(x_train, y_train)
 

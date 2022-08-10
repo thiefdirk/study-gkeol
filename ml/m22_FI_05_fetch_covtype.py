@@ -53,7 +53,7 @@ def plot_feature_importances(model) :
     plt.title(model)
 print(np.unique(y)) # [1 2 3 4 5 6 7]
 
-x_train, x_test,y_train, y_test= train_test_split(x,y, train_size=0.8, shuffle=True, random_state=1234)
+x_train, x_test,y_train, y_test= train_test_split(x,y, train_size=0.8, shuffle=True, random_state=1234, stratify=y) # stratify : 데이터를 군집화할 때 사용하는 열의 값을 지정한다.
 
 
 #3. 훈련, 컴파일

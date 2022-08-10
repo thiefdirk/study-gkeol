@@ -1,3 +1,7 @@
+# PCA
+# standard scaler 랑 궁합좋음
+# 보통 scaler 한방 때리고 pca로 차원 축소해서 작업들어가는 사람들 많음(의견 갈림)
+
 import numpy as np
 from sklearn import datasets
 from sklearn.datasets import load_boston
