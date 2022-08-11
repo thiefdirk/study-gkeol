@@ -22,7 +22,7 @@ parameters_rfr = [{
     'RFR__bootstrap': [True], 'RFR__max_depth': [5, 10, None], 
     'RFR__max_features': ['auto', 'log2'], 'RFR__n_estimators': [5, 6, 7, 8, 9, 10, 11, 12, 13, 15]}]
 
-kfold = StratifiedKFold(n_splits=5,shuffle=True,random_state=100)
+kfold = KFold(n_splits=5,shuffle=True,random_state=100)
 
 
 #1. 데이터
@@ -222,6 +222,8 @@ pipe = Pipeline([('standard', StandardScaler()), ('XGB', XGBRegressor())], verbo
 model = GridSearchCV(pipe, parameters,verbose=1,cv=kfold,
                      refit=True,n_jobs=-1,)
 
+scores = cross_val_score(pipe,x_train,y_train,cv=kfold,scoring='f1_micro')
+
 
 #3. 컴파일,훈련
 import time
@@ -272,3 +274,11 @@ print("걸린 시간 :",round(end,2),"초")
 # accuracy_score : 0.8556263361994998
 # 최적 튠  ACC : 0.8556263361994998
 # 걸린 시간 : 5.65 초
+
+# grid search 이상치 제거 안함
+# 최적의 파라미터 : {'XGB__colsample_bytree': 0.9, 'XGB__gamma': 0, 'XGB__learning_rate': 0.05, 'XGB__max_depth': 3, 'XGB__n_estimators': 500}
+# best_score : 0.8757222594879028
+# model_score : 0.8855287155248044
+# accuracy_score : 0.8855287155248044
+# 최적 튠  ACC : 0.8855287155248044
+# 걸린 시간 : 281.19 초

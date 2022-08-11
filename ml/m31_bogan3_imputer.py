@@ -14,7 +14,9 @@ data.columns = ['x1', 'x2', 'x3', 'x4'] # 컬럼 이름 지정
 print(data)
 
 from sklearn.experimental import enable_iterative_imputer # 이터러블 입력시 사용하는 모듈 추가
-from sklearn.impute import SimpleImputer, KNNImputer, IterativeImputer # simpleimputer : 값이 없는 곳을 임의의 값으로 채워주는 것, knnimputer : 가장 가까운 값을 채워주는 것, iterativeimputer : 여러 개의 값을 채워주는 것
+from sklearn.impute import SimpleImputer, KNNImputer, IterativeImputer 
+
+# simpleimputer : 값이 없는 곳을 임의의 값으로 채워주는 것, knnimputer : 가장 가까운 값을 채워주는 것, iterativeimputer : 여러 개의 값을 채워주는 것
 
 ######################simpleimputer######################
 # imputer = SimpleImputer(missing_values=np.nan, strategy='mean') # missing_values default값은 np.nan, strategy default값은 mean

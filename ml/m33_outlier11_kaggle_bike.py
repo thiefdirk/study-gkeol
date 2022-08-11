@@ -138,16 +138,9 @@ print("걸린 시간 :",round(end,2),"초")
 # RMSE :  42.06061976287204
 # r2스코어 :  0.945912412806713
 
-# 최적의 파라미터 : {'XGB__max_depth': 8, 'XGB__min_samples_split': 2, 'XGB__n_jobs': -1}     
-# best_score : 0.9511965767770754
-# model_score : 0.9472368868092601
-# accuracy_score : 0.9472368868092601
-# 최적 튠  ACC : 0.9472368868092601
-# 걸린 시간 : 225.93 초
-
-# 최적의 파라미터 : {'XGB__max_depth': 8, 'XGB__min_samples_split': 2, 'XGB__n_jobs': -1}     
-# best_score : 0.9511671562274154
-# model_score : 0.9472316702797408
-# accuracy_score : 0.9472316702797408
-# 최적 튠  ACC : 0.9472316702797408
-# 걸린 시간 : 226.03 초
+# 최적의 파라미터 : {'XGB__colsample_bytree': 0.8, 'XGB__gamma': 1, 'XGB__learning_rate': 0.05, 'XGB__max_depth': 7, 'XGB__n_estimators': 500}
+# best_score : 0.9570907058756125
+# model_score : 0.9561155013042215
+# accuracy_score : 0.9561155013042215
+# 최적 튠  ACC : 0.9561155013042215
+# 걸린 시간 : 1406.42 초

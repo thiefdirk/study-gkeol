@@ -19,7 +19,18 @@ parameters = [
     'XGB__max_depth' : [3,5,7,10,15],
     'XGB__gamma' : [0,1,2,3],
     'XGB__colsample_bytree' : [0.8,0.9]}]
-kfold = StratifiedKFold(n_splits=5,shuffle=True,random_state=100)
+
+parameters = [{
+        "n_estimators": range(50, 100, 25),
+
+        "max_depth": [1, 2, 4],
+
+        "learning_rate": [0.0001, 0.001, 0.01, 0.1],
+
+        "subsample": [0.7, 0.9],
+
+        "max_features": list(range(1, 2))}]
+kfold = KFold(n_splits=5,shuffle=True,random_state=100)
 
 #1. 데이터
 path = './_data/kaggle_titanic/'
@@ -122,7 +133,7 @@ from xgboost import XGBRegressor, XGBClassifier # xgboost 사용
 from sklearn.svm import LinearSVC, SVC
 from sklearn.pipeline import make_pipeline, Pipeline # pipeline을 사용하기 위한 함수
 
-pipe = Pipeline([('robust', RobustScaler()), ('XGB', GradientBoostingClassifier())], verbose=1)
+pipe = Pipeline([('robust', RobustScaler()), ('GBC', GradientBoostingClassifier())], verbose=1)
 # pipe = make_pipeline(MinMaxScaler(), XGBRegressor())
 model = GridSearchCV(pipe, parameters,verbose=1,cv=kfold,
                      refit=True,n_jobs=-1,)

@@ -15,8 +15,8 @@ outlier = EllipticEnvelope(contamination=0.1) # contamination
 
 outlier1 = outlier.fit(aaa1)
 results1 = outlier1.predict(aaa1)
-print(results1) # [-1 -1  1  1  1  1  1  1  1  1  1 -1 -1]
+print(results1) # [-1  1  1  1  1  1  1  1  1  1  1  1 -1]
 
 outlier2 = outlier.fit(aaa2)
 results2 = outlier2.predict(aaa2)
-print(results2) # [ 1  1  1  1  1  1 -1  1 -1 -1  1  1  1]
+print(results2) # [ 1  1  1  1  1  1 -1  1  1 -1  1  1  1]

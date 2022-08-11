@@ -5,7 +5,7 @@ aaa = np.array([[-10,2,3,4,5,6,7,8,9,10,11,12,50],
 
 aaa = np.transpose(aaa) # 행과 열을 바꿔줌
 print(aaa)
-print(aaa[,0])
+print(aaa[:,0])
 print(aaa[:,1])
 
 
@@ -24,8 +24,9 @@ def outlier(data_out, i) :
     return np.where(((data_out[:,i] > upper_bound) | (data_out[:,i] < lower_bound))) # 최소값과 최대값 이상의 값을 찾아서 반환함
 
 outliers_loc1 = outlier(aaa,0) # 최소값과 최대값 이상의 값을 찾아서 반환함
-outliers_loc2 = outlier(aaa,1) # 최소값과 최대값 이상의 값을 찾아서 반환함
 print('최소값과 최대값 이상의 값을 찾아서 반환함 1 : ', outliers_loc1)
+
+outliers_loc2 = outlier(aaa,1) # 최소값과 최대값 이상의 값을 찾아서 반환함
 print('최소값과 최대값 이상의 값을 찾아서 반환함 2 : ', outliers_loc2)
 
 import matplotlib.pyplot as plt
@@ -38,4 +39,13 @@ plt.show()
 # IQR :  6.0
 # 최소값 :  -5.0
 # 최대값 :  19.0
-# 최소값과 최대값 이상의 값을 찾아서 반환함 :  (array([ 0, 12], dtype=int64),)
+# 최소값과 최대값 이상의 값을 찾아서 반환함 1 :  (array([ 0, 12], dtype=int64),)
+
+
+# 1사분위수 :  200.0
+# 50%사분위수 :  400.0
+# 3사분위수 :  600.0
+# IQR :  400.0
+# 최소값 :  -400.0
+# 최대값 :  1200.0
+# 최소값과 최대값 이상의 값을 찾아서 반환함 2 :  (array([6], dtype=int64),)

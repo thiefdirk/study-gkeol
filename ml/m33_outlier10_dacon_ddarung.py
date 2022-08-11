@@ -23,7 +23,7 @@ parameters_rfr = [{
     'RFR__bootstrap': [True], 'RFR__max_depth': [5, 10, None], 
     'RFR__max_features': ['auto', 'log2'], 'RFR__n_estimators': [5, 6, 7, 8, 9, 10, 11, 12, 13, 15]}]
 
-kfold = StratifiedKFold(n_splits=5,shuffle=True,random_state=100)
+kfold = KFold(n_splits=5,shuffle=True,random_state=100)
 
 #1. 데이터
 path = './_data/ddarung/'
