@@ -2,8 +2,7 @@ import numpy as np
 import pandas as pd
 from sqlalchemy import true #pandas : 엑셀땡겨올때 씀
 from tensorflow.python.keras.models import Sequential, Model
-from tensorflow.python.keras.layers import Activation, Dense, Conv2D, Flatten, MaxPooling2D, Input, Dropout
-from keras.layers.recurrent import LSTM, SimpleRNN
+from tensorflow.python.keras.layers import Activation, Dense, Conv2D, Flatten, MaxPooling2D, Input, Dropout, LSTM, SimpleRNN
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import r2_score, mean_squared_error
 from sklearn.preprocessing import MinMaxScaler, StandardScaler
@@ -150,7 +149,7 @@ mcp = ModelCheckpoint(monitor='val_loss', mode='auto', verbose=1, save_best_only
 
 hist = model.fit(x_train, y_train, epochs=1000, batch_size=100,
                  validation_split=0.2,
-                 callbacks=[earlyStopping, mcp],
+                 callbacks=[earlyStopping],
                  verbose=1)
 
 
