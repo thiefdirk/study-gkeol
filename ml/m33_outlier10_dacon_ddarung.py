@@ -12,12 +12,17 @@ from sklearn.impute import SimpleImputer, KNNImputer, IterativeImputer
 
 
 
-parameters = [
-    {'XGB__n_estimators' : [100, 200], 'XGB__max_depth': [40,30,20,50], 'XGB__min_samples_leaf':[15, 30, 50, 100]}, #epochs
-    {'XGB__max_depth' : [6, 8, 10, 12], 'XGB__min_samples_split':[2, 4, 5, 20], 'XGB__n_jobs' : [-1, 3, 5]},
-    {'XGB__min_samples_leaf' : [3, 5, 7, 10], 'XGB__n_estimators':[150, 300, 200], 'XGB__max_depth':[7, 8, 9, 10]},
-    {'XGB__min_samples_split' : [2, 3, 5, 10]},
-    {'XGB__n_jobs' : [-1, 2, 4]}] 
+parameters_xgb = [
+    {'XGB__n_estimators' : [100,200,300,400,500],
+    'XGB__learning_rate' : [0.01,0.05,0.1,0.15],
+    'XGB__max_depth' : [3,5,7,10,15],
+    'XGB__gamma' : [0,1,2,3],
+    'XGB__colsample_bytree' : [0.8,0.9]}]
+
+parameters_rfr = [{
+    'RFR__bootstrap': [True], 'RFR__max_depth': [5, 10, None], 
+    'RFR__max_features': ['auto', 'log2'], 'RFR__n_estimators': [5, 6, 7, 8, 9, 10, 11, 12, 13, 15]}]
+
 kfold = StratifiedKFold(n_splits=5,shuffle=True,random_state=100)
 
 #1. 데이터
@@ -37,11 +42,11 @@ print(train_set.info()) # info 정보출력
 print(train_set.describe()) # describe 평균치, 중간값, 최소값 등등 출력
 
 #### 결측치 처리 knn 임퓨터 ####
-# imputer1 = KNNImputer(missing_values=np.nan, n_neighbors=3) # n_neighbors default값은 3
-# imputer2 = KNNImputer(missing_values=np.nan, n_neighbors=3) # n_neighbors default값은 3
+imputer1 = KNNImputer(missing_values=np.nan, n_neighbors=3) # n_neighbors default값은 3
+imputer2 = KNNImputer(missing_values=np.nan, n_neighbors=3) # n_neighbors default값은 3
 
-imputer1 = IterativeImputer(missing_values=np.nan, max_iter=10, tol=0.001)
-imputer2 = IterativeImputer(missing_values=np.nan, max_iter=10, tol=0.001)
+# imputer1 = IterativeImputer(missing_values=np.nan, max_iter=10, tol=0.001)
+# imputer2 = IterativeImputer(missing_values=np.nan, max_iter=10, tol=0.001)
 
 print(train_set.isnull().sum())
 imputer1.fit(train_set) # 데이터프레임에 적용하기 위해 fit()함수 사용
@@ -71,14 +76,15 @@ x_train, x_test, y_train, y_test = train_test_split(x,y,
 
 #2. 모델구성
 
-from sklearn.ensemble import RandomForestClassifier
+from sklearn.ensemble import RandomForestClassifier ,RandomForestRegressor
 from xgboost import XGBRegressor # xgboost 사용
 from sklearn.svm import LinearSVC, SVC
 from sklearn.pipeline import make_pipeline, Pipeline # pipeline을 사용하기 위한 함수
 
-pipe = Pipeline([('minmax', MinMaxScaler()), ('XGB', XGBRegressor())], verbose=1)
+# pipe = Pipeline([('minmax', MinMaxScaler()), ('XGB', XGBRegressor())], verbose=1)
+pipe = Pipeline([('minmax', MinMaxScaler()), ('RFR', RandomForestRegressor())], verbose=1)
 # pipe = make_pipeline(MinMaxScaler(), XGBRegressor())
-model = GridSearchCV(pipe, parameters,verbose=1,cv=kfold,
+model = GridSearchCV(pipe, parameters_rfr,verbose=1,cv=kfold,
                      refit=True,n_jobs=-1,)
 
 
@@ -111,9 +117,14 @@ print('최적 튠  ACC :',r2_score(y_test,y_predict))
 
 print("걸린 시간 :",round(end,2),"초")
 
-# 최적의 파라미터 : {'XGB__max_depth': 6, 'XGB__min_samples_split': 2, 'XGB__n_jobs': -1}     
-# best_score : 0.7575992901520798
-# model_score : 0.8014237720454513
-# accuracy_score : 0.8014237720454513
-# 최적 튠  ACC : 0.8014237720454513
-# 걸린 시간 : 45.42 초
+# DNN
+# loss :  [6566530560.0, 73198.2578125]
+# RMSE :  44.036038145412206
+# r2스코어 :  0.7233021847450295
+
+# 최적의 파라미터 : {'XGB__colsample_bytree': 0.9, 'XGB__gamma': 2, 'XGB__learning_rate': 0.15, 'XGB__max_depth': 7, 'XGB__n_estimators': 400}
+# best_score : 0.7700927289068344
+# model_score : 0.812590847259622
+# accuracy_score : 0.812590847259622
+# 최적 튠  ACC : 0.812590847259622
+# 걸린 시간 : 332.74 초
