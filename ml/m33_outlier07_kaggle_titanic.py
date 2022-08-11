@@ -68,7 +68,7 @@ sns.barplot(x="SibSp", y="Survived", data=train_set)
 #### 결측치 처리 1. 제거 ####
 
 train_set = train_set.fillna({"Embarked": "C"})
-train_set.Age = train_set.Age.fillna(value=train_set.Age.mean())
+# train_set.Age = train_set.Age.fillna(value=train_set.Age.mean())
 
 train_set = train_set.drop(['Name'], axis = 1)
 test_set = test_set.drop(['Name'], axis = 1)
@@ -117,12 +117,12 @@ x_train, x_test, y_train, y_test = train_test_split(x,y,
 
 #2. 모델구성
 
-from sklearn.ensemble import RandomForestClassifier
+from sklearn.ensemble import RandomForestClassifier, GradientBoostingClassifier
 from xgboost import XGBRegressor, XGBClassifier # xgboost 사용
 from sklearn.svm import LinearSVC, SVC
 from sklearn.pipeline import make_pipeline, Pipeline # pipeline을 사용하기 위한 함수
 
-pipe = Pipeline([('robust', RobustScaler()), ('XGB', XGBClassifier())], verbose=1)
+pipe = Pipeline([('robust', RobustScaler()), ('XGB', GradientBoostingClassifier())], verbose=1)
 # pipe = make_pipeline(MinMaxScaler(), XGBRegressor())
 model = GridSearchCV(pipe, parameters,verbose=1,cv=kfold,
                      refit=True,n_jobs=-1,)
@@ -159,3 +159,10 @@ print("걸린 시간 :",round(end,2),"초")
 
 # rfc
 # model.score :  0.8547486033519553
+
+# 최적의 파라미터 : {'XGB__colsample_bytree': 0.8, 'XGB__gamma': 2, 'XGB__learning_rate': 0.05, 'XGB__max_depth': 7, 'XGB__n_estimators': 300}
+# best_score : 0.8175022160937655
+# model_score : 0.8715083798882681
+# accuracy_score : 0.8715083798882681
+# 최적 튠  ACC : 0.8715083798882681
+# 걸린 시간 : 137.71 초
