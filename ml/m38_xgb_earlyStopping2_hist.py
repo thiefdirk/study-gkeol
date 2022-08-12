@@ -64,30 +64,38 @@ y_predict = model.predict(x_test)
 
 print('accuracy_score :',accuracy_score(y_test,y_predict))
 
+print('========================================================')
+hist = model.evals_result()
+print(hist)
+
+import matplotlib.pyplot as plt
+
+# plt.plot(hist['validation_0']['error'])
+# plt.plot(hist['validation_1']['error'])
+# plt.xlabel('round')# x축 이름 설정
+# plt.ylabel('error')# y축 이름 설정
+# plt.title('XGBoost')# 차트 제목 설정
+# plt.legend(['train', 'test']) # 범례 설정
+# plt.show()
 
 
-# print("최적의 매개변수 :",model.best_estimator_)
+print(hist)
+print(hist['validation_0'])
 
 
-# print("최적의 파라미터 :",model.best_params_)
-
- 
-# print("best_score :",model.best_score_)
-
-# print("model_score :",model.score(x_test,y_test))
-
-# y_predict = model.predict(x_test)
-# print('accuracy_score :',accuracy_score(y_test,y_predict))
-
-# y_pred_best = model.best_estimator_.predict(x_test)
-# print('최적 튠  ACC :',accuracy_score(y_test,y_predict))
-
-# print("걸린 시간 :",round(end,2),"초")
-
-# 최적의 파라미터 : {'classifier__colsample_bytree': 0.5, 'classifier__gamma': 0, 'classifier__learning_rate': 0.15, 
-# 'classifier__max_depth': 5, 'classifier__min_child_weight': 0.5, 'classifier__n_estimators': 200, 'classifier__subsample': 1}
-# best_score : 0.9670329670329669
-# model_score : 1.0
-# accuracy_score : 1.0
-# 최적 튠  ACC : 1.0
-# 걸린 시간 : 2.84 초
+#subplot
+for i in range(2):
+    plt.subplot(2,1,i+1)
+    plt.xlabel('round')# x축 이름 설정
+    plt.ylabel('error')# y축 이름 설정
+    if i == 0:
+        plt.plot(hist['validation_'+str(i)]['error'],'b')
+        plt.legend(['train'])
+        plt.title('XGBoost')# 차트 제목 설정
+    else:
+        plt.plot(hist['validation_'+str(i)]['error'],'r')
+        plt.legend(['test'])
+    # 색상 설정
+    plt.grid(True)
+    
+plt.show()

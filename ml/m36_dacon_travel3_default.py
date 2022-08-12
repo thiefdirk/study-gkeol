@@ -126,11 +126,34 @@ print(test_set)
 
 
 
-#### 결측치 처리 knn 임퓨터 ####
-imputer = KNNImputer(missing_values=np.nan, n_neighbors=1) # n_neighbors default값은 3
+# #### 결측치 처리 knn 임퓨터 ####
+# imputer = KNNImputer(missing_values=np.nan, n_neighbors=1) # n_neighbors default값은 3
+# imputer.fit(x) # 훈련용 데이터로 학습하기 위해 fit()함수 사용
+# x = imputer.transform(x) # 학습한 데이터로 훈련용 데이터를 이용해서 변환하기 위해 transform()함수 사용
+# test_set = imputer.transform(test_set) # 학습한 데이터로 훈련용 데이터를 이용해서 변환하기 위해 transform()함수 사용
+
+# 결측치 처리 mean 값 넣기
+imputer = SimpleImputer(missing_values=np.nan, strategy='mean') # strategy default값은 mean
 imputer.fit(x) # 훈련용 데이터로 학습하기 위해 fit()함수 사용
 x = imputer.transform(x) # 학습한 데이터로 훈련용 데이터를 이용해서 변환하기 위해 transform()함수 사용
 test_set = imputer.transform(test_set) # 학습한 데이터로 훈련용 데이터를 이용해서 변환하기 위해 transform()함수 사용
+
+#  labelencoder inverse_transform 사용하기 위해 inverse_transform()함수 사용
+x['TypeofContact'] = le_TypeofContact.inverse_transform(x['TypeofContact']) # TypeofContact 컬럼을 인코딩해줌
+x['Occupation'] = le_Occupation.inverse_transform(x['Occupation']) # Occupation 컬럼을 인코딩해줌
+x['Gender'] = le_gender.inverse_transform(x['Gender'])
+x['ProductPitched'] = le_ProductPitched.inverse_transform(x['ProductPitched']) # Occupation 컬럼을 인코딩해줌
+x['MaritalStatus'] = le_MaritalStatus.inverse_transform(x['MaritalStatus']) # Occupation 컬럼을 인코딩해줌
+x['Designation'] = le_Designation.inverse_transform(x['Designation']) # Occupation 컬럼을 인코딩해줌
+
+test_set['TypeofContact'] = le_TypeofContact.inverse_transform(test_set['TypeofContact']) # TypeofContact 컬럼을 인코딩해줌
+test_set['Occupation'] = le_Occupation.inverse_transform(test_set['Occupation']) # Occupation 컬럼을 인코딩해줌
+test_set['Gender'] = le_gender.inverse_transform(test_set['Gender'])
+test_set['ProductPitched'] = le_ProductPitched.inverse_transform(test_set['ProductPitched']) # Occupation 컬럼을 인코딩해줌
+test_set['MaritalStatus'] = le_MaritalStatus.inverse_transform(test_set['MaritalStatus']) # Occupation 컬럼을 인코딩해줌
+test_set['Designation'] = le_Designation.inverse_transform(test_set['Designation']) # Occupation 컬럼을 인코딩해줌
+
+
 
 print(x)
 print(y)

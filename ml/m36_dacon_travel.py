@@ -325,3 +325,12 @@ submission_set.to_csv(path + 'sample_submission.csv', index = True)
 # accuracy_score : 0.8797953964194374
 # 최적 튠  ACC : 0.8797953964194374
 # 걸린 시간 : 34.15 초
+
+# 최적의 매개변수 : LGBMClassifier(learning_rate=0.2, max_depth=9, n_estimators=300, num_leaves=20,
+#                subsample=0.7, subsample_for_bin=200, subsample_freq=2) , gender, Designation 제거, knnimputer 제거, 결측치 행제거
+# 최적의 파라미터 : {'boosting_type': 'gbdt', 'learning_rate': 0.2, 'max_depth': 9, 'n_estimators': 300, 'num_leaves': 20, 'subsample': 0.7, 'subsample_for_bin': 200, 'subsample_freq': 2}
+# best_score : 0.875829383886256
+# model_score : 0.8545454545454545
+# accuracy_score : 0.8545454545454545
+# 최적 튠  ACC : 0.8545454545454545
+# 걸린 시간 : 491.58 초
