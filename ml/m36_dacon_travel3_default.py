@@ -15,6 +15,7 @@ import warnings
 warnings.filterwarnings('ignore')
 from sklearn.discriminant_analysis import LinearDiscriminantAnalysis as LDA
 from catboost import CatBoostClassifier, CatBoostRegressor
+from sklearn.feature_selection import SelectFromModel
 
 
 
@@ -257,17 +258,31 @@ print('accuracy_score :',accuracy_score(y_test,y_predict))
 
 # print("걸린 시간 :",round(end,2),"초")
 
+threshold = model.feature_importances_
+print('========================')
+for thresh in threshold:
+    selection = SelectFromModel(model, threshold=thresh, prefit=True)
+    select_x_train = selection.transform(x_train)
+    select_x_test = selection.transform(x_test)
+    print(select_x_train.shape) # (442, 1)
+    print(select_x_test.shape) # (119, 1)
+    selection_model = XGBClassifier()
+    selection_model.fit(select_x_train,y_train, verbose=1)
+    y_predict = selection_model.predict(select_x_test)
+    print('thresh=', thresh)
+    print('accuracy_score :',accuracy_score(y_test,y_predict))
+    print('========================')
 
 
-pred = model.predict(test_set)
-y_summit = [1 if x > 0.5 else 0 for x in pred]
+# pred = model.predict(test_set)
+# y_summit = [1 if x > 0.5 else 0 for x in pred]
 
-submission_set = pd.read_csv(path + 'sample_submission.csv', # + 명령어는 문자를 앞문자와 더해줌
-                             index_col=0) # index_col=n n번째 컬럼을 인덱스로 인식
+# submission_set = pd.read_csv(path + 'sample_submission.csv', # + 명령어는 문자를 앞문자와 더해줌
+#                              index_col=0) # index_col=n n번째 컬럼을 인덱스로 인식
 
-submission_set['ProdTaken'] = y_summit
+# submission_set['ProdTaken'] = y_summit
 
-submission_set.to_csv(path + 'sample_submission_cat.csv', index = True)
+# submission_set.to_csv(path + 'sample_submission_cat.csv', index = True)
 
 
 # model.score :  0.8618925831202046

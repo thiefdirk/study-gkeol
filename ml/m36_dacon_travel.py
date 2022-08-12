@@ -70,6 +70,7 @@ print(train_set.columns)
 print(train_set.info()) # info 정보출력
 print(test_set.info()) # info 정보출력
 print(train_set.describe()) # describe 평균치, 중간값, 최소값 등등 출력
+drop_col = ['NumberOfChildrenVisiting','TypeofContact','OwnCar','NumberOfPersonVisiting'] # 컬럼 삭제하기 위한 리스트 생성
 
 # 결측치 행제거
 
@@ -103,8 +104,8 @@ test_set['ProductPitched'] = le_ProductPitched.transform(test_set['ProductPitche
 test_set['MaritalStatus'] = le_MaritalStatus.transform(test_set['MaritalStatus']) # Occupation 컬럼을 인코딩해줌
 test_set['Designation'] = le_Designation.transform(test_set['Designation']) # Occupation 컬럼을 인코딩해줌
 
-train_set = train_set.drop(['Designation', 'Gender'], axis=1) # drop 데이터에서 ''사이 값 빼기
-test_set = test_set.drop(['Designation', 'Gender'], axis=1)
+train_set = train_set.drop(drop_col, axis=1) # drop 데이터에서 ''사이 값 빼기
+test_set = test_set.drop(drop_col, axis=1)
 
 train_set = train_set.dropna() # 결측치 행제거
 
@@ -245,7 +246,7 @@ submission_set = pd.read_csv(path + 'sample_submission.csv', # + 명령어는 �
 submission_set['ProdTaken'] = y_summit
 
 
-submission_set.to_csv(path + 'sample_submission.csv', index = True)
+submission_set.to_csv(path + 'sample_submission_lgbm_drop_col.csv', index = True)
 
 # 최적의 파라미터 : {'classifier__gamma': 0, 'classifier__learning_rate': 0.3, 'classifier__max_depth': 5, 'classifier__min_child_weight': 0.1, 'classifier__n_estimators': 100}
 # best_score : 0.8518914163629508

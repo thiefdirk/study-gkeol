@@ -13,6 +13,7 @@ from sklearn.preprocessing import LabelEncoder, OneHotEncoder
 import warnings
 warnings.filterwarnings('ignore')
 from sklearn.discriminant_analysis import LinearDiscriminantAnalysis as LDA
+from sklearn.feature_selection import SelectFromModel
 
 
 
@@ -219,6 +220,22 @@ print("걸린 시간 :",round(end,2),"초")
 print("===================================")
 print(model.feature_importances_)
 
+threshold = model.feature_importances_
+print('========================')
+for thresh in threshold:
+    selection = SelectFromModel(model, threshold=thresh, prefit=True)
+    select_x_train = selection.transform(x_train)
+    select_x_test = selection.transform(x_test)
+    print(select_x_train.shape) # (442, 1)
+    print(select_x_test.shape) # (119, 1)
+    selection_model = XGBClassifier()
+    selection_model.fit(select_x_train,y_train, verbose=1)
+    y_predict = selection_model.predict(select_x_test)
+    print('thresh=', thresh)
+    print('accuracy_score :',accuracy_score(y_test,y_predict))
+    print('========================')
+
+
 import matplotlib.pyplot as plt
 
 # def plot_feature_importances(model) : 
@@ -236,6 +253,8 @@ import matplotlib.pyplot as plt
 from xgboost.plotting import plot_importance
 plot_importance(model)
 plt.show()
+
+
 
 
 pred = model.predict(test_set)
