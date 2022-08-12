@@ -4,13 +4,12 @@ from sklearn.datasets import load_iris
 from sklearn.model_selection import KFold,cross_val_score,GridSearchCV,StratifiedKFold, RandomizedSearchCV
 from sklearn.experimental import enable_halving_search_cv
 from sklearn.model_selection import HalvingGridSearchCV, HalvingRandomSearchCV
-from sklearn.preprocessing import StandardScaler, MinMaxScaler, RobustScaler, MaxAbsScaler
+from sklearn.preprocessing import StandardScaler, MinMaxScaler
 from sklearn.metrics import accuracy_score, r2_score
 from sklearn.model_selection import train_test_split
 from sklearn.experimental import enable_iterative_imputer # 이터러블 입력시 사용하는 모듈 추가
 from sklearn.impute import SimpleImputer, KNNImputer, IterativeImputer 
 from sklearn.preprocessing import LabelEncoder, OneHotEncoder
-from lightgbm import LGBMClassifier, LGBMRegressor
 import warnings
 warnings.filterwarnings('ignore')
 from sklearn.discriminant_analysis import LinearDiscriminantAnalysis as LDA
@@ -37,22 +36,14 @@ from sklearn.discriminant_analysis import LinearDiscriminantAnalysis as LDA
 # reg_lambda, lambda : [0, 0.1, 0.01, 0.001, 1, 2, 10] / 디폴트 1 / 0~inf / L2 절대값 가중치 규제
 
 parameters_xgb = [
-    {'gamma': [0], 'learning_rate': [0.3], 
-'max_depth': [6], 'min_child_weight': [1], 'n_estimators': [100], 'subsample' : [1]}]
+    {'gamma': [0], 'learning_rate': [0.4], 
+'max_depth': [5], 'min_child_weight': [0.1], 'n_estimators': [100], 'subsample' : [0.7]}]
 
 parameters_rfr = [{
-    'bootstrap': [True], 'max_depth': [5, 10, None], 'n_estimators': [5, 6, 7, 8, 9, 10, 11, 12, 13, 15], }]
+    'RFR__bootstrap': [True], 'RFR__max_depth': [5, 10, None], 
+    'RFR__max_features': ['auto', 'log2'], 'RFR__n_estimators': [5, 6, 7, 8, 9, 10, 11, 12, 13, 15]}]
 
-# parameters_lgb = [{'boosting_type': ['gbdt'], 'learning_rate': [0.1, 0.2, 0.3, 0.4, 0.5, 1, 0.01, 0.001],
-#                    'max_depth': [2, 3, 4, 5, 6, 7, 8, 9, 10], 'n_estimators': [100, 200, 300, 400, 500], 'num_leaves': [10, 20, 30, 40, 50, 60, 70, 80, 90, 100], 
-#                    'subsample': [0.5, 0.6, 0.7, 0.8, 0.9, 1], 'subsample_for_bin': [200, 300, 400, 500, 600, 700, 800, 900, 1000], 'subsample_freq': [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]}]
-
-parameters_lgb = [{'boosting_type': ['gbdt'], 'learning_rate': [0.1, 0.2, 0.3, 0.4],
-                   'max_depth': [5, 6, 7, 8, 9], 'n_estimators': [100, 200, 300], 'num_leaves': [10, 20, 30, 40], 
-                   'subsample': [0.5, 0.6, 0.7], 'subsample_for_bin': [200, 300, 400], 'subsample_freq': [0, 1, 2, 3]}]
-
-
-kfold = KFold(n_splits=5,shuffle=True,random_state=100)
+kfold = StratifiedKFold(n_splits=5,shuffle=True,random_state=100)
 
 #1. 데이터
 path = './_data/dacon_travel/'
@@ -71,16 +62,11 @@ print(train_set.info()) # info 정보출력
 print(test_set.info()) # info 정보출력
 print(train_set.describe()) # describe 평균치, 중간값, 최소값 등등 출력
 
-# 결측치 행제거
+x = train_set.iloc[:, :-1] # 컬럼을 제외한 모든 컬럼을 x로 저장
+y = train_set.iloc[:, -1] # 마지막 컬럼을 y로 저장
 
-print(train_set.shape)  # (2933, 18)
-
-print(test_set.shape)  # (2933, 18)
-# (1649, 19)
-# (2479, 18)
-
-
-
+# train set 과 test set concat하기
+# all_data = pd.concat([x, test_set], axis=0) # axis=0은 행을 더하는 것이라는 뜻
 
 le_TypeofContact = LabelEncoder() # TypeofContact 컬럼을 인코딩해줌
 le_Occupation = LabelEncoder() # Occupation 컬럼을 인코딩해줌
@@ -89,12 +75,12 @@ le_ProductPitched = LabelEncoder() # ProductPitched 컬럼을 인코딩해줌
 le_MaritalStatus = LabelEncoder() # MaritalStatus 컬럼을 인코딩해줌
 le_Designation = LabelEncoder() # Designation 컬럼을 인코딩해줌
 
-train_set['TypeofContact'] = le_TypeofContact.fit_transform(train_set['TypeofContact']) # TypeofContact 컬럼을 인코딩해줌
-train_set['Occupation'] = le_Occupation.fit_transform(train_set['Occupation']) # Occupation 컬럼을 인코딩해줌
-train_set['Gender'] = le_gender.fit_transform(train_set['Gender']) # Occupation 컬럼을 인코딩해줌
-train_set['ProductPitched'] = le_ProductPitched.fit_transform(train_set['ProductPitched']) # Occupation 컬럼을 인코딩해줌
-train_set['MaritalStatus'] = le_MaritalStatus.fit_transform(train_set['MaritalStatus']) # Occupation 컬럼을 인코딩해줌
-train_set['Designation'] = le_Designation.fit_transform(train_set['Designation']) # Occupation 컬럼을 인코딩해줌
+x['TypeofContact'] = le_TypeofContact.fit_transform(x['TypeofContact']) # TypeofContact 컬럼을 인코딩해줌
+x['Occupation'] = le_Occupation.fit_transform(x['Occupation']) # Occupation 컬럼을 인코딩해줌
+x['Gender'] = le_gender.fit_transform(x['Gender']) # Occupation 컬럼을 인코딩해줌
+x['ProductPitched'] = le_ProductPitched.fit_transform(x['ProductPitched']) # Occupation 컬럼을 인코딩해줌
+x['MaritalStatus'] = le_MaritalStatus.fit_transform(x['MaritalStatus']) # Occupation 컬럼을 인코딩해줌
+x['Designation'] = le_Designation.fit_transform(x['Designation']) # Occupation 컬럼을 인코딩해줌
 
 test_set['TypeofContact'] = le_TypeofContact.transform(test_set['TypeofContact']) # TypeofContact 컬럼을 인코딩해줌
 test_set['Occupation'] = le_Occupation.transform(test_set['Occupation']) # Occupation 컬럼을 인코딩해줌
@@ -103,14 +89,9 @@ test_set['ProductPitched'] = le_ProductPitched.transform(test_set['ProductPitche
 test_set['MaritalStatus'] = le_MaritalStatus.transform(test_set['MaritalStatus']) # Occupation 컬럼을 인코딩해줌
 test_set['Designation'] = le_Designation.transform(test_set['Designation']) # Occupation 컬럼을 인코딩해줌
 
-train_set = train_set.drop(['Designation', 'Gender'], axis=1) # drop 데이터에서 ''사이 값 빼기
-test_set = test_set.drop(['Designation', 'Gender'], axis=1)
-
-train_set = train_set.dropna() # 결측치 행제거
 
 
-x = train_set.iloc[:, :-1] # 컬럼을 제외한 모든 컬럼을 x로 저장
-y = train_set.iloc[:, -1] # 마지막 컬럼을 y로 저장
+
 # all_data concat 분리
 
 
@@ -126,13 +107,11 @@ print(test_set.shape) # (2932, 18)
 # test_set = np.array(test_set) # numpy array로 변환하기 위해 np.array()함수 사용
 print(test_set)
 
-
-
-# #### 결측치 처리 knn 임퓨터 ####
-# imputer = KNNImputer(missing_values=np.nan, n_neighbors=1) # n_neighbors default값은 3
-# imputer.fit(x) # 훈련용 데이터로 학습하기 위해 fit()함수 사용
-# x = imputer.transform(x) # 학습한 데이터로 훈련용 데이터를 이용해서 변환하기 위해 transform()함수 사용
-# test_set = imputer.transform(test_set) # 학습한 데이터로 훈련용 데이터를 이용해서 변환하기 위해 transform()함수 사용
+#### 결측치 처리 knn 임퓨터 ####
+imputer = KNNImputer(missing_values=np.nan, n_neighbors=1) # n_neighbors default값은 3
+imputer.fit(x) # 훈련용 데이터로 학습하기 위해 fit()함수 사용
+x = imputer.transform(x) # 학습한 데이터로 훈련용 데이터를 이용해서 변환하기 위해 transform()함수 사용
+test_set_ = imputer.transform(test_set) # 학습한 데이터로 훈련용 데이터를 이용해서 변환하기 위해 transform()함수 사용
 
 print(x)
 print(y)
@@ -157,12 +136,25 @@ print(x)
 print(y)
 print(test_set)
 
+x = pd.DataFrame(x, columns=test_set.columns)
+y = pd.DataFrame(y, columns=['ProdTaken'])
+test_set = pd.DataFrame(test_set_, columns=test_set.columns)
+
+# 열 삭제
+# x = x.drop(['PreferredPropertyStar', 'MaritalStatus', 'CityTier','Passport', 'NumberOfFollowups', 'Occupation', 'OwnCar', 'ProductPitched' ,
+#             'NumberOfChildrenVisiting', 'NumberOfPersonVisiting', 'TypeofContact', 'Gender', 'Designation'], axis=1) # drop 데이터에서 ''사이 값 빼기
+# test_set = test_set.drop(['PreferredPropertyStar', 'MaritalStatus', 'CityTier','Passport', 'NumberOfFollowups', 'Occupation', 'OwnCar', 'ProductPitched' ,
+#             'NumberOfChildrenVisiting', 'NumberOfPersonVisiting', 'TypeofContact', 'Gender', 'Designation'], axis=1)
+
+x = x.drop(['Designation'], axis=1) # drop 데이터에서 ''사이 값 빼기
+test_set = test_set.drop(['Designation'], axis=1)
+
 
 # 스케일러, LDA
-scaler = RobustScaler() # 스케일러 적용하기 위해 StandardScaler() 객체 생성
-scaler.fit(x) # 훈련용 데이터로 학습하기 위해 fit()함수 사용
-x = scaler.transform(x) # 학습한 데이터로 훈련용 데이터를 이용해서 변환하기 위해 transform()함수 사용
-# test_set = scaler.transform(test_set) # 학습한 데이터로 훈련용 데이터를 이용해서 변환하기 위해 transform()함수 사용
+# scaler = StandardScaler() # 스케일러 적용하기 위해 StandardScaler() 객체 생성
+# scaler.fit(x) # 훈련용 데이터로 학습하기 위해 fit()함수 사용
+# x = scaler.transform(x) # 학습한 데이터로 훈련용 데이터를 이용해서 변환하기 위해 transform()함수 사용
+# test_set = scaler.transform(test_set_) # 학습한 데이터로 훈련용 데이터를 이용해서 변환하기 위해 transform()함수 사용
 
 # lda = LDA() # LDA 객체 생성
 # lda.fit(x, y) # 훈련용 데이터로 학습하기 위해 fit()함수 사용
@@ -201,9 +193,7 @@ from sklearn.pipeline import make_pipeline, Pipeline # pipeline을 사용하기 
 
 # pipe = Pipeline([('minmax', MinMaxScaler()), ('RFR', RandomForestRegressor())], verbose=1)
 # pipe = make_pipeline(MinMaxScaler(), XGBRegressor())
-model = GridSearchCV(LGBMClassifier(), parameters_lgb,verbose=1,cv=kfold,
-                     refit=True,n_jobs=-1) # GridSearchCV를 사용하기 위한 함수
-fit_params = {'eval_set': [(x_val, y_val)], 'early_stopping_rounds': 50, 'eval_metric': 'error'} # GridSearchCV의 fit_params를 사용하기 위한 함수
+model = XGBClassifier()
 
 #3. 컴파일,훈련
 import time
@@ -216,36 +206,52 @@ result = model.score(x_test, y_test)
 print('model.score : ', result) # model.score :  1.0
 
 
-print("최적의 매개변수 :",model.best_estimator_)
-
-
-print("최적의 파라미터 :",model.best_params_)
-
- 
-print("best_score :",model.best_score_)
 
 print("model_score :",model.score(x_test,y_test))
 
 y_predict = model.predict(x_test)
 print('accuracy_score :',accuracy_score(y_test,y_predict))
 
-y_pred_best = model.best_estimator_.predict(x_test)
 print('최적 튠  ACC :',accuracy_score(y_test,y_predict))
 
 print("걸린 시간 :",round(end,2),"초")
 
+print("===================================")
+print(model.feature_importances_)
+
+import matplotlib.pyplot as plt
+
+# def plot_feature_importances(model) : 
+#     n_features = datasets.data.shape[1]
+#     plt.barh(np.arange(n_features), model.feature_importances_, align='center') # 수직바
+#     plt.yticks(np.arange(n_features), datasets.feature_names) # 수직바 위쪽에 컬럼명 추가, arange는 수열을 만들어줌
+#     plt.xlabel("Feature Importance")
+#     plt.ylabel("Feature")
+#     plt.ylim(-1, n_features)
+#     plt.title(model)
+#     plt.show()
+    
+# plot_feature_importances(model)
+
+from xgboost.plotting import plot_importance
+plot_importance(model)
+plt.show()
 
 
-pred = model.best_estimator_.predict(test_set)
+pred = model.predict(test_set)
 y_summit = [1 if x > 0.5 else 0 for x in pred]
 
-submission_set = pd.read_csv(path + 'sample_submission.csv', # + 명령어는 문자를 앞문자와 더해줌
-                             index_col=0) # index_col=n n번째 컬럼을 인덱스로 인식
+# y_summit = np.argmax(y_summit, axis= 1)
+# submission_set = pd.read_csv(path + 'sample_submission.csv', # + 명령어는 문자를 앞문자와 더해줌
+#                              index_col=0) # index_col=n n번째 컬럼을 인덱스로 인식
 
-submission_set['ProdTaken'] = y_summit
+# print(submission_set)
+
+# submission_set['ProdTaken'] = y_summit
+# print(submission_set)
 
 
-submission_set.to_csv(path + 'sample_submission.csv', index = True)
+# submission_set.to_csv(path + 'sample_submission.csv', index = True)
 
 # 최적의 파라미터 : {'classifier__gamma': 0, 'classifier__learning_rate': 0.3, 'classifier__max_depth': 5, 'classifier__min_child_weight': 0.1, 'classifier__n_estimators': 100}
 # best_score : 0.8518914163629508
@@ -300,28 +306,3 @@ submission_set.to_csv(path + 'sample_submission.csv', index = True)
 # accuracy_score : 0.8644501278772379
 # 최적 튠  ACC : 0.8644501278772379
 # 걸린 시간 : 238.74 초
-
-# 최적의 파라미터 : {'gamma': 0, 'learning_rate': 0.3, 'max_depth': 6, 'min_child_weight': 1, 
-# 'n_estimators': 100, 'subsample': 1}
-# best_score : 0.8680988047808764
-# model_score : 0.8772378516624041
-# accuracy_score : 0.8772378516624041
-# 최적 튠  ACC : 0.8772378516624041
-# 걸린 시간 : 1.82 초
-
-# 최적의 매개변수 : LGBMClassifier(learning_rate=0.5, max_depth=9) , gender, Designation 제거
-# 최적의 파라미터 : {'boosting_type': 'gbdt', 'learning_rate': 0.5, 'max_depth': 9, 'n_estimators': 100}
-# best_score : 0.8608796812749004
-# model_score : 0.8695652173913043
-# accuracy_score : 0.8695652173913043
-# 최적 튠  ACC : 0.8695652173913043
-# 걸린 시간 : 31.17 초
-
-
-# 최적의 매개변수 : LGBMClassifier(learning_rate=0.4, max_depth=9) , gender, Designation 제거, knnimputer n_neighbors=1
-# 최적의 파라미터 : {'boosting_type': 'gbdt', 'learning_rate': 0.4, 'max_depth': 9, 'n_estimators': 100}
-# best_score : 0.8664828685258964
-# model_score : 0.8797953964194374
-# accuracy_score : 0.8797953964194374
-# 최적 튠  ACC : 0.8797953964194374
-# 걸린 시간 : 34.15 초

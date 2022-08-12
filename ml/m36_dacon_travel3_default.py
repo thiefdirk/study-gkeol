@@ -14,6 +14,8 @@ from lightgbm import LGBMClassifier, LGBMRegressor
 import warnings
 warnings.filterwarnings('ignore')
 from sklearn.discriminant_analysis import LinearDiscriminantAnalysis as LDA
+from catboost import CatBoostClassifier, CatBoostRegressor
+
 
 
 
@@ -37,8 +39,8 @@ from sklearn.discriminant_analysis import LinearDiscriminantAnalysis as LDA
 # reg_lambda, lambda : [0, 0.1, 0.01, 0.001, 1, 2, 10] / 디폴트 1 / 0~inf / L2 절대값 가중치 규제
 
 parameters_xgb = [
-    {'gamma': [0], 'learning_rate': [0.3], 
-'max_depth': [6], 'min_child_weight': [1], 'n_estimators': [100], 'subsample' : [1]}]
+    {'gamma': [0], 'learning_rate': [0.3], 'max_depth': [6], 'min_child_weight': [1], 
+    'n_estimators': [100], 'subsample': [0, 0.1, 0.2, 0.3, 0.5, 0.7, 1]}]
 
 parameters_rfr = [{
     'bootstrap': [True], 'max_depth': [5, 10, None], 'n_estimators': [5, 6, 7, 8, 9, 10, 11, 12, 13, 15], }]
@@ -47,9 +49,7 @@ parameters_rfr = [{
 #                    'max_depth': [2, 3, 4, 5, 6, 7, 8, 9, 10], 'n_estimators': [100, 200, 300, 400, 500], 'num_leaves': [10, 20, 30, 40, 50, 60, 70, 80, 90, 100], 
 #                    'subsample': [0.5, 0.6, 0.7, 0.8, 0.9, 1], 'subsample_for_bin': [200, 300, 400, 500, 600, 700, 800, 900, 1000], 'subsample_freq': [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]}]
 
-parameters_lgb = [{'boosting_type': ['gbdt'], 'learning_rate': [0.1, 0.2, 0.3, 0.4],
-                   'max_depth': [5, 6, 7, 8, 9], 'n_estimators': [100, 200, 300], 'num_leaves': [10, 20, 30, 40], 
-                   'subsample': [0.5, 0.6, 0.7], 'subsample_for_bin': [200, 300, 400], 'subsample_freq': [0, 1, 2, 3]}]
+parameters_lgb = [{'boosting_type': ['gbdt'], 'learning_rate': [0.5], 'max_depth': [9], 'n_estimators': [100], 'num_leaves': [10, 20, 30, 40, 50]}]
 
 
 kfold = KFold(n_splits=5,shuffle=True,random_state=100)
@@ -103,10 +103,8 @@ test_set['ProductPitched'] = le_ProductPitched.transform(test_set['ProductPitche
 test_set['MaritalStatus'] = le_MaritalStatus.transform(test_set['MaritalStatus']) # Occupation 컬럼을 인코딩해줌
 test_set['Designation'] = le_Designation.transform(test_set['Designation']) # Occupation 컬럼을 인코딩해줌
 
-train_set = train_set.drop(['Designation', 'Gender'], axis=1) # drop 데이터에서 ''사이 값 빼기
-test_set = test_set.drop(['Designation', 'Gender'], axis=1)
-
-train_set = train_set.dropna() # 결측치 행제거
+# train_set = train_set.drop(['Designation', 'Gender'], axis=1) # drop 데이터에서 ''사이 값 빼기
+# test_set = test_set.drop(['Designation', 'Gender'], axis=1)
 
 
 x = train_set.iloc[:, :-1] # 컬럼을 제외한 모든 컬럼을 x로 저장
@@ -128,11 +126,11 @@ print(test_set)
 
 
 
-# #### 결측치 처리 knn 임퓨터 ####
-# imputer = KNNImputer(missing_values=np.nan, n_neighbors=1) # n_neighbors default값은 3
-# imputer.fit(x) # 훈련용 데이터로 학습하기 위해 fit()함수 사용
-# x = imputer.transform(x) # 학습한 데이터로 훈련용 데이터를 이용해서 변환하기 위해 transform()함수 사용
-# test_set = imputer.transform(test_set) # 학습한 데이터로 훈련용 데이터를 이용해서 변환하기 위해 transform()함수 사용
+#### 결측치 처리 knn 임퓨터 ####
+imputer = KNNImputer(missing_values=np.nan, n_neighbors=1) # n_neighbors default값은 3
+imputer.fit(x) # 훈련용 데이터로 학습하기 위해 fit()함수 사용
+x = imputer.transform(x) # 학습한 데이터로 훈련용 데이터를 이용해서 변환하기 위해 transform()함수 사용
+test_set = imputer.transform(test_set) # 학습한 데이터로 훈련용 데이터를 이용해서 변환하기 위해 transform()함수 사용
 
 print(x)
 print(y)
@@ -159,10 +157,10 @@ print(test_set)
 
 
 # 스케일러, LDA
-scaler = RobustScaler() # 스케일러 적용하기 위해 StandardScaler() 객체 생성
-scaler.fit(x) # 훈련용 데이터로 학습하기 위해 fit()함수 사용
-x = scaler.transform(x) # 학습한 데이터로 훈련용 데이터를 이용해서 변환하기 위해 transform()함수 사용
-# test_set = scaler.transform(test_set) # 학습한 데이터로 훈련용 데이터를 이용해서 변환하기 위해 transform()함수 사용
+# scaler = RobustScaler() # 스케일러 적용하기 위해 StandardScaler() 객체 생성
+# scaler.fit(x) # 훈련용 데이터로 학습하기 위해 fit()함수 사용
+# x = scaler.transform(x) # 학습한 데이터로 훈련용 데이터를 이용해서 변환하기 위해 transform()함수 사용
+# # test_set = scaler.transform(test_set) # 학습한 데이터로 훈련용 데이터를 이용해서 변환하기 위해 transform()함수 사용
 
 # lda = LDA() # LDA 객체 생성
 # lda.fit(x, y) # 훈련용 데이터로 학습하기 위해 fit()함수 사용
@@ -201,14 +199,16 @@ from sklearn.pipeline import make_pipeline, Pipeline # pipeline을 사용하기 
 
 # pipe = Pipeline([('minmax', MinMaxScaler()), ('RFR', RandomForestRegressor())], verbose=1)
 # pipe = make_pipeline(MinMaxScaler(), XGBRegressor())
-model = GridSearchCV(LGBMClassifier(), parameters_lgb,verbose=1,cv=kfold,
-                     refit=True,n_jobs=-1) # GridSearchCV를 사용하기 위한 함수
-fit_params = {'eval_set': [(x_val, y_val)], 'early_stopping_rounds': 50, 'eval_metric': 'error'} # GridSearchCV의 fit_params를 사용하기 위한 함수
+# model = GridSearchCV(XGBClassifier(), parameters_xgb,verbose=1,cv=kfold,
+#                      refit=True,n_jobs=-1) # GridSearchCV를 사용하기 위한 함수
+# fit_params = {'eval_set': [(x_val, y_val)], 'early_stopping_rounds': 50} # GridSearchCV의 fit_params를 사용하기 위한 함수
+model = CatBoostClassifier(random_state=123, n_estimators=1000)
+
 
 #3. 컴파일,훈련
 import time
 start = time.time()
-model.fit(x_train, y_train) 
+model.fit(x_train_val, y_train_val)  # **fit_params
 end = time.time()- start
 #4. 평가, 예측
 result = model.score(x_test, y_test)
@@ -216,27 +216,27 @@ result = model.score(x_test, y_test)
 print('model.score : ', result) # model.score :  1.0
 
 
-print("최적의 매개변수 :",model.best_estimator_)
+# print("최적의 매개변수 :",model.best_estimator_)
 
 
-print("최적의 파라미터 :",model.best_params_)
+# print("최적의 파라미터 :",model.best_params_)
 
  
-print("best_score :",model.best_score_)
+# print("best_score :",model.best_score_)
 
-print("model_score :",model.score(x_test,y_test))
+# print("model_score :",model.score(x_test,y_test))
 
 y_predict = model.predict(x_test)
 print('accuracy_score :',accuracy_score(y_test,y_predict))
 
-y_pred_best = model.best_estimator_.predict(x_test)
-print('최적 튠  ACC :',accuracy_score(y_test,y_predict))
+# y_pred_best = model.best_estimator_.predict(x_test)
+# print('최적 튠  ACC :',accuracy_score(y_test,y_predict))
 
-print("걸린 시간 :",round(end,2),"초")
+# print("걸린 시간 :",round(end,2),"초")
 
 
 
-pred = model.best_estimator_.predict(test_set)
+pred = model.predict(test_set)
 y_summit = [1 if x > 0.5 else 0 for x in pred]
 
 submission_set = pd.read_csv(path + 'sample_submission.csv', # + 명령어는 문자를 앞문자와 더해줌
@@ -244,62 +244,22 @@ submission_set = pd.read_csv(path + 'sample_submission.csv', # + 명령어는 �
 
 submission_set['ProdTaken'] = y_summit
 
+submission_set.to_csv(path + 'sample_submission_cat.csv', index = True)
 
-submission_set.to_csv(path + 'sample_submission.csv', index = True)
 
-# 최적의 파라미터 : {'classifier__gamma': 0, 'classifier__learning_rate': 0.3, 'classifier__max_depth': 5, 'classifier__min_child_weight': 0.1, 'classifier__n_estimators': 100}
-# best_score : 0.8518914163629508
-# model_score : 0.8644501278772379
-# accuracy_score : 0.8644501278772379
-# 최적 튠  ACC : 0.8644501278772379
-# 걸린 시간 : 405.91 초
+# model.score :  0.8618925831202046
+# best_score : defaultdict(<class 'collections.OrderedDict'>, {})
+# model_score : 0.8618925831202046
+# accuracy_score : 0.8618925831202046
+# 걸린 시간 : 0.07 초
 
-# 최적의 파라미터 : {'gamma': 4, 'learning_rate': 0.1, 'max_depth': 2, 'min_child_weight': 0, 
-# 'n_estimators': 100}
-# best_score : 0.8427589962716266
-# model_score : 0.8414322250639387
-# accuracy_score : 0.8414322250639387
-# 최적 튠  ACC : 0.8414322250639387
-# 걸린 시간 : 199.89 초
-
-# 최적의 파라미터 : {'classifier__gamma': 0, 'classifier__learning_rate': 0.1, 
-# 'classifier__max_depth': None, 'classifier__min_child_weight': 0, 'classifier__n_estimators': 100}
-# best_score : 0.8519081730970633
-# model_score : 0.8644501278772379
-# accuracy_score : 0.8644501278772379
-# 최적 튠  ACC : 0.8644501278772379
-# 걸린 시간 : 7313.46 초
-
-# 최적의 파라미터 : {'gamma': 0, 'learning_rate': 0.1, 'max_depth': None, 'min_child_weight': 
-# 0, 'n_estimators': 100, 'subsample': 0.7}     
-# best_score : 0.852829793473252
-# model_score : 0.8593350383631714
-# accuracy_score : 0.8593350383631714
-# 최적 튠  ACC : 0.8593350383631714
-# 걸린 시간 : 3.6 초
-
-# 최적의 파라미터 : {'gamma': 0, 'learning_rate': 0.1, 'max_depth': None, 'min_child_weight': 
-# 0.1, 'n_estimators': 100, 'subsample': 0.7}   
-# best_score : 0.8537388462988563
-# model_score : 0.8644501278772379
-# accuracy_score : 0.8644501278772379
-# 최적 튠  ACC : 0.8644501278772379
-# 걸린 시간 : 5.13 초
-
-# 최적의 파라미터 : {'gamma': 0, 'learning_rate': 0.2, 'max_depth': None, 'min_child_weight': 
-# 0.1, 'n_estimators': 100, 'subsample': 0.7}   
-# best_score : 0.8573876251518578
+# 최적의 매개변수 : LGBMClassifier(learning_rate=0.5, max_depth=9, num_leaves=10)
+# 최적의 파라미터 : {'boosting_type': 'gbdt', 'learning_rate': 0.5, 'max_depth': 9, 'n_estimators': 100, 'num_leaves': 10}
+# best_score : 0.8600796812749003
 # model_score : 0.8695652173913043
 # accuracy_score : 0.8695652173913043
 # 최적 튠  ACC : 0.8695652173913043
-# 걸린 시간 : 45.16 초
-
-# 최적의 파라미터 : {'gamma': 0, 'learning_rate': 0.4, 'max_depth': 5, 'min_child_weight': 0.1, 'n_estimators': 100, 'subsample': 0.7}      
-# best_score : 0.8744860557768923
-# model_score : 0.8644501278772379
-# accuracy_score : 0.8644501278772379
-# 최적 튠  ACC : 0.8644501278772379
-# 걸린 시간 : 238.74 초
+# 걸린 시간 : 2.72 초
 
 # 최적의 파라미터 : {'gamma': 0, 'learning_rate': 0.3, 'max_depth': 6, 'min_child_weight': 1, 
 # 'n_estimators': 100, 'subsample': 1}
@@ -309,19 +269,21 @@ submission_set.to_csv(path + 'sample_submission.csv', index = True)
 # 최적 튠  ACC : 0.8772378516624041
 # 걸린 시간 : 1.82 초
 
-# 최적의 매개변수 : LGBMClassifier(learning_rate=0.5, max_depth=9) , gender, Designation 제거
-# 최적의 파라미터 : {'boosting_type': 'gbdt', 'learning_rate': 0.5, 'max_depth': 9, 'n_estimators': 100}
-# best_score : 0.8608796812749004
-# model_score : 0.8695652173913043
-# accuracy_score : 0.8695652173913043
-# 최적 튠  ACC : 0.8695652173913043
-# 걸린 시간 : 31.17 초
-
-
-# 최적의 매개변수 : LGBMClassifier(learning_rate=0.4, max_depth=9) , gender, Designation 제거, knnimputer n_neighbors=1
-# 최적의 파라미터 : {'boosting_type': 'gbdt', 'learning_rate': 0.4, 'max_depth': 9, 'n_estimators': 100}
-# best_score : 0.8664828685258964
-# model_score : 0.8797953964194374
-# accuracy_score : 0.8797953964194374
-# 최적 튠  ACC : 0.8797953964194374
-# 걸린 시간 : 34.15 초
+# 최적의 매개변수 : XGBClassifier(base_score=0.5, booster='gbtree', callbacks=None,
+#               colsample_bylevel=1, colsample_bynode=1, colsample_bytree=1,
+#               early_stopping_rounds=None, enable_categorical=False,
+#               eval_metric=None, gamma=0, gpu_id=-1, grow_policy='depthwise',
+#               importance_type=None, interaction_constraints='',
+#               learning_rate=0.3, max_bin=256, 
+# max_cat_to_onehot=4,
+#               max_delta_step=0, max_depth=6, max_leaves=0, min_child_weight=1,
+#               missing=nan, monotone_constraints='()', n_estimators=100,
+#               n_jobs=0, num_parallel_tree=1, predictor='auto', random_state=0,
+#               reg_alpha=0, reg_lambda=1, ...) 
+# 최적의 파라미터 : {'gamma': 0, 'learning_rate': 0.3, 'max_depth': 6, 'min_child_weight': 1, 
+# 'n_estimators': 100, 'subsample': 1}
+# best_score : 0.8648764940239044
+# model_score : 0.8593350383631714
+# accuracy_score : 0.8593350383631714
+# 최적 튠  ACC : 0.8593350383631714
+# 걸린 시간 : 1.72 초
