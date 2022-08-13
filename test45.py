@@ -1,152 +1,179 @@
-#boston house price 데이터셋에 어떻게 적절한 feature engineering을 적용하고, 
-#최근 kaggle에서 가장 인기 있는 모델인 XGBoost 모델을 어떻게 적용
+import numpy as np
+from sklearn.metrics import mean_squared_error, r2_score
 
-import numpy as np 
+
+
 import pandas as pd
-import matplotlib.pyplot as plt
-import seaborn as sns
-from tensorflow.keras.models import Sequential
-from tensorflow.keras.layers import Dense
-from sklearn.metrics import r2_score, mean_squared_error
-
-# laod data
-path = './_data/kaggle_house/'
-train_df =  pd.read_csv(path + 'train.csv')
-test_df = pd.read_csv(path + 'test.csv') 
-
-train_df.head()
-
-# set index
-train_df.set_index('Id', inplace=True)
-test_df.set_index('Id', inplace=True)
-len_train_df = len(train_df) #print(len_train_df) #1460
-len_test_df = len(test_df) #print(len_test_df) #1459
-
-corrmat = train_df.corr()
-top_corr_features = corrmat.index[abs(corrmat["SalePrice"])>=0.3]
-top_corr_features
-
-
-# heatmap
-plt.figure(figsize=(13,10))
-g = sns.heatmap(train_df[top_corr_features].corr(),annot=True,cmap="RdYlGn")
-
-# feature selection
-# train_df = train_df[top_corr_features]
-# test_df = test_df[top_corr_features.drop(['SalePrice'])]
-
-
-# split y_label
-train_y_label = train_df['SalePrice'] 	# target 값을 미리 분리하였음.
-train_df.drop(['SalePrice'], axis=1, inplace=True)
-
-# concat train & test
-boston_df = pd.concat((train_df, test_df), axis=0)
-boston_df_index = boston_df.index
-
-print('Length of Boston Dataset : ',len(boston_df))
-boston_df.head()
-
-# check null 
-check_null = boston_df.isna().sum() / len(boston_df)
-# columns of null ratio >= 0.5
-check_null[check_null >= 0.5]
-
-# remove columns of null ratio >= 0.5
-remove_cols = check_null[check_null >= 0.5].keys()
-boston_df = boston_df.drop(remove_cols, axis=1)
-
-boston_df.head()
-
-# split object & numeric
-boston_obj_df = boston_df.select_dtypes(include='object')	# 카테고리형
-boston_num_df = boston_df.select_dtypes(exclude='object')	# 수치형
-
-print('Object type columns:\n',boston_obj_df.columns)
-print('---------------------------------------------------------------------------------')
-print('Numeric type columns:\n',boston_num_df.columns)
-
-
-boston_dummy_df = pd.get_dummies(boston_obj_df, drop_first=True)
-boston_dummy_df.index = boston_df_index
-boston_dummy_df.head()
-
-from sklearn.impute import SimpleImputer
-#Imputer 3 버전 전에 사용되지 않으며 0.22에서 제거되었다. 
-#Imputer 모듈을 불러오기 위해선 sklearn.impute를 사용하면 된다.
-
-imputer = SimpleImputer(strategy='mean')
-imputer.fit(boston_num_df)
-boston_num_df_ = imputer.transform(boston_num_df)
-
-boston_num_df = pd.DataFrame(boston_num_df_, columns=boston_num_df.columns, index=boston_df_index)
-boston_num_df.head()
-
-boston_df = pd.merge(boston_dummy_df, boston_num_df, left_index=True, right_index=True)
-boston_df.head()
-
-train_df = boston_df[:len_train_df]
-test_df = boston_df[len_train_df:]
-
-train_df['SalePrice'] = train_y_label
-
-print('train set length: ',len(train_df))
-print('test set length: ',len(test_df))
-
+from sklearn.datasets import load_iris
+from sklearn.model_selection import KFold,cross_val_score,cross_val_predict, GridSearchCV,StratifiedKFold, RandomizedSearchCV
+from sklearn.experimental import enable_halving_search_cv
+from sklearn.model_selection import HalvingGridSearchCV, HalvingRandomSearchCV
+from sklearn.preprocessing import StandardScaler, MinMaxScaler, RobustScaler, MaxAbsScaler
+from sklearn.metrics import accuracy_score, r2_score
 from sklearn.model_selection import train_test_split
+from sklearn.experimental import enable_iterative_imputer # 이터러블 입력시 사용하는 모듈 추가
+from sklearn.impute import SimpleImputer, KNNImputer, IterativeImputer 
+from sklearn.preprocessing import LabelEncoder, OneHotEncoder
+from lightgbm import LGBMClassifier, LGBMRegressor
+import warnings
+warnings.filterwarnings('ignore')
+from sklearn.discriminant_analysis import LinearDiscriminantAnalysis as LDA
+from sklearn.feature_selection import SelectFromModel
 
-X_train = train_df.drop(['SalePrice'], axis=1)
-y_train = train_df['SalePrice']
+def lg_nrmse(gt, preds):
+    # 각 Y Feature별 NRMSE 총합
+    # Y_01 ~ Y_08 까지 20% 가중치 부여
+    all_nrmse = []
+    for idx in range(0,14): # ignore 'ID'
+        rmse = mean_squared_error(gt[:,idx], preds[:,idx], squared=False)
+        nrmse = rmse/np.mean(np.abs(gt[:,idx]))
+        all_nrmse.append(nrmse)
+    score = 1.2 * np.sum(all_nrmse[:8]) + 1.0 * np.sum(all_nrmse[8:14])
+    return score
 
-X_train, X_val, y_train, y_val = train_test_split(X_train, y_train, test_size=0.2, shuffle=True)
 
-X_test = test_df
-test_id_idx = test_df.index
 
-print('X_train : ',len(X_train))
-print('X_val : ',len(X_val))
-print('X_test :',len(X_test))
+#1. 데이터
+path = './_data/dacon_autopilot/open/'
+train_set = pd.read_csv(path + 'train.csv', # + 명령어는 문자를 앞문자와 더해줌
+                        index_col=0) # index_col=n n번째 컬럼을 인덱스로 인식
 
-from sklearn.model_selection import GridSearchCV
-import xgboost as xgb #pip install xgboost https://log-laboratory.tistory.com/328
+test_set = pd.read_csv(path + 'test.csv', # 예측에서 쓸거임                
+                       index_col=0)
+# 결측치를 처리하는 함수를 작성.
+# drop_col = ['X_04', 'X_11', 'X_02', 'X_01', 'X_24', 'X_37'] # 컬럼 삭제하기 위한 리스트 생성
+# train_set = train_set.drop(drop_col, axis=1) # axis=1 : 세로, axis=0 : 가로
+# test_set = test_set.drop(drop_col, axis=1) # 결측치 처리하기 위한 함수 실행
+kfold = KFold(n_splits=5, shuffle=True, random_state=42) # 정규화된 데이터로 교차검증 수행
 
-param = {
-    'max_depth':[2,3,4],
-    'n_estimators':range(550,700,50),
-    'colsample_bytree':[0.5,0.7,1],
-    'colsample_bylevel':[0.5,0.7,1],
-}
-model = xgb.XGBRegressor()
-grid_search = GridSearchCV(estimator=model, param_grid=param, cv=5, 
-                           scoring='neg_mean_squared_error',
-                           n_jobs=-1)
+out_put_col = ['Y_01','Y_02','Y_03','Y_04','Y_05','Y_06','Y_07','Y_08','Y_09','Y_10','Y_11','Y_12','Y_13','Y_14']
 
-grid_search.fit(X_train, y_train)
-print(grid_search.best_params_)
-print(grid_search.best_estimator_)
+# 결측치 확인
+print(train_set.isnull().sum()) # 결측치 확인
 
-from sklearn.metrics import mean_squared_error, mean_absolute_error
-pred_train = grid_search.predict(X_train)
-pred_val = grid_search.predict(X_val)
 
-print('train mae score: ', mean_absolute_error(y_train, pred_train))
-print('val mae score:', mean_absolute_error(y_val, pred_val))
+# 모델 선언
+from xgboost import XGBClassifier, XGBRegressor
+from catboost import CatBoostClassifier, CatBoostRegressor
+# MultiRMSE import
 
-plt.figure(figsize=(17,7))
-plt.plot(range(0, len(y_val)), y_val,'o-', label='Validation Actual')
-plt.plot(range(0, len(pred_val)), pred_val, '-', label='Validation Predict')
-plt.title('Prediction of House Prices')
-plt.ylabel('Prices')
-plt.legend()
+# model = CatBoostRegressor()
 
-test_y_pred = grid_search.predict(X_test)
-id_pred_df = pd.DataFrame()
-id_pred_df['Id'] = test_id_idx
-id_pred_df['SalePrice'] = test_y_pred
+# # 분석할 의미가 없는 칼럼을 제거합니다.
+# train = train_enc.drop(columns=['TypeofContact','Occupation'])
+# test = test.drop(columns=['TypeofContact','Occupation'])
 
-submission_set = pd.read_csv(path + 'sample_submission.csv', # + 명령어는 문자를 앞문자와 더해줌
-                             index_col=0) # index_col=n n번째 컬럼을 인덱스로 인식
 
-submission_set['SalePrice'] = test_y_pred
+# 학습에 사용할 정보와 예측하고자 하는 정보를 분리합니다.
+x = train_set.drop(out_put_col, axis=1) # 학습에 사용할 정보를 분리합니다.
+y = train_set[out_put_col] # 예측하고자 하는 정보를 분리합니다.
 
-submission_set.to_csv(path + 'submission_ji.csv', index=True)
+
+
+x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.2, random_state=42)
+print(x_train.shape, x_test.shape, y_train.shape, y_test.shape)
+# (31685, 56) (7922, 56) (31685, 14) (7922, 14)
+print(x_train.head())
+print(y_train.head())
+
+# scaler = MinMaxScaler()
+# x_train = scaler.fit_transform(x_train)
+# x_test = scaler.fit_transform(x_test)
+
+from sklearn.utils import all_estimators
+
+allAlgorithms = all_estimators(type_filter='regressor')
+
+
+for (name, algorithm) in allAlgorithms:
+    try:
+        model = algorithm()
+        ypred = cross_val_predict(model, x_test, y_test, cv=kfold)
+        score = cross_val_score(model, x_train, y_train, cv=kfold)
+        print(name, '의 정답률: ', round(np.mean(score),4))
+        
+    except:
+        # continue # 또는 pass
+        print(name, '은 안나온 놈')
+
+
+
+
+# model = XGBRegressor()
+
+# #3. 컴파일,훈련
+# import time
+# start = time.time()
+# model.fit(x_train, y_train)  # **fit_params
+# end = time.time()- start
+# #4. 평가, 예측
+# # result = model.score(x_test, y_test)
+
+# # print('model.score : ', result) # model.score :  1.0
+
+# y_predict = model.predict(x_test)
+# print('y_predict : ', y_predict)
+# print('y_test : ', np.array(y_test))
+
+# print('NRMSE : ',lg_nrmse(np.array(y_test), y_predict)) # 0.0
+
+
+# y_summit = model.predict(test_set)
+# # y_summit = [1 if x > 0.5 else 0 for x in pred]
+
+# submission_set = pd.read_csv(path + 'sample_submission.csv', # + 명령어는 문자를 앞문자와 더해줌
+#                              index_col=0) # index_col=n n번째 컬럼을 인덱스로 인식
+
+# submission_set[out_put_col] = y_summit # 예측값을 예측값으로 채워넣기
+
+# submission_set.to_csv(path + 'sample_submission_cat_basic.csv', index = True)
+
+# model.save_model(path + 'cat_basic.model') # 모델 저장
+
+
+# # xgb_basic
+# # NRMSE :  1.9934298355377522
+
+# # xgb_drop_col
+# # NRMSE :  1.9934566473103086
+
+
+
+# # threshold = model.feature_importances_
+# # print('========================')
+# # for thresh in threshold:
+# #     selection = SelectFromModel(model, threshold=thresh, prefit=True)
+# #     select_x_train = selection.transform(x_train)
+# #     select_x_test = selection.transform(x_test)
+# #     print(select_x_train.shape) # (442, 1)
+# #     print(select_x_test.shape) # (119, 1)
+# #     selection_model = XGBRegressor()
+# #     selection_model.fit(select_x_train,y_train, verbose=1)
+# #     y_predict = selection_model.predict(select_x_test)
+# #     score = lg_nrmse(np.array(y_test),y_predict)
+# #     print('thresh=%.3f, n=%d, nrmse: %.2f%%' %(thresh, select_x_train.shape[1], score*100.0))
+# #     print('========================')
+    
+# # (31685, 50)
+# # (7922, 50)
+
+# # FI = model.feature_importances_
+# # FN = train_set.columns # 컬럼명
+# # drop_order = []
+# # drop_columns = []
+# # break_num = 0
+
+# # while break_num < 6:
+# #         v1 = min(FI)
+# #         i1 = np.where(model.feature_importances_ == v1)
+# #         v2 = train_set.columns[i1]
+# #         drop_order.append(i1[0][0])
+# #         drop_columns.append(v2[0])
+# #         i2 = np.where(FI==v1)
+# #         FI = np.delete(FI, i2)        
+# #         break_num += 1
+# #         print(drop_order)
+# #         print(drop_columns)
+# #         continue
+
+
