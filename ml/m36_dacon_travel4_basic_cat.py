@@ -27,9 +27,9 @@ train = pd.read_csv(path + 'train.csv', # + 명령어는 문자를 앞문자와 
 test = pd.read_csv(path + 'test.csv', # 예측에서 쓸거임                
                        index_col=0)
 # 결측치를 처리하는 함수를 작성.
-drop_col = ['NumberOfChildrenVisiting','TypeofContact','OwnCar','NumberOfPersonVisiting'] # 컬럼 삭제하기 위한 리스트 생성
-train = train.drop(drop_col, axis=1) # axis=1 : 세로, axis=0 : 가로
-test = test.drop(drop_col, axis=1) # 결측치 처리하기 위한 함수 실행
+# drop_col = ['NumberOfChildrenVisiting','TypeofContact','OwnCar','NumberOfPersonVisiting'] # 컬럼 삭제하기 위한 리스트 생성
+# train = train.drop(drop_col, axis=1) # axis=1 : 세로, axis=0 : 가로
+# test = test.drop(drop_col, axis=1) # 결측치 처리하기 위한 함수 실행
 
 def handle_na(data):
     temp = data.copy()
@@ -132,15 +132,15 @@ print('accuracy_score :',accuracy_score(y_test,y_predict))
 
 
 
-# pred = model.predict(test)
-# y_summit = [1 if x > 0.5 else 0 for x in pred]
+pred = model.predict(test)
+y_summit = [1 if x > 0.5 else 0 for x in pred]
 
-# submission_set = pd.read_csv(path + 'sample_submission.csv', # + 명령어는 문자를 앞문자와 더해줌
-#                              index_col=0) # index_col=n n번째 컬럼을 인덱스로 인식
+submission_set = pd.read_csv(path + 'sample_submission.csv', # + 명령어는 문자를 앞문자와 더해줌
+                             index_col=0) # index_col=n n번째 컬럼을 인덱스로 인식
 
-# submission_set['ProdTaken'] = y_summit
+submission_set['ProdTaken'] = y_summit
 
-# submission_set.to_csv(path + 'sample_submission_xgb_basic.csv', index = True)
+submission_set.to_csv(path + 'sample_submission_cat_drp.csv', index = True)
 
 # sample_submission_xgb_basic.csv
 # model.score :  0.8721227621483376
