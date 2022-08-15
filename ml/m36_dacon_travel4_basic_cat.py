@@ -16,7 +16,12 @@ warnings.filterwarnings('ignore')
 from sklearn.discriminant_analysis import LinearDiscriminantAnalysis as LDA
 from sklearn.feature_selection import SelectFromModel
 
+parameters = {'depth'         : [4,5,6,7,8,9, 10],
+              'learning_rate' : [0.01,0.02,0.03,0.04],
+              'n_estimators':[100, 200, 300]
+                 }
 
+kfold = KFold(n_splits=5,shuffle=True,random_state=100)
 
 
 #1. 데이터
@@ -27,9 +32,9 @@ train = pd.read_csv(path + 'train.csv', # + 명령어는 문자를 앞문자와 
 test = pd.read_csv(path + 'test.csv', # 예측에서 쓸거임                
                        index_col=0)
 # 결측치를 처리하는 함수를 작성.
-# drop_col = ['NumberOfChildrenVisiting','TypeofContact','OwnCar','NumberOfPersonVisiting'] # 컬럼 삭제하기 위한 리스트 생성
-# train = train.drop(drop_col, axis=1) # axis=1 : 세로, axis=0 : 가로
-# test = test.drop(drop_col, axis=1) # 결측치 처리하기 위한 함수 실행
+drop_col = ['NumberOfChildrenVisiting','TypeofContact','OwnCar','NumberOfPersonVisiting'] # 컬럼 삭제하기 위한 리스트 생성
+train = train.drop(drop_col, axis=1) # axis=1 : 세로, axis=0 : 가로
+test = test.drop(drop_col, axis=1) # 결측치 처리하기 위한 함수 실행
 
 def handle_na(data):
     temp = data.copy()
@@ -98,7 +103,8 @@ print(test)
 from xgboost import XGBClassifier, XGBRegressor
 from catboost import CatBoostClassifier, CatBoostRegressor
 # model = XGBClassifier()
-model = CatBoostClassifier()
+cat = CatBoostClassifier()
+model = GridSearchCV(cat, param_grid = parameters, cv = kfold, n_jobs=-1)
 
 # # 분석할 의미가 없는 칼럼을 제거합니다.
 # train = train_enc.drop(columns=['TypeofContact','Occupation'])
@@ -109,10 +115,17 @@ model = CatBoostClassifier()
 x = train_enc.drop(columns=['ProdTaken'])
 y = train_enc[['ProdTaken']]
 
+
+# # 스케일러, LDA
+# scaler = RobustScaler() # 스케일러 적용하기 위해 StandardScaler() 객체 생성
+# scaler.fit(x) # 훈련용 데이터로 학습하기 위해 fit()함수 사용
+# x = scaler.transform(x) # 학습한 데이터로 훈련용 데이터를 이용해서 변환하기 위해 transform()함수 사용
+# # test_set = scaler.transform(test_set) # 학습한 데이터로 훈련용 데이터를 이용해서 변환하기 위해 transform()함수 사용
+
+
 x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.2, random_state=42)
 print(x_train.shape, x_test.shape, y_train.shape, y_test.shape)
-print(x_train.head())
-print(y_train.head())
+
 
 
 
@@ -140,7 +153,16 @@ submission_set = pd.read_csv(path + 'sample_submission.csv', # + 명령어는 �
 
 submission_set['ProdTaken'] = y_summit
 
-submission_set.to_csv(path + 'sample_submission_cat_drp.csv', index = True)
+submission_set.to_csv(path + 'cat_new_grid_drop_kfold.csv', index = True)
+
+import joblib
+
+joblib.dump(model, path + 'cat_new_grid_drop_kfold.model')
+
+print(" Results from Grid Search " )
+print("\n The best estimator across ALL searched params:\n",model.best_estimator_)
+print("\n The best score across ALL searched params:\n",model.best_score_)
+print("\n The best parameters across ALL searched params:\n",model.best_params_)
 
 # sample_submission_xgb_basic.csv
 # model.score :  0.8721227621483376
@@ -149,6 +171,21 @@ submission_set.to_csv(path + 'sample_submission_cat_drp.csv', index = True)
 # sample_submission_cat.csv
 # model.score :  0.8644501278772379
 # accuracy_score : 0.8644501278772379
+
+# cat grid search
+#  {'depth': 6, 'iterations': 100, 'learning_rate': 0.04}
+# model.score :  0.8184143222506394
+# accuracy_score : 0.8184143222506394
+
+# cat grid search drop columns
+# {'depth': 7, 'iterations': 100, 'learning_rate': 0.04}
+# model.score :  0.8209718670076727
+# accuracy_score : 0.8209718670076727
+
+# cat_new_grid_drop
+#  {'depth': 9, 'learning_rate': 0.04, 'n_estimators': 300}
+# model.score :  0.8951406649616368
+# accuracy_score : 0.8951406649616368
 
 # threshold = model.feature_importances_
 # print('========================')
