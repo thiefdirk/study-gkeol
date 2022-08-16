@@ -61,6 +61,16 @@ print(len(outliers_loc[0])) # 200
 x = np.delete(x, outliers_loc, 0) # outliers_loc의 위치에 있는 값을 삭제함
 y = np.delete(y, outliers_loc, 0) # outliers_loc의 위치에 있는 값을 삭제함
 
+newlist = []
+
+for i in y:
+    if i == 3 or i == 4 or i == 5:
+        newlist += [0]
+    elif i == 7 or i == 8 or i == 9:
+        newlist += [2]
+    else :
+        newlist += [1]
+    
 
 
 print(np.unique(y, return_counts=True)) # [3. 4. 5. 6. 7. 8. 9.]
@@ -68,9 +78,14 @@ print(dataset['quality'].value_counts()) # 데이터프레임에서 value_counts
 # le = LabelEncoder()
 # y = le.fit_transform(y)
 # print(np.unique(y, return_counts=True)) # [0 1 2 3 4 5 6]
-exit()
-x_train, x_test, y_train, y_test = train_test_split(x, y, train_size=0.8, random_state=123,
+x_train, x_test, y_train, y_test = train_test_split(x, newlist, train_size=0.8, random_state=123,
                                                     shuffle=True, stratify=y)
+
+
+scaler = MinMaxScaler()
+scaler.fit(x_train)
+x_train = scaler.transform(x_train)
+x_test = scaler.transform(x_test)
 
 
 #2. 모델
@@ -96,5 +111,7 @@ print('f1_score(micro) : ', f1_score(y_test, y_pred, average='micro'))
 # model.score :  0.7306122448979592
 # 이상치 제거 후
 # model.score :  0.7393617021276596
+# newlist
+# model.score :  0.7531914893617021
 
 #######과제 f1_score presicion recall 정리#########

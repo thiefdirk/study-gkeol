@@ -105,11 +105,10 @@ print(test)
 # 모델 선언
 from xgboost import XGBClassifier, XGBRegressor
 from catboost import CatBoostClassifier, CatBoostRegressor
-from sklearn.ensemble import RandomForestClassifier, RandomForestRegressor
 # model = XGBClassifier()
 # model = CatBoostClassifier()
 
-model = GridSearchCV(RandomForestClassifier, param_grid = parameters, n_jobs=-1, cv=kfold, verbose=1)
+model = GridSearchCV(CatBoostClassifier(), parameters, cv=kfold, verbose=1)
 
 # # 분석할 의미가 없는 칼럼을 제거합니다.
 # train = train_enc.drop(columns=['TypeofContact','Occupation'])
@@ -139,8 +138,8 @@ outliers_loc = outlier(y) # 최소값과 최대값 이상의 값을 찾아서 �
 print('최소값과 최대값 이상의 값을 찾아서 반환함 : ', outliers_loc)
 print(len(outliers_loc[0])) # 200
 
-x = np.delete(x, outliers_loc, 0) # outliers_loc의 위치에 있는 값을 삭제함
-y = np.delete(y, outliers_loc, 0) # outliers_loc의 위치에 있는 값을 삭제함
+x = x.drop(outliers_loc[0], axis=0) # 이상치를 제거함
+y = y.drop(outliers_loc[0], axis=0) # 이상치를 제거함
 
 
 # # 스케일러, LDA
@@ -160,7 +159,7 @@ print(x_train.shape, x_test.shape, y_train.shape, y_test.shape)
 #3. 컴파일,훈련
 import time
 start = time.time()
-model.fit(x_train, y_train)  # **fit_params
+model.fit(x_train, y_train)
 end = time.time()- start
 #4. 평가, 예측
 result = model.score(x_test, y_test)
