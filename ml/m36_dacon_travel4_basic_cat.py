@@ -15,11 +15,19 @@ import warnings
 warnings.filterwarnings('ignore')
 from sklearn.discriminant_analysis import LinearDiscriminantAnalysis as LDA
 from sklearn.feature_selection import SelectFromModel
+from imblearn.over_sampling import SMOTE
 
-parameters = {'depth'         : [4,5,6,7,8,9, 10],
-              'learning_rate' : [0.01,0.02,0.03,0.04],
-              'n_estimators':[100, 200, 300]
-                 }
+
+# parameters = {'depth'         : [4,5,6,7,8,9, 10],
+#               'learning_rate' : [0.01,0.02,0.03,0.04],
+#               'n_estimators':[100, 200, 300]
+#                  }
+
+# parameters = [
+#     {'gamma': [0], 'learning_rate': [0.3], 'max_depth': [6], 'min_child_weight': [1], 
+#     'n_estimators': [100], 'subsample': [0, 0.1, 0.2, 0.3, 0.5, 0.7, 1]}]
+
+parameters = [{'depth': [10], 'learning_rate': [0.04], 'n_estimators': [300]} ]
 
 kfold = KFold(n_splits=5,shuffle=True,random_state=100)
 
@@ -152,6 +160,7 @@ y = y.drop(outliers_loc[0], axis=0) # 이상치를 제거함
 x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.2, random_state=42, stratify=y)
 print(x_train.shape, x_test.shape, y_train.shape, y_test.shape)
 
+x_train, y_train = SMOTE(random_state=42).fit_resample(x_train, y_train)
 
 
 
@@ -179,15 +188,15 @@ submission_set = pd.read_csv(path + 'sample_submission.csv', # + 명령어는 �
 
 submission_set['ProdTaken'] = y_summit
 
-submission_set.to_csv(path + 'cat_new_grid_drop_statify_outlier_kfold.csv', index = True)
+submission_set.to_csv(path + 'cat2_new_grid_drop_statify_outlier_kfold_smote.csv', index = True)
 
 import joblib
 
-joblib.dump(model, path + 'cat_new_grid_drop_statify_outlier_kfold.model')
+joblib.dump(model, path + 'cat2_new_grid_drop_statify_outlier_kfold_smote.model')
 
 print(" Results from Grid Search " )
 print("\n The best estimator across ALL searched params:\n",model.best_estimator_)
-print("\n The best score across ALL searched params:\n",model.best_score_)
+print("\n The best score across ALL searched params:\n",model.best_score_) 
 print("\n The best parameters across ALL searched params:\n",model.best_params_)
 
 # sample_submission_xgb_basic.csv
@@ -223,6 +232,32 @@ print("\n The best parameters across ALL searched params:\n",model.best_params_)
 #  0.884918489391333
 # model.score :  0.8900255754475703
 # accuracy_score : 0.8900255754475703
+
+# cat_new_grid_drop_statify_outlier_kfold
+# model.score :  0.8666666666666667
+# accuracy_score : 0.8666666666666667
+#  The best score across ALL searched params:   
+#  0.8790710175172327
+#  The best parameters across ALL searched params:
+#  {'depth': 10, 'learning_rate': 0.04, 'n_estimators': 300}
+
+# cat_new_grid_drop_statify_outlier_kfold_smote
+# model.score :  0.8412698412698413
+# accuracy_score : 0.8412698412698413
+#  The best score across ALL searched params:
+#  0.9141795445053191
+#  The best parameters across ALL searched params:
+#  {'depth': 10, 'learning_rate': 0.04, 'n_estimators': 300} 
+
+# xgb_new_grid_drop_statify_outlier_kfold_smote
+# model.score :  0.8317460317460318
+# accuracy_score : 0.8317460317460318
+#  The best score across ALL searched params:
+#  0.908229123160455
+#  The best parameters across ALL searched params:
+#  {'gamma': 0, 'learning_rate': 0.3, 'max_depth': 6, 
+#   'min_child_weight': 1, 'n_estimators': 100, 'subsample': 1}
+
 
 # threshold = model.feature_importances_
 # print('========================')

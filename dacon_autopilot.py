@@ -155,15 +155,15 @@ joblib.dump(model, path +str(score)+ '_cat_drp_MultiOutputRegressor.model') # �
 
 # MultiOutputRegressor(catboostregressor)
 # NRMSE :  1.9376827157308794
-# 아직 제출 안함
+# 1.9498334591
 
 # MultiOutputRegressor(LGBMRegressor)_drop_col
 # NRMSE :  1.941478542140069
-# 아직 제출 안함
+# 1.9531576506
 
 # MultiOutputRegressor(catboostregressor)_drop_col
-
-
+# NRMSE :  1.9382488450118323
+# 1.9514119887
 
 
 # threshold = model.feature_importances_

@@ -46,6 +46,8 @@ parameters_rfr = [{
 
 kfold = StratifiedKFold(n_splits=5,shuffle=True,random_state=100)
 
+
+
 #1. 데이터
 path = './_data/dacon_travel/'
 train_set = pd.read_csv(path + 'train.csv', # + 명령어는 문자를 앞문자와 더해줌
@@ -253,7 +255,6 @@ import matplotlib.pyplot as plt
 from xgboost.plotting import plot_importance
 plot_importance(model)
 plt.show()
-
 
 
 

@@ -77,3 +77,5 @@ for thresh in threshold:
 # accuracy_score : 0.9333333333333333
 
 ################drop 후###############################
+# model.score :  1.0
+# accuracy_score : 1.0

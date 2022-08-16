@@ -37,7 +37,7 @@ print(dataset.info())
 # plt.bar 로 그린다(quality 컬럼)
 
 # groupby : quality 컬럼으로 그룹화 
-count_data = dataset.groupby('quality').count() # quality 컬럼의 값들을 묶어서 각각의 개수를 세줌
+count_data = dataset.groupby('quality')['quality'].count() # quality 컬럼의 값들을 묶어서 각각의 개수를 세줌
 # .count()를 하면 quality 컬럼을 제외한 나머지 컬럼들의 값들이 count된다
 print(count_data)
 plt.bar(count_data.index, count_data) # x축에는 count_data.index, y축에는 count_data

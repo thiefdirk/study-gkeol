@@ -60,5 +60,6 @@ acc = accuracy_score(y_test, y_pred)
 print('f1_score(macro) : ', f1_score(y_test, y_pred, average='macro'))
 print('f1_score(micro) : ', f1_score(y_test, y_pred, average='micro'))
 
-
 # model.score :  0.7306122448979592
+
+#######과제 f1_score presicion recall 정리#########
