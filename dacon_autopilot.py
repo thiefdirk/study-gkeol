@@ -77,10 +77,10 @@ x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.2, random_
 print(x_train.shape, x_test.shape, y_train.shape, y_test.shape)
 # (31685, 56) (7922, 56) (31685, 14) (7922, 14)
 
-
-# scaler = StandardScaler()
-# x_train = scaler.fit_transform(x_train)
-# x_test = scaler.fit_transform(x_test)
+# StandardScaler, MinMaxScaler, RobustScaler, MaxAbsScaler
+scaler = RobustScaler()
+x_train = scaler.fit_transform(x_train)
+x_test = scaler.fit_transform(x_test)
 
 
 
@@ -88,7 +88,7 @@ print(x_train.shape, x_test.shape, y_train.shape, y_test.shape)
 # model = XGBRegressor()
 # model = LGBMRegressor()
 # model = MultiOutputRegressor(LGBMRegressor())
-model = MultiOutputRegressor(CatBoostRegressor())
+model = CatBoostRegressor(loss_function='MultiRMSE')
 
 #3. 컴파일,훈련
 import time
@@ -116,10 +116,10 @@ submission_set = pd.read_csv(path + 'sample_submission.csv', # + 명령어는 �
 
 submission_set[out_put_col] = y_summit # 예측값을 예측값으로 채워넣기
 
-submission_set.to_csv(path +str(score)+ '_cat_drp_MultiOutputRegressor.csv', index = True)
+submission_set.to_csv(path +str(score)+ '_cat_drp_robust.csv', index = True)
 
 import joblib
-joblib.dump(model, path +str(score)+ '_cat_drp_MultiOutputRegressor.model') # 저장하기
+joblib.dump(model, path +str(score)+ '_cat_drp_robust.model') # 저장하기
 
 # model.save_model(path +str(score)+  '_MultiOutputRegressor.model') # 모델 저장
 
@@ -165,6 +165,20 @@ joblib.dump(model, path +str(score)+ '_cat_drp_MultiOutputRegressor.model') # �
 # NRMSE :  1.9382488450118323
 # 1.9514119887
 
+# _cat_drp_
+# NRMSE :  1.940710356884139
+# 1.9477700047
+
+# _cat_drp_stndscl
+# NRMSE :  1.9408016383496292
+# 2.0844623159
+
+# _cat_drp_minmax
+# NRMSE :  1.9993093980815655
+
+# _cat_drp_robust
+# NRMSE :  1.9400422657496188
+# 2.0586802241	
 
 # threshold = model.feature_importances_
 # print('========================')

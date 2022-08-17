@@ -60,3 +60,6 @@ acc = accuracy_score(y_test, y_pred)
 print('acc : ', acc)
 # print('f1_score(macro) : ', f1_score(y_test, y_pred, average='macro')) # macro : 각 클래스별로 f1_score를 구하고 그것을 평균
 print('f1_score(micro) : ', f1_score(y_test, y_pred, average='micro')) # micro : 다중분류에서 사용
+
+# acc :  0.9572558367684139
+# f1_score(micro) :  0.9572558367684139

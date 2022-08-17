@@ -54,8 +54,8 @@ acc = accuracy_score(y_test, y_pred)
 print('f1_score(macro) : ', f1_score(y_test, y_pred, average='macro'))
 
 ###################smote 적용 전###################
-# model.score :  0.9824561403508771
-# f1_score(macro) :  0.981329839502129
+# model.score :  0.9912280701754386
+# f1_score(macro) :  0.99062114356232   
 ###################smote 적용 후###################
 # model.score :  0.9824561403508771
 # f1_score(macro) :  0.981329839502129

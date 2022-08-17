@@ -78,6 +78,6 @@ print('f1_score(macro) : ', f1_score(y_test, y_pred, average='macro'))
 # model.score :  0.9385964912280702
 # f1_score(macro) :  0.9329805996472663 
 ###################smote 적용 후###################
-# model.score :  0.9824561403508771
-# f1_score(macro) :  0.981329839502129
+# model.score :  0.9649122807017544
+# f1_score(macro) :  0.9623015873015872
 
