@@ -1,6 +1,8 @@
 import pandas as pd
 import numpy as np
 import glob
+import joblib
+
 
 path = 'C:\study\_data\dacon_chung/'
 all_input_list = sorted(glob.glob(path + 'train_input/*.csv'))
@@ -61,14 +63,13 @@ from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Dense, LSTM, Conv1D, Flatten, Dropout, MaxPooling1D, GRU
 
 model = Sequential()
-model.add(Conv1D(64,2, activation='relu', input_shape=(1440, 37)))
-model.add(Flatten())
+model.add(GRU(64, activation='relu'))
 model.add(Dense(1))
 
 # 3. 컴파일, 훈련
 
 model.compile(loss='mse', optimizer='adam', metrics=['mae'])
-model.fit(train_data, label_data, epochs=100, batch_size=1, validation_data=(val_train_data, val_label_data))
+model.fit(train_data, label_data, epochs=50, batch_size=100, validation_data=(val_train_data, val_label_data))
 
 #4. 평가, 예측
 
@@ -77,3 +78,22 @@ print('loss, mae : ', loss, mae)
 
 y_pred = model.predict(test_input_data)
 print(y_pred)
+print(y_pred.shape)  # (11520, 1)
+
+test = []
+test_split_list = [29, 35, 26, 32, 37, 36]
+
+for [index, value] in enumerate(test_split_list):
+    new_list = y_pred[:value]
+    csv = pd.read_csv(path + 'test_target/' + 'TEST_' + '%02d' %(index+1) + '.csv')
+    csv['rate'] = new_list
+    csv.to_csv(path + 'TEST_' + '%02d' %(index+1) + '.csv', index = True)
+    y_pred = y_pred[value:]
+    
+    
+print(test)   # (11520,)
+    
+
+
+
+# joblib.save(y_pred, 'C:\study\_data\dacon_chung/y_pred.pkl')
