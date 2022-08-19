@@ -29,11 +29,11 @@ pca = PCA(n_components=712) # n_components : 주요하지 않은 변수를 제�
 x = pca.fit_transform(x) # x를 pca로 변환한다.
 pca_EVR = pca.explained_variance_ratio_ # 주요하지 않은 변수의 중요도를 확인한다.
 cumsum = np.cumsum(pca_EVR) # 중요도를 이용해 주요하지 않은 변수를 제거한다.
-# print('n_components=', 783, ':') # 중요도를 이용해 주요하지 않은 변수를 제거한다.
-# print(np.argmax(cumsum >= 0.95)+1) #154
-# print(np.argmax(cumsum >= 0.99)+1) #331
-# print(np.argmax(cumsum >= 0.999)+1) #486
-# print(np.argmax(cumsum+1)) #712
+print('n_components=', 783, ':') # 중요도를 이용해 주요하지 않은 변수를 제거한다.
+print(np.argmax(cumsum >= 0.95)+1) #154
+print(np.argmax(cumsum >= 0.99)+1) #331
+print(np.argmax(cumsum >= 0.999)+1) #486
+print(np.argmax(cumsum+1)) #712
 x_train, x_test, y_train, y_test = train_test_split(x,y, train_size=0.8, shuffle=True, random_state=66, stratify=y) # stratify : 데이터를 군집화할 때 사용하는 열의 값을 지정한다.
 
 
