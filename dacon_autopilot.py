@@ -42,7 +42,8 @@ def lg_nrmse(gt, preds):
 parameters = {'iterations': [600, 700, 800, 900, 1000],
           'depth': [4, 5, 6],
           'l2_leaf_reg': np.logspace(-20, -19, 3),
-          'leaf_estimation_iterations': [10]}
+          'leaf_estimation_iterations': [10]} # cat_prams
+
 
 #1. 데이터
 path = './_data/dacon_autopilot/open/'
@@ -189,10 +190,10 @@ submission_set = pd.read_csv(path + 'sample_submission.csv', # + 명령어는 �
 
 submission_set[out_put_col] = y_summit # 예측값을 예측값으로 채워넣기
 
-submission_set.to_csv(path +str(score)+ '_cat_drp2_123_gridcv.csv', index = True)
+submission_set.to_csv(path +str(score)+ '_cat__drp2_123_gridcv.csv', index = True)
 
 import joblib
-joblib.dump(model, path +str(score)+ '_cat_drp2_123_gridcv.model') # 저장하기
+joblib.dump(model, path +str(score)+ '_cat__ drp2_123_gridcv.model') # 저장하기
 
 print('걸린시간 : ', end)
 print('best_params : ', model.best_params_)
@@ -294,6 +295,11 @@ print('best_index : ', model.best_index_)
 # 걸린시간 :  616.8261032104492
 # best_params :  {'n_estimators': 200, 'learning_rate': 0.03, 'depth': 7}
 
+# _cat_drp2_123_gridcv
+# NRMSE :  1.9412497852996515
+# 걸린시간 :  7632.0811603069305
+# best_params :  {'depth': 6, 'iterations': 1000,
+#                 'l2_leaf_reg': 1e-20, 'leaf_estimation_iterations': 10}  
 
 
 

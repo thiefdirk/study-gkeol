@@ -10,5 +10,8 @@ optimizer = BayesianOptimization(f=y_function,
                                  pbounds=param_bounds, 
                                  random_state=1234)
 
-optimizer.maximize(init_points=2, n_iter=20) # maximize : 최대값을 찾는다.
+optimizer.maximize(init_points=2, n_iter=20, n_jobs=-1) # n_jobs=-1 : cpu를 모두 사용하겠다
+# maximize : 최대값을 찾는다.
 # 2번의 랜덤값을 찾고, 3번의 최적값을 찾는다.
+
+print(optimizer.max) # 최대값을 찾는다.

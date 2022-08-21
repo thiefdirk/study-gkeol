@@ -121,15 +121,7 @@ print(test)
 
 # parameters_rfr = [{
 #     'bootstrap': [True], 'max_depth': [5, 10, None], 'n_estimators': [5, 6, 7, 8, 9, 10, 11, 12, 13, 15], }]
-parameters_lgb = [{'boosting_type': ['gbdt'], 'learning_rate': [0.1, 0.2, 0.3, 0.01, 0.001],
-                   'max_depth': [2, 3, 4, 5, 6, 7], 'n_estimators': [100, 400, 500], 'num_leaves': [10, 20, 30, 40, 50], 
-                   'subsample': [0.5, 0.7, 0.9, 1], 'subsample_for_bin': [200, 300, 400, 500], 'subsample_freq': [0, 1, 2, 3, 4,]}]
-parameters_xgb = [
-    {'n_estimators' : [100, 300, 500] ,
-    'learning_rate' : [ 0.2, 0.5, 1, 0.01, 0.001],
-    'max_depth' : [None, 2, 4, 6, 7],
-    'gamma' : [0, 1, 4, 10, 100],
-    'min_child_weight' : [0, 0.01, 0.001, 0.1, 0.5, 1, 5],}]
+
 
 
 # 모델 선언
@@ -139,53 +131,97 @@ from sklearn.linear_model import LogisticRegression# import bagging
 from sklearn.ensemble import BaggingClassifier
 # import voting
 from sklearn.ensemble import VotingClassifier
-from lightgbm import LGBMClassifier, LGBMRegressor
+import joblib
 
 
-model = GridSearchCV(XGBClassifier(gpu_id=0, tree_method='gpu_hist'), parameters_xgb, n_jobs=-1, verbose=1)
+# model = GridSearchCV(RandomForestClassifier(), parameters_rfr, cv=kfold, n_jobs=-1, verbose=1)
 # model = XGBClassifier(random_state=72, n_jobs=-1, n_estimators=100, max_depth=5, learning_rate=0.1, colsample_bytree=0.9, subsample=0.9)
 # model = BaggingClassifier(base_estimator=XGBClassifier(), n_estimators=100, random_state=1234)
 # model = VotingClassifier(estimators=[('xgb', XGBClassifier()), ('cat', CatBoostClassifier()), ('rfc', RandomForestClassifier())], voting='soft')
-# model = CatBoostClassifier(random_state=72)
+
 
 # 분석할 의미가 없는 칼럼을 제거합니다.
 # 상관계수 그래프를 통해 연관성이 적은것과 - 인것을 빼준다.
-train = train_enc.drop(columns=['TypeofContact','NumberOfChildrenVisiting','NumberOfPersonVisiting','OwnCar', 'MonthlyIncome'])  
-test = test.drop(columns=['TypeofContact','NumberOfChildrenVisiting','NumberOfPersonVisiting','OwnCar', 'MonthlyIncome'])
-# train = train_enc.drop(columns=['NumberOfChildrenVisiting','NumberOfPersonVisiting'])  
-# test = test.drop(columns=['NumberOfChildrenVisiting','NumberOfPersonVisiting'])
+# train = train_enc.drop(columns=['TypeofContact','NumberOfChildrenVisiting','NumberOfPersonVisiting','OwnCar', 'MonthlyIncome'])  
+# test = test.drop(columns=['TypeofContact','NumberOfChildrenVisiting','NumberOfPersonVisiting','OwnCar', 'MonthlyIncome'])
+train = train_enc.drop(columns=['NumberOfChildrenVisiting','NumberOfPersonVisiting'])  
+test = test.drop(columns=['NumberOfChildrenVisiting','NumberOfPersonVisiting'])
 
 
 # 학습에 사용할 정보와 예측하고자 하는 정보를 분리합니다.
 x_train = train.drop(columns=['ProdTaken'])
 y_train = train[['ProdTaken']]
 print(x_train.info())
-y_train = y_train.values.ravel()
+# y_train = y_train.values.ravel()
+print(y_train.info())
+
+print(x_train.shape)
+print(y_train.shape)
+y_train = y_train.values.ravel() # 1차원으로 변환
+print(y_train.shape)
+print(test.shape)
 
 # pf = PolynomialFeatures(degree=2)
 # x_train = pf.fit_transform(x_train)
 # test = pf.transform(test)
+from bayes_opt import BayesianOptimization
 
-# 모델 학습
-model.fit(x_train,y_train)
-y_pred = model.predict(test)
+scaler = StandardScaler()
 
-print('----------------------예측된 데이터의 상위 10개의 값 확인--------------------\n')
+scaler.fit(x_train)
+x_train = scaler.transform(x_train)
+test = scaler.transform(test)
 
-print(y_pred[:10])
-print(model.score(x_train, y_train))
-# 예측된 값을 정답파일과 병합
-sample_submission['ProdTaken'] = y_pred
 
-# 정답파일 데이터프레임 확인
-print(sample_submission)
-print(model.best_params_)
+bayesian_params = {
+    'max_depth': (6,16),
+    'num_leaves': (24, 64),
+    'min_child_samples': (10, 200),
+    'min_child_weight': (1, 50),
+    'subsample': (0.5, 1),
+    'colsample_bytree': (0.5, 1),
+    'max_bin': (10, 500),
+    'reg_lambda': (0.001, 10),
+    'reg_alpha': (0.01, 50),
+}
 
-sample_submission.to_csv(path+'xgb_grid.csv',index = False)
+def lgb_hamsu(max_depth, num_leaves, min_child_samples, min_child_weight,
+            subsample, colsample_bytree, max_bin, reg_lambda, reg_alpha):
+    params = {'n_estimators': 500, 'learning_rate' : 0.02,
+        'max_depth': int(max_depth),
+        'num_leaves': int(num_leaves),
+        'min_child_samples': int(min_child_samples),
+        'min_child_weight': min_child_weight,
+        'subsample': subsample,
+        'colsample_bytree': colsample_bytree,
+        'max_bin': int(max_bin),
+        'reg_lambda': reg_lambda,
+        'reg_alpha': reg_alpha,
+    }
+    model = LGBMClassifier(**params)
+    model.fit(x_train, y_train,
+              verbose=100)
+    y_pred = model.predict(test)
+    return y_pred
 
-import joblib
 
-joblib.dump(model, path + 'xgb_grid.model')
+lgb_bo = BayesianOptimization(lgb_hamsu, bayesian_params, random_state=1234)
+lgb_bo.maximize(init_points=5, n_iter=30)
+print(lgb_bo.max)
+sample_submission['ProdTaken'] = lgb_bo
+sample_submission.to_csv(path+'lgb_bo1.csv',index = False)
+# joblib.dump(model, path + 'lgb_bo1.model')
+# # 예측된 값을 정답파일과 병합
+# sample_submission['ProdTaken'] = y_pred
+
+# # 정답파일 데이터프레임 확인
+# print(sample_submission)
+
+# sample_submission.to_csv(path+'xgb_basic72.csv',index = False)
+
+# import joblib
+
+# joblib.dump(model, path + 'xgb_basic72.model')
 
 
 # sample_submission_xgb_basic.csv
@@ -326,9 +362,8 @@ joblib.dump(model, path + 'xgb_grid.model')
 
 # xgb_basic_new_drp_72
 # 0.9514066496163683
+# 0.8653026428
 
 # xgb_basic47
 # 0.9457800511508951
-# lgbm_grid
-# {'boosting_type': 'gbdt', 'learning_rate': 0.3, 'max_depth': 7, 'n_estimators': 400, 'num_leaves': 20, 'subsample': 0.9, 'subsample_for_bin': 300, 'subsample_freq': 
-# 4}
+# 0.8712702472
