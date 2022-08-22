@@ -20,8 +20,15 @@ test = pd.read_csv(path + 'test.csv',
 
 sample_submission = pd.read_csv(path + 'sample_submission.csv')
 
+print(train['Gender'].value_counts())
+print(train['Occupation'].value_counts())
+print(test['Gender'].value_counts())
+print(test['Occupation'].value_counts())
+
+print
 
 
+exit()
 print(train.describe())  # DurationOfPitch, MonthlyIncome
 print("=============================상관계수 히트 맵==============")
 print(train.corr())                    # 상관관계를 확인.  

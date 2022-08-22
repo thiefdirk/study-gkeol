@@ -160,7 +160,7 @@ test = test.drop(columns=['TypeofContact','NumberOfChildrenVisiting','NumberOfPe
 x_train = train.drop(columns=['ProdTaken'])
 y_train = train[['ProdTaken']]
 print(x_train.info())
-y_train = y_train.values.ravel()
+y_train = y_train.values.ravel() # 1차원으로 변환
 
 # pf = PolynomialFeatures(degree=2)
 # x_train = pf.fit_transform(x_train)
@@ -332,3 +332,6 @@ joblib.dump(model, path + 'xgb_grid.model')
 # lgbm_grid
 # {'boosting_type': 'gbdt', 'learning_rate': 0.3, 'max_depth': 7, 'n_estimators': 400, 'num_leaves': 20, 'subsample': 0.9, 'subsample_for_bin': 300, 'subsample_freq': 
 # 4}
+
+# xgb_grid
+# {'gamma': 0, 'learning_rate': 1, 'max_depth': 7, 'min_child_weight': 0.01, 'n_estimators': 100}
