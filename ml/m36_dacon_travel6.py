@@ -36,61 +36,50 @@ train = pd.read_csv(path + 'train.csv', # + 명령어는 문자를 앞문자와 
 test = pd.read_csv(path + 'test.csv', # 예측에서 쓸거임                
                        index_col=0)
 
-sample_submission = pd.read_csv(path + 'sample_submission.csv')
+sample_submission = pd.read_csv(path + 'sample_submission.csv', index_col=0)
 
-kfold = KFold(n_splits=5,shuffle=True,random_state=100)
 
 print(train.describe())  # DurationOfPitch, MonthlyIncome
 print("=============================상관계수 히트 맵==============")
 print(train.corr())                    # 상관관계를 확인.  
 import matplotlib.pyplot as plt 
 import seaborn as sns
-sns.set(font_scale=0.3)
+sns.set(font_scale=0.6)
 sns.heatmap(data=train.corr(),square=True, annot=True, cbar=True) 
 plt.show()
 
 
 
-# 결측치를 처리하는 함수를 작성.
-def handle_na(data):
-    temp = data.copy()
-    for col, dtype in temp.dtypes.items():
-        if dtype == 'object':
-            # 문자형 칼럼의 경우 'Unknown'
-            value = 'Unknown'
-        elif dtype == int or dtype == float:
-            # 수치형 칼럼의 경우 0
-            value = 0
-        temp.loc[:,col] = temp[col].fillna(value)
-    return temp
+for i in [train, test]:
+    i['Gender'] = i['Gender'].map({'Male': 0, 'Female': 1, 'Fe Male': 1})
 
-train_nona = handle_na(train)
 
-# 결측치 처리가 잘 되었는지 확인해 줍니다.
+# pandas의 fillna 메소드를 활용하여 NAN 값을 채워니다.
+train_nona = train.copy()
+
+# 0 으로 채우는 경우
+train_nona.DurationOfPitch = train_nona.DurationOfPitch.fillna(0)
+train_nona.PreferredPropertyStar = train_nona.PreferredPropertyStar.fillna(0)
+train_nona.Age = train_nona.Age.fillna(0)
+
+# mean 값으로 채우는 경우
+mean_cols = ['NumberOfFollowups','NumberOfTrips','NumberOfChildrenVisiting','MonthlyIncome']
+for col in mean_cols:
+    train_nona[col] = train_nona[col].fillna(test[col].mean())
+
+# "Unknown"으로 채우는 경우
+train_nona.TypeofContact = train_nona.TypeofContact.fillna("Unknown")
+
+# 결과를 확인합니다.
 train_nona.isna().sum()
 
-print(train_nona.isna().sum())
-object_columns = train_nona.columns[train_nona.dtypes == 'object']
-print('object 칼럼 : ', list(object_columns))
+object_columns = train.columns[train.dtypes == 'object']
+print('object 칼럼은 다음과 같습니다 : ', list(object_columns))
 
 # 해당 칼럼만 보아서 봅시다
-train_nona[object_columns]
+train[object_columns]
 
-print(train_nona.shape)
-print(test.shape)
-
-
-# LabelEncoder를 준비해줍니다.
 from sklearn.preprocessing import LabelEncoder
-
-encoder = LabelEncoder()
-
-# LabelEcoder는 학습하는 과정을 필요로 합니다.
-encoder.fit(train_nona['TypeofContact'])
-
-#학습된 encoder를 사용하여 문자형 변수를 숫자로 변환해줍니다.
-encoder.transform(train_nona['TypeofContact'])
-print(train_nona['TypeofContact'])
 
 train_enc = train_nona.copy()
 
@@ -101,9 +90,23 @@ for o_col in object_columns:
     train_enc[o_col] = encoder.transform(train_enc[o_col])
 
 # 결과를 확인합니다.
-print(train_enc)
+train_enc
+print(train_enc.isna().sum())
+
+
 # 결측치 처리
-test = handle_na(test)
+# 0 으로 채우는 경우
+test.DurationOfPitch = test.DurationOfPitch.fillna(0)
+test.PreferredPropertyStar = test.PreferredPropertyStar.fillna(0)
+test.Age = test.Age.fillna(0)
+
+# mean 값으로 채우는 경우
+mean_cols = ['NumberOfFollowups','NumberOfTrips','NumberOfChildrenVisiting','MonthlyIncome']
+for col in mean_cols:
+    test[col] = test[col].fillna(test[col].mean())
+
+# "Unknown"으로 채우는 경우
+test.TypeofContact = test.TypeofContact.fillna("Unknown")
 
 # 문자형 변수 전처리
 for o_col in object_columns:
@@ -115,13 +118,8 @@ for o_col in object_columns:
     # test 데이터는 오로지 transform 에서만 사용되어야 합니다.
     test[o_col] = encoder.transform(test[o_col])
 
-# 결과를 확인
-print(test)
-
-
-# parameters_rfr = [{
-#     'bootstrap': [True], 'max_depth': [5, 10, None], 'n_estimators': [5, 6, 7, 8, 9, 10, 11, 12, 13, 15], }]
-
+print(train_enc.isna().sum())
+print(test.isna().sum())
 
 
 # 모델 선언
@@ -133,95 +131,80 @@ from sklearn.ensemble import BaggingClassifier
 from sklearn.ensemble import VotingClassifier
 import joblib
 
+# parameters_xgb = [
+#     {'n_estimators' : [100, 300, 500] ,
+#     'learning_rate' : [ 0.2, 0.5, 1, 0.01, 0.001],
+#     'max_depth' : [None, 2, 4, 6, 7],
+#     'gamma' : [0, 1, 4, 10, 100],
+#     'min_child_weight' : [0, 0.01, 0.001, 0.1, 0.5, 1, 5],}]
+
+parameters_xgb = [
+    {'gamma': [0], 'learning_rate': [0.2], 'max_depth': [7], 'min_child_weight': [0], 'n_estimators': [300]}]
 
 # model = GridSearchCV(RandomForestClassifier(), parameters_rfr, cv=kfold, n_jobs=-1, verbose=1)
 # model = XGBClassifier(random_state=72, n_jobs=-1, n_estimators=100, max_depth=5, learning_rate=0.1, colsample_bytree=0.9, subsample=0.9)
 # model = BaggingClassifier(base_estimator=XGBClassifier(), n_estimators=100, random_state=1234)
 # model = VotingClassifier(estimators=[('xgb', XGBClassifier()), ('cat', CatBoostClassifier()), ('rfc', RandomForestClassifier())], voting='soft')
+model = GridSearchCV(XGBClassifier(gpu_id=0, tree_method='gpu_hist', random_state=66), parameters_xgb, n_jobs=-1, verbose=1)
+# model = XGBClassifier(random_state=66)
+
+
+# 스케일링
+# scaler = MinMaxScaler()
+scaler = StandardScaler()
+# scaler = RobustScaler()
+# scaler = MaxAbsScaler()
+
+train_enc[['Age', 'DurationOfPitch', 'MonthlyIncome']] = scaler.fit_transform(train_enc[['Age', 'DurationOfPitch', 'MonthlyIncome']])
+test[['Age', 'DurationOfPitch', 'MonthlyIncome']] = scaler.transform(test[['Age', 'DurationOfPitch', 'MonthlyIncome']])
 
 
 # 분석할 의미가 없는 칼럼을 제거합니다.
 # 상관계수 그래프를 통해 연관성이 적은것과 - 인것을 빼준다.
-# train = train_enc.drop(columns=['TypeofContact','NumberOfChildrenVisiting','NumberOfPersonVisiting','OwnCar', 'MonthlyIncome'])  
-# test = test.drop(columns=['TypeofContact','NumberOfChildrenVisiting','NumberOfPersonVisiting','OwnCar', 'MonthlyIncome'])
-train = train_enc.drop(columns=['NumberOfChildrenVisiting','NumberOfPersonVisiting'])  
-test = test.drop(columns=['NumberOfChildrenVisiting','NumberOfPersonVisiting'])
 
+drop_col = ['TypeofContact', 'NumberOfChildrenVisiting',
+                                'NumberOfPersonVisiting', 'OwnCar', 'MonthlyIncome', 'NumberOfTrips', 'NumberOfFollowups']
+
+train = train_enc.drop(columns=drop_col) 
+test = test.drop(columns=drop_col)
+# train = train_enc.drop(columns=['NumberOfChildrenVisiting','NumberOfPersonVisiting'])  
+# test = test.drop(columns=['NumberOfChildrenVisiting','NumberOfPersonVisiting'])
 
 # 학습에 사용할 정보와 예측하고자 하는 정보를 분리합니다.
-x_train = train.drop(columns=['ProdTaken'])
-y_train = train[['ProdTaken']]
-print(x_train.info())
-# y_train = y_train.values.ravel()
-print(y_train.info())
+x = train.drop(columns=['ProdTaken'])
+y = train[['ProdTaken']]
+y = y.values.ravel() # 1차원으로 변환
 
-print(x_train.shape)
-print(y_train.shape)
-y_train = y_train.values.ravel() # 1차원으로 변환
-print(y_train.shape)
-print(test.shape)
+x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.1,
+                                                    random_state=66)
 
-# pf = PolynomialFeatures(degree=2)
-# x_train = pf.fit_transform(x_train)
-# test = pf.transform(test)
-from bayes_opt import BayesianOptimization
+# 모델 학습
+model.fit(x_train, y_train)
 
-scaler = StandardScaler()
+# 모델 예측
+score = model.score(x_test, y_test)
 
-scaler.fit(x_train)
-x_train = scaler.transform(x_train)
-test = scaler.transform(test)
+# 예측
+y_pred = model.predict(test)
+
+print("최적의 매개변수 :",model.best_estimator_)
 
 
-bayesian_params = {
-    'max_depth': (6,16),
-    'num_leaves': (24, 64),
-    'min_child_samples': (10, 200),
-    'min_child_weight': (1, 50),
-    'subsample': (0.5, 1),
-    'colsample_bytree': (0.5, 1),
-    'max_bin': (10, 500),
-    'reg_lambda': (0.001, 10),
-    'reg_alpha': (0.01, 50),
-}
+print("최적의 파라미터 :",model.best_params_)
 
-def lgb_hamsu(max_depth, num_leaves, min_child_samples, min_child_weight,
-            subsample, colsample_bytree, max_bin, reg_lambda, reg_alpha):
-    params = {'n_estimators': 500, 'learning_rate' : 0.02,
-        'max_depth': int(max_depth),
-        'num_leaves': int(num_leaves),
-        'min_child_samples': int(min_child_samples),
-        'min_child_weight': min_child_weight,
-        'subsample': subsample,
-        'colsample_bytree': colsample_bytree,
-        'max_bin': int(max_bin),
-        'reg_lambda': reg_lambda,
-        'reg_alpha': reg_alpha,
-    }
-    model = LGBMClassifier(**params)
-    model.fit(x_train, y_train,
-              verbose=100)
-    y_pred = model.predict(test)
-    return y_pred
+ 
+print("best_score :",model.best_score_)
 
+print("model_score :",model.score(x_test,y_test))
 
-lgb_bo = BayesianOptimization(lgb_hamsu, bayesian_params, random_state=1234)
-lgb_bo.maximize(init_points=5, n_iter=30)
-print(lgb_bo.max)
-sample_submission['ProdTaken'] = lgb_bo
-sample_submission.to_csv(path+'lgb_bo1.csv',index = False)
-# joblib.dump(model, path + 'lgb_bo1.model')
-# # 예측된 값을 정답파일과 병합
-# sample_submission['ProdTaken'] = y_pred
+joblib.dump(model, path + 'xgb_grid_0823.model')
+# 예측된 값을 정답파일과 병합
+sample_submission['ProdTaken'] = y_pred
 
-# # 정답파일 데이터프레임 확인
-# print(sample_submission)
+# 정답파일 데이터프레임 확인
+print(sample_submission)
 
-# sample_submission.to_csv(path+'xgb_basic72.csv',index = False)
-
-# import joblib
-
-# joblib.dump(model, path + 'xgb_basic72.model')
+sample_submission.to_csv(path+'xgb_grid_0823.csv',index = True)
 
 
 # sample_submission_xgb_basic.csv
@@ -367,3 +350,9 @@ sample_submission.to_csv(path+'lgb_bo1.csv',index = False)
 # xgb_basic47
 # 0.9457800511508951
 # 0.8712702472
+
+
+# xgb_grid
+# 최적의 파라미터 : {'gamma': 0, 'learning_rate': 0.2, 'max_depth': 7, 'min_child_weight': 0, 'n_estimators': 300}
+# best_score : 0.9003796771295249
+# model_score : 0.9387755102040817
