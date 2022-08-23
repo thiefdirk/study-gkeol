@@ -39,10 +39,10 @@ def lg_nrmse(gt, preds):
 #               'n_estimators':[100, 200, 300]
 #                  }
 
-parameters = {'iterations': [600, 700, 800, 900, 1000],
-          'depth': [4, 5, 6],
-          'l2_leaf_reg': np.logspace(-20, -19, 3),
-          'leaf_estimation_iterations': [10]} # cat_prams
+parameters = {'depth'         : [4,5,6,7,8,9, 10],
+              'learning_rate' : [0.01,0.02,0.03,0.04],
+              'n_estimators':[100, 200, 300]
+                 } 
 
 
 #1. 데이터
@@ -190,10 +190,10 @@ submission_set = pd.read_csv(path + 'sample_submission.csv', # + 명령어는 �
 
 submission_set[out_put_col] = y_summit # 예측값을 예측값으로 채워넣기
 
-submission_set.to_csv(path +str(score)+ '_cat__drp2_123_gridcv.csv', index = True)
+submission_set.to_csv(path +str(score)+ '_cat__drp2_123_gridcv_.csv', index = True)
 
 import joblib
-joblib.dump(model, path +str(score)+ '_cat__ drp2_123_gridcv.model') # 저장하기
+joblib.dump(model, path +str(score)+ '_cat__ drp2_123_gridcv_.model') # 저장하기
 
 print('걸린시간 : ', end)
 print('best_params : ', model.best_params_)

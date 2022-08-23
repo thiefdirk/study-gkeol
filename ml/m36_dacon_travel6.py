@@ -175,8 +175,8 @@ x = train.drop(columns=['ProdTaken'])
 y = train[['ProdTaken']]
 y = y.values.ravel() # 1차원으로 변환
 
-x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.1,
-                                                    random_state=66)
+x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.15,
+                                                    random_state=66) #내일은 이거 지우고 돌려보기
 
 # 모델 학습
 model.fit(x_train, y_train)
@@ -197,14 +197,14 @@ print("best_score :",model.best_score_)
 
 print("model_score :",model.score(x_test,y_test))
 
-joblib.dump(model, path + 'xgb_grid_0823.model')
+joblib.dump(model, path + 'xgb_grid_strd_15_0823.model')
 # 예측된 값을 정답파일과 병합
 sample_submission['ProdTaken'] = y_pred
 
 # 정답파일 데이터프레임 확인
 print(sample_submission)
 
-sample_submission.to_csv(path+'xgb_grid_0823.csv',index = True)
+sample_submission.to_csv(path+'xgb_grid_strd_15_0823.csv',index = True)
 
 
 # sample_submission_xgb_basic.csv
@@ -352,7 +352,18 @@ sample_submission.to_csv(path+'xgb_grid_0823.csv',index = True)
 # 0.8712702472
 
 
-# xgb_grid
+# xgb_grid, traintest 0.05
 # 최적의 파라미터 : {'gamma': 0, 'learning_rate': 0.2, 'max_depth': 7, 'min_child_weight': 0, 'n_estimators': 300}
 # best_score : 0.9003796771295249
 # model_score : 0.9387755102040817
+
+
+# xgb_grid, traintest 0.1
+# 최적의 파라미터 : {'gamma': 0, 'learning_rate': 0.2, 'max_depth': 7, 'min_child_weight': 0, 'n_estimators': 300}
+# best_score : 0.8857355607355608
+# model_score : 0.9540816326530612
+
+# xgb_grid_minmax_0823
+# 최적의 파라미터 : {'gamma': 0, 'learning_rate': 0.2, 'max_depth': 7, 'min_child_weight': 0, 'n_estimators': 300}
+# best_score : 0.9030750949192823
+# model_score : 0.9489795918367347
