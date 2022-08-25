@@ -16,7 +16,6 @@ b= tf.Variable(tf.compat.v1.random_normal([1]), name='bias') # shape=[1] : 1차�
 
 hypothesis = tf.sigmoid(tf.matmul(x, w) + b) # sigmoid : 0~1 사이의 값으로 변환
 
-# loss = tf.reduce_mean(tf.square(hypothesis - y))
 loss = -tf.reduce_mean(y * tf.log(hypothesis) + (1 - y) * tf.log(1 - hypothesis)) # binary_crossentropy
 
 

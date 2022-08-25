@@ -81,4 +81,4 @@ acc = accuracy_score(y_test, y_pred)
 print('acc : ', acc)
 
 sess.close()
-# acc :  1.0
+# acc :  0.3701023209383579

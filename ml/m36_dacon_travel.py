@@ -80,7 +80,8 @@ print(test_set.shape)  # (2933, 18)
 # (1649, 19)
 # (2479, 18)
 
-
+for i in [train_set, test_set]:
+    i['Gender'] = i['Gender'].map({'Male': 0, 'Female': 1, 'Fe Male': 1}) # map : 
 
 
 le_TypeofContact = LabelEncoder() # TypeofContact 컬럼을 인코딩해줌

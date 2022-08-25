@@ -8,8 +8,8 @@ y = [1, 2, 3, 4, 5]
 
 # W = tf.Variable(333, dtype=tf.float32)
 # b = tf.Variable(245, dtype=tf.float32)
-W = tf.Variable(tf.random_uniform([1]), dtype=tf.float32) # random_normal : 정규분포
-b = tf.Variable(tf.random_uniform([1]), dtype=tf.float32) # random_normal : 정규분포
+W = tf.Variable(tf.random_uniform([1]), dtype=tf.float32) # random_normal : 정규분포 , random_uniform : 균등분포
+b = tf.Variable(tf.random_uniform([1]), dtype=tf.float32) 
 init = tf.compat.v1.global_variables_initializer() # 변수 초기화
 sess.run(init)
 print(sess.run(W), sess.run(b)) # [-1.5080816] [0.9301948]

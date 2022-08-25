@@ -15,7 +15,7 @@ loss = tf.reduce_mean(tf.square(hypothesis - y))
 lr = 0.1
 gradient = tf.reduce_mean((w * x - y) * x) # gradient : 기울기
 descent = w - lr * gradient # descent : 하강
-update = w.assign(descent) # assign : 할당
+update = w.assign(descent) # assign : 할당  
 
 w_history = []
 loss_history = []

@@ -7,6 +7,5 @@ y = tf.Variable([3], dtype=tf.float32) # 변수
 
 init = tf.compat.v1.global_variables_initializer() # 변수 초기화
 sess.run(init)
-
 sess.run(x+y)
 

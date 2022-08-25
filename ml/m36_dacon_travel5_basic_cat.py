@@ -36,7 +36,7 @@ train = pd.read_csv(path + 'train.csv', # + 명령어는 문자를 앞문자와 
 test = pd.read_csv(path + 'test.csv', # 예측에서 쓸거임                
                        index_col=0)
 
-sample_submission = pd.read_csv(path + 'sample_submission.csv')
+sample_submission = pd.read_csv(path + 'sample_submission.csv', index_col=0)
 
 kfold = KFold(n_splits=5,shuffle=True,random_state=100)
 

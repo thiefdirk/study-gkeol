@@ -83,7 +83,7 @@ color_list = ['r', 'b', 'g']
 for i in range(len(plt_list)):
     plt.subplot(1, len(plt_list), i+1)
     plt.plot(plt_list[i], color_list[i])
-    plt.title(str(plt_list[i]))
+    plt.title('plt_list')
     plt.xlabel('epochs')
     plt.ylabel('plt_list')
     

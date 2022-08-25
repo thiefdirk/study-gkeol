@@ -6,8 +6,8 @@ sess = tf.compat.v1.Session()
 x = [1, 2, 3]
 y = [1, 2, 3]
 
-W = tf.constant(10, dtype=tf.float32) # random_normal : 정규분포
-b = tf.constant(11, dtype=tf.float32) # random_normal : 정규분포
+W = tf.Variable(10, dtype=tf.float32) # random_normal : 정규분포
+b = tf.Variable(11, dtype=tf.float32) # random_normal : 정규분포
 
 init = tf.compat.v1.global_variables_initializer() # 변수 초기화
 sess.run(init)

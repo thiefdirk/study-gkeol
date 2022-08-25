@@ -26,8 +26,6 @@ y_data = train_set['Survived']
 
 print(x_data.shape) # (891, 10)
 
-x_data = x_data.drop(['Name', 'Ticket', 'Cabin', 'Sex'], axis=1)
-test_set = test_set.drop(['Name', 'Ticket', 'Cabin', 'Sex'], axis=1)
 
 x_train, x_test, y_train, y_test = train_test_split(x_data, y_data, test_size=0.2, random_state=66, stratify=y_data)
 sess.run(tf.compat.v1.global_variables_initializer())

@@ -16,10 +16,10 @@ datasets = load_breast_cancer()
 x_data = datasets.data
 y_data = datasets.target
 y_data = y_data.reshape(-1, 1)
-print(x_data) # (569, 30)
-print(y_data) # (569, 1)
-print(x_data.dtype) # float64
-print(y_data.dtype) # int32
+# print(x_data) # (569, 30)
+# print(y_data) # (569, 1)
+# print(x_data.dtype) # float64
+# print(y_data.dtype) # int32
 # change type
 # x_data = x_data.astype('float32')
 # y_data = y_data.astype('float32')
