@@ -196,28 +196,33 @@ from bayes_opt import BayesianOptimization
 
 # kfold = StratifiedKFold(n_splits=n_splits,shuffle=True,random_state=123)
 
-# cat_paramets = {"learning_rate" : [0.20909079092170735],
-#                 'depth' : [8],
-#                 'od_pval' : [0.236844398775451],
-#                 'model_size_reg': [0.30614059763442997],
-#                 'l2_leaf_reg' :[5.535171839105427]}
-# cat = CatBoostClassifier(random_state=123,verbose=False,n_estimators=500)
-# model = RandomizedSearchCV(cat,cat_paramets,cv=kfold,n_jobs=-1)
+cat_paramets = {"learning_rate" : [0.20909079092170735],
+                'depth' : [8],
+                'od_pval' : [0.236844398775451],
+                'model_size_reg': [0.30614059763442997],
+                'l2_leaf_reg' :[5.535171839105427]}
+cat = CatBoostClassifier(random_state=123,verbose=False,n_estimators=500)
+model = RandomizedSearchCV(cat,cat_paramets,cv=kfold,n_jobs=-1)
 
-model = ak.
+# model = ak.StructuredDataClassifier()
+# model.fit(x_train,y_train,epochs=200,validation_split=0.2,verbose=2, callbacks=[EarlyStopping(patience=40,monitor='val_loss')])
 
 import time 
 start_time = time.time()
-model.fit(x_train,y_train)   
-end_time = time.time()-start_time 
+results = model.evaluate(x_test,y_test)
 y_predict = model.predict(x_test)
+
+
+# model.fit(x_train,y_train)   
+end_time = time.time()-start_time 
+# y_predict = model.predict(x_test)
 results = accuracy_score(y_test,y_predict)
-print('최적의 매개변수 : ',model.best_params_)
-print('최상의 점수 : ',model.best_score_)
+# print('최적의 매개변수 : ',model.best_params_)
+# print('최상의 점수 : ',model.best_score_)
 print('acc :',results)
 print('걸린 시간 :',end_time)
 
-model.fit(x,y)   
+# model.fit(x,y)   
 y_summit = model.predict(test_set)
 y_summit = np.round(y_summit,0)
 submission = pd.read_csv(path + 'sample_submission.csv',#예측에서 쓸거야!!
@@ -225,3 +230,13 @@ submission = pd.read_csv(path + 'sample_submission.csv',#예측에서 쓸거야!
 submission['ProdTaken'] = y_summit
 
 submission.to_csv('ssuc_sac_autokeras.csv',index=False)
+
+model_save = model.export_model()
+model_save.save('ssuc_sac_autokeras.h5')
+
+# acc : 0.872093023255814
+# 걸린 시간 : 3.2080018520355225
+# 0.862745098
+
+# acc : 0.8604651162790697
+# 걸린 시간 : 3.2957935333251953
