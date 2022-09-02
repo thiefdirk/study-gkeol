@@ -17,7 +17,7 @@ model = ak.ImageClassifier( # ImageClassifier는 이미지를 입력받아 이�
 
 #3. 컴파일, 훈련
 start = time.time()
-model.fit(x_train, y_train, epochs=30, validation_split=0.2, callbacks=[tf.keras.callbacks.EarlyStopping(patience=3)], batch_size=2000)
+model.fit(x_train, y_train, epochs=4, validation_split=0.2, batch_size=2000)
 
 #4. 평가, 예측
 y_pred = model.predict(x_test)

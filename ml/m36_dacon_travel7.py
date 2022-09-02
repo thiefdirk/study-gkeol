@@ -6,6 +6,7 @@ from tensorflow.python.keras.callbacks import EarlyStopping,ModelCheckpoint
 import matplotlib.pyplot as plt
 from sklearn.metrics import r2_score
 from sklearn.decomposition import PCA
+import autokeras as ak
 
 import matplotlib
 matplotlib.rcParams['font.family']='Malgun Gothic'
@@ -191,17 +192,19 @@ from catboost import CatBoostRegressor,CatBoostClassifier
 from bayes_opt import BayesianOptimization
 # 2. 모델
 
-n_splits = 6
+# n_splits = 6
 
-kfold = StratifiedKFold(n_splits=n_splits,shuffle=True,random_state=123)
+# kfold = StratifiedKFold(n_splits=n_splits,shuffle=True,random_state=123)
 
-cat_paramets = {"learning_rate" : [0.20909079092170735],
-                'depth' : [8],
-                'od_pval' : [0.236844398775451],
-                'model_size_reg': [0.30614059763442997],
-                'l2_leaf_reg' :[5.535171839105427]}
-cat = CatBoostClassifier(random_state=123,verbose=False,n_estimators=500)
-model = RandomizedSearchCV(cat,cat_paramets,cv=kfold,n_jobs=-1)
+# cat_paramets = {"learning_rate" : [0.20909079092170735],
+#                 'depth' : [8],
+#                 'od_pval' : [0.236844398775451],
+#                 'model_size_reg': [0.30614059763442997],
+#                 'l2_leaf_reg' :[5.535171839105427]}
+# cat = CatBoostClassifier(random_state=123,verbose=False,n_estimators=500)
+# model = RandomizedSearchCV(cat,cat_paramets,cv=kfold,n_jobs=-1)
+
+model = ak.
 
 import time 
 start_time = time.time()
@@ -221,4 +224,4 @@ submission = pd.read_csv(path + 'sample_submission.csv',#예측에서 쓸거야!
                       )
 submission['ProdTaken'] = y_summit
 
-submission.to_csv('ssuc_sac_xyfit.csv',index=False)
+submission.to_csv('ssuc_sac_autokeras.csv',index=False)
