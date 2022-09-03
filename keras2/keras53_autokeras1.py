@@ -1,5 +1,4 @@
 import autokeras as ak
-print(ak.__version__)
 import tensorflow as tf
 import time
 
