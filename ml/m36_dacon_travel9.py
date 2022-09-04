@@ -3,12 +3,11 @@ from sklearn.model_selection import train_test_split
 import pandas as pd
 import numpy as np 
 from tensorflow.python.keras.callbacks import EarlyStopping,ModelCheckpoint
-import autokeras as ak
 from tpot import TPOTClassifier
 
 
 #1. 데이터
-path = 'C:\study\_data\dacon_travel/' # ".은 현재 폴더"
+path = './_data/dacon_travel/' # ".은 현재 폴더"
 train_set = pd.read_csv(path + 'train.csv',
                         index_col=0)
 test_set = pd.read_csv(path + 'test.csv', #예측에서 쓸거야!!
@@ -92,10 +91,10 @@ cols = ['TypeofContact','Occupation','Gender','ProductPitched','MaritalStatus','
 from sklearn.preprocessing import LabelEncoder
 from tqdm import tqdm_notebook
 
-for col in tqdm_notebook(cols):
+for i in cols:
     le = LabelEncoder()
-    train_set[col]=le.fit_transform(train_set[col])
-    test_set[col]=le.fit_transform(test_set[col])
+    train_set[i]=le.fit_transform(train_set[i])
+    test_set[i]=le.fit_transform(test_set[i])
 
 # print(train_set)
 
@@ -198,8 +197,9 @@ from catboost import CatBoostClassifier
 # 2. 모델
 
 
-tpot = TPOTClassifier(verbosity=2, random_state=72, cv=kfold, scoring='accuracy',warm_start=True, generations=10, population_size=100, early_stop=10, memory='auto')
+tpot = TPOTClassifier(verbosity=2, random_state=72, cv=kfold, scoring='accuracy',warm_start=True, generations=10, population_size=100, early_stop=10)
 tpot.fit(x_train, y_train)
+##
 
 print(tpot.score(x_test, y_test))
 tpot.export('tpot_digits_pipeline.py')
