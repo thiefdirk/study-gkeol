@@ -76,7 +76,7 @@ train = optimizer.minimize(loss)
 sess = tf.compat.v1.Session()
 sess.run(tf.compat.v1.global_variables_initializer())
 epoch = 31
-batch_size = 100
+batch_size = 1000
 total_batch = int(len(x_train)/batch_size)
 for epochs in range(epoch) :
     next_batch = 0
@@ -90,8 +90,7 @@ for epochs in range(epoch) :
         prediction = tf.equal(tf.argmax(hypothesis, 1), tf.argmax(y, 1)) 
         accuracy = tf.reduce_mean(tf.cast(prediction, tf.float32))
         acc = sess.run(accuracy, feed_dict={x: batch_x, y: batch_y})
-    if epochs % 10 == 0 :
-        print(epochs + 1, avg_loss, acc)
+    print(epochs + 1, 'loss :  {:.9f}'.format(avg_loss), '# acc : ', acc)
 
         
 # 4. 평가, 예측
