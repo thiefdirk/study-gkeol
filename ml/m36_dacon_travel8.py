@@ -55,8 +55,8 @@ test_set['NumberOfTrips'].fillna(test_set.groupby('DurationOfPitch')['NumberOfTr
 train_set.loc[train_set['Occupation'] =='Free Lancer', 'Occupation'] = 'Salaried'
 test_set.loc[test_set['Occupation'] =='Free Lancer', 'Occupation'] = 'Salaried'
 
-train_set.loc[train_set['Gender'] =='Fe Male' , 'Gender'] = 'Female'
-test_set.loc[test_set['Gender'] =='Fe Male' , 'Gender'] = 'Female'
+train_set.loc[train_set['Gender'] =='Fe Male', 'Gender'] = 'Female'
+test_set.loc[test_set['Gender'] =='Fe Male', 'Gender'] = 'Female'
 cols = ['TypeofContact','Occupation','Gender','ProductPitched','MaritalStatus','Designation']
 
 for col in tqdm_notebook(cols):
