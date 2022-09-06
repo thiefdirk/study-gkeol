@@ -13,10 +13,13 @@ path = 'C:\study\_data\dacon_travel/'
 train_set = pd.read_csv(path + 'train.csv',index_col=0)
 test_set = pd.read_csv(path + 'test.csv', index_col=0)
 
+# 결측치 처리, 그룹화
 train_set['TypeofContact'].fillna('Self Enquiry', inplace=True)
 test_set['TypeofContact'].fillna('Self Enquiry', inplace=True)
+
 train_set['Age'].fillna(train_set.groupby('Designation')['Age'].transform('mean'), inplace=True)
 test_set['Age'].fillna(test_set.groupby('Designation')['Age'].transform('mean'), inplace=True)
+
 train_set['Age']=np.round(train_set['Age'],0).astype(int)
 test_set['Age']=np.round(test_set['Age'],0).astype(int)
 
@@ -25,6 +28,7 @@ test_set['MonthlyIncome'].fillna(test_set.groupby('Designation')['MonthlyIncome'
 
 train_set['NumberOfChildrenVisiting'].fillna(train_set.groupby('MaritalStatus')['NumberOfChildrenVisiting'].transform('mean'), inplace=True)
 test_set['NumberOfChildrenVisiting'].fillna(test_set.groupby('MaritalStatus')['NumberOfChildrenVisiting'].transform('mean'), inplace=True)
+
 train_set['NumberOfFollowups'].fillna(train_set.groupby('NumberOfChildrenVisiting')['NumberOfFollowups'].transform('mean'), inplace=True)
 test_set['NumberOfFollowups'].fillna(test_set.groupby('NumberOfChildrenVisiting')['NumberOfFollowups'].transform('mean'), inplace=True)
 
@@ -48,17 +52,22 @@ for dataset in all_data:
 train_set['NumberOfTrips'].fillna(train_set.groupby('DurationOfPitch')['NumberOfTrips'].transform('mean'), inplace=True)
 test_set['NumberOfTrips'].fillna(test_set.groupby('DurationOfPitch')['NumberOfTrips'].transform('mean'), inplace=True)
 
+# 프리랜서 직장인으로 변경
 train_set.loc[train_set['Occupation'] =='Free Lancer', 'Occupation'] = 'Salaried'
 test_set.loc[test_set['Occupation'] =='Free Lancer', 'Occupation'] = 'Salaried'
 
+# 오타 수정
 train_set.loc[train_set['Gender'] =='Fe Male', 'Gender'] = 'Female'
 test_set.loc[test_set['Gender'] =='Fe Male', 'Gender'] = 'Female'
+
+# 범주형 데이터 원핫
 categorical = ['TypeofContact','Occupation','Gender','ProductPitched','MaritalStatus','Designation']
 
 for col in categorical:
     le = LabelEncoder()
     train_set[col]=le.fit_transform(train_set[col])
     test_set[col]=le.fit_transform(test_set[col])
+    
 
 x = train_set.drop(['ProdTaken','NumberOfChildrenVisiting',
                     'NumberOfPersonVisiting','OwnCar', 'MonthlyIncome', 'NumberOfFollowups'], axis=1)
@@ -88,7 +97,6 @@ cat_paramets = {"learning_rate" : [0.01],
 cat = CatBoostClassifier(random_state=1127,verbose=False,n_estimators=1304)
 model = RandomizedSearchCV(cat,cat_paramets,cv=kfold,n_jobs=-1)
 
-import time 
 model.fit(x_train,y_train)
 y_predict = model.predict(x_test)
 results = accuracy_score(y_test,y_predict)
