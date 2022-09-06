@@ -44,6 +44,8 @@ x = Dense(15,
 # x = Dropout(drop)(x)
 x = Dense(20,
            activation=activation, name='Conv2D3')(x)
+x = Dense(20,
+           activation=activation, name='Conv2D4')(x)
 
 outputs = Dense(7, activation='softmax', name='outputs')(x)
 

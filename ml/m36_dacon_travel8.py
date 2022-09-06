@@ -1,15 +1,11 @@
-from time import time
 from sklearn.model_selection import train_test_split
 import pandas as pd
 import numpy as np 
-from tensorflow.python.keras.callbacks import EarlyStopping,ModelCheckpoint
 from sklearn.model_selection import RandomizedSearchCV
 from sklearn.model_selection import StratifiedKFold
 from catboost import CatBoostClassifier
 from sklearn.metrics import accuracy_score
-import autokeras as ak
 from sklearn.preprocessing import LabelEncoder
-from tqdm import tqdm_notebook
 import pickle
 
 #1. 데이터
@@ -39,8 +35,8 @@ train_set['PreferredPropertyStar'].fillna(train_set.groupby('Occupation')['Prefe
 test_set['PreferredPropertyStar'].fillna(test_set.groupby('Occupation')['PreferredPropertyStar'].transform('mean'), inplace=True)
 
 
-combine = [train_set,test_set]
-for dataset in combine:    
+all_data = [train_set,test_set]
+for dataset in all_data:    
     dataset.loc[ dataset['Age'] <= 20, 'Age'] = 0
     dataset.loc[(dataset['Age'] > 20) & (dataset['Age'] <= 29), 'Age'] = 1
     dataset.loc[(dataset['Age'] > 29) & (dataset['Age'] <= 39), 'Age'] = 2
@@ -57,9 +53,9 @@ test_set.loc[test_set['Occupation'] =='Free Lancer', 'Occupation'] = 'Salaried'
 
 train_set.loc[train_set['Gender'] =='Fe Male', 'Gender'] = 'Female'
 test_set.loc[test_set['Gender'] =='Fe Male', 'Gender'] = 'Female'
-cols = ['TypeofContact','Occupation','Gender','ProductPitched','MaritalStatus','Designation']
+categorical = ['TypeofContact','Occupation','Gender','ProductPitched','MaritalStatus','Designation']
 
-for col in tqdm_notebook(cols):
+for col in categorical:
     le = LabelEncoder()
     train_set[col]=le.fit_transform(train_set[col])
     test_set[col]=le.fit_transform(test_set[col])
@@ -105,4 +101,4 @@ submission['ProdTaken'] = y_summit
 submission.to_csv('cat_0902_submission.csv',index=False)
 
 pickle.dump(model,open('cat_0902.pkl','wb'))
-# acc : 0.9715909090909091
+acc : 0.9715909090909091
