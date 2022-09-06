@@ -28,10 +28,10 @@ x = datasets.data
 y = datasets.target
 print(x.shape) # (569, 30)
 print(y.shape) # (569,)
-from sklearn.preprocessing import PolynomialFeatures
-pf = PolynomialFeatures(degree=2)
+from sklearn.preprocessing import PolynomialFeatures # 다항식 변환
+pf = PolynomialFeatures(degree=2) # degree=2 : 2차항까지 만들어라, include_bias=False : 절편을 만들지 말아라
 x = pf.fit_transform(x)
-
+print(x.shape) # (569, 496)
 x_train, x_test, y_train, y_test = train_test_split(x,y,
         train_size=0.8, shuffle=True, random_state=123, stratify=y)
 

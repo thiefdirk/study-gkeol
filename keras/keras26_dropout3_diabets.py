@@ -87,7 +87,7 @@ mcp = ModelCheckpoint(monitor='val_loss', mode='auto', verbose=1, save_best_only
 
 hist = model.fit(x_train, y_train, epochs=1000, batch_size=100,
                  validation_split=0.2,
-                 callbacks=[earlyStopping, mcp],
+                 callbacks=[earlyStopping],
                  verbose=1)
 
 #4. 평가, 예측
