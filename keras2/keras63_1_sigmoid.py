@@ -1,0 +1,16 @@
+import numpy as np
+import matplotlib.pyplot as plt
+
+def sigmoid(x):
+    return 1 / (1 + np.exp(-x))
+
+sigmoid2 = lambda x: 1 / (1 + np.exp(-x))
+
+x = np.arange(-5, 5, 0.1) # -5부터 5까지 0.1씩 증가
+print(x, len(x))
+
+y = sigmoid2(x)
+
+plt.plot(x, y, 'k-') # k- : 검은색 실선
+plt.grid()
+plt.show()
