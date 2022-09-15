@@ -13,24 +13,21 @@ USE_CUDA = torch.cuda.is_available()
 DEVICE = torch.device('cuda' if USE_CUDA else 'cpu')
 print('torch:',torch.__version__,'use divece:',DEVICE)  # torch: 1.12.1 use divece: cuda
 
+
 #1. 데이터
+# x = np.array({1,2,3,4,5,6,7,8,9,10})
+# y = np.array({1,2,3,4,5,6,7,8,9,10})
+x_train = torch.FloatTensor(np.array([1,2,3,4,5,6,7])).unsqueeze(1).to(DEVICE)
+x_test = torch.FloatTensor(np.array([8,9,10])).unsqueeze(1).to(DEVICE)
+y_train = torch.FloatTensor(np.array([1,2,3,4,5,6,7])).unsqueeze(1).to(DEVICE)
+y_test = torch.FloatTensor(np.array([8,9,10])).unsqueeze(1).to(DEVICE)
+
+x_pred = torch.FloatTensor(np.array([11,12,13])).unsqueeze(1).to(DEVICE)
+
+print(x_train.shape)    # torch.Size([7])
+print(x_test.shape)     # torch.Size([3])
 
 
-x = torch.FloatTensor([range(10)]).to(DEVICE)
-y = torch.FloatTensor([[1,2,3,4,5,6,7,8,9,10],
-             [1,1.1,1.2,1.3,1.4,1.5,1.6,1.7,1.8,1.9],
-             [9,8,7,6,5,4,3,2,1,0]]).to(DEVICE)
-x_test = torch.FloatTensor([9]).to(DEVICE)
-
-x = x.T
-y = y.T
-
-x_test = (x_test - x.mean()) / x.std()  # 평균을 빼고 표준편차로 나눈다., std = 표준편차
-x = (x - x.mean()) / x.std()  # 스탠다드 스케일링
-print(x, y, x_test)
-
-print(x.shape,y.shape, x_test.shape)  # torch.Size([3, 1]) torch.Size([3, 1]) torch.Size([1, 1])
-# torch.Size([3]) torch.Size([3]) > torch.Size([3, 1]) torch.Size([3, 1])
 #2. 모델
 
 # model =nn.Linear(1,5).to(DEVICE)  # (1,1) : 1개의 입력을 받아서 1개의 출력을 내보낸다.
@@ -45,13 +42,12 @@ model = nn.Sequential(
     nn.Linear(5,3).to(DEVICE),
     nn.ReLU(),
     nn.Linear(3,2).to(DEVICE),
-    nn.Linear(2,3).to(DEVICE),)
+    nn.Linear(2,1).to(DEVICE),)
 
-w = torch.zeros((1,10), requires_grad=True).to(DEVICE)
+
 #3. 컴파일,훈련
-# model.compile(loss='mse',optimizer='sgd')
 criterion = nn.MSELoss()        # criterion(표준) =loss  
-optimizer = optim.SGD(w,lr=0.001)  # lr = learning rate
+optimizer = optim.SGD(model.parameters(),lr=0.001)  # lr = learning rate
 # optim.Adam(model.parameters(),lr=0.01)
 
 #4. 훈련
@@ -71,7 +67,7 @@ def train(model,criterion,optimizer,x,y):
 
 epochs = 1500
 for epoch in range(1,epochs+1):
-    loss = train(model, criterion,optimizer,x,y )
+    loss = train(model, criterion,optimizer,x_train,y_train )
     print('epoch :{},loss:{}'.format(epoch,loss))
     
 # 평가,예측
@@ -84,9 +80,9 @@ def evaluate(model, criterion,x,y ) :   # 평가에서는 optimizer가 필요없
         results = criterion(y_predict,y)
     return results.item()
 
-loss2 = evaluate(model,criterion,x,y)
+loss2 = evaluate(model,criterion,x_test,y_test)
 print('최종loss:',loss2)
 # y_predict = model.predict([4])
-results = model(x_test)
+results = model(x_pred)
 # results = torch.Tensor.cpu(results)
 print('예측값:',results.detach().cpu().numpy()) 
