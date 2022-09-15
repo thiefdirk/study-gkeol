@@ -94,7 +94,7 @@ es = EarlyStopping(monitor='val_loss', patience=100, mode='min', verbose=1)
 lr = ReduceLROnPlateau(monitor='val_loss', patience=50, factor=0.5, verbose=1)
 
 model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['acc'])
-model.fit(x_train_noised, x_train, epochs=100, batch_size=180, validation_split=0.2, callbacks=[es, lr], verbose=1)
+model.fit(x_train_noised, x_train, epochs=500, batch_size=180, validation_split=0.2, callbacks=[es, lr], verbose=1)
 
 path = 'D:\study_data\_save/_xg/'
 # model = pkl.load(open(path + 'a08_men_women_model.pkl', 'rb'))
