@@ -48,7 +48,7 @@ start_time = time.time()
 #2. 모델구성
 
 model = Sequential()
-model.add(LSTM(200, return_sequences=True, 
+model.add(LSTM(200, return_sequences=True, # return_sequences=True : LSTM을 여러개 쌓을 때 사용
                    input_shape=(4,2)))
 model.add(LSTM(100))
 model.add(Dense(256))
