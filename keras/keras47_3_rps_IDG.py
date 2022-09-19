@@ -6,6 +6,7 @@ from tensorflow.python.keras.callbacks import EarlyStopping, ModelCheckpoint
 import tensorflow as tf
 from sklearn.metrics import r2_score, accuracy_score
 import time
+
 start = time.time()
 
 ###########################폴더 생성시 현재 파일명으로 자동생성###########################################
@@ -98,3 +99,7 @@ import matplotlib.pyplot as plt
 # plt.imshow(acc, 'gray')
 plt.plot(acc, 'gray')
 plt.show()
+
+# import image
+
+# img = image.load_img('d:/study_data/_save/_npy/keras47_3_test_x.npy')
