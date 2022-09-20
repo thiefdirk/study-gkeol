@@ -22,7 +22,7 @@ from sklearn.model_selection import train_test_split
 
 x_train, x_test, y_train, y_test = train_test_split(x,y,
                                                     train_size=0.7,shuffle=True,
-                                                    random_state=66, stratify=y)
+                                                    random_state=66, stratify=y) # shuffle : 데이터를 섞을지 말지
 
 
 from sklearn.preprocessing import StandardScaler, MinMaxScaler
@@ -47,7 +47,7 @@ print(train_set[0][1])
 print(len(train_set)) # 455
 
 train_loader = DataLoader(train_set,batch_size=40,shuffle=True)
-test_loader = DataLoader(test_set,batch_size=40,shuffle=True)
+test_loader = DataLoader(test_set,batch_size=40,shuffle=True) # test_set은 shuffle하지 않는다. 왜냐하면 정확도를 높이기 위해서
 
 
 
@@ -115,7 +115,7 @@ for epoch in range(1, epochs+1):
         print('Epoch {:4d}/{} Loss: {:.6f}/ Accuracy: {:.4f}%'.format(
             epoch,epochs,loss,binary_acc(model(x_test),y_test)))
         
-#4. 평가,예측
+#4. 평가,예측.
 
 def evaluate(model,criterion,loader):
     model.eval()

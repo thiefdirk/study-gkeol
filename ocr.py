@@ -66,7 +66,7 @@ def make_scan_image(image, width, ksize=(5,5), min_threshold=75, max_threshold=2
   # 이미지를 grayscale로 변환하고 blur를 적용
   # 모서리를 찾기위한 이미지 연산
   gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-  blurred = cv2.GaussianBlur(gray, ksize, 0)
+  blurred = cv2.GaussianBlur(gray, ksize, 0) # ksize : 커널 사이즈
   edged = cv2.Canny(blurred, min_threshold, max_threshold)
  
   image_list_title = ['gray', 'blurred', 'edged']
@@ -126,8 +126,8 @@ import io
 from keras.preprocessing import image
 from keras.utils import load_img
 # url = 'C:\study/aaa.jpg'
-path =  'D:\sample_resident.jpg'
-img = cv2.imencode('.jpg', cv2.imread(path))[1].tobytes() # [1] : jpg, [1].tobytes() : jpg를 byte로 변환
+path =  'D:/11111.jpg'
+img = cv2.imencode('.jpg', cv2.imread(path))[1].tobytes() # png 인식 : cv2.imencode('.png', cv2.imread(path))[1].tobytes()
 url = 'https://user-images.githubusercontent.com/69428232/155486780-55525c3c-8f5f-4313-8590-dd69d4ce4111.jpg'
 image_nparray_ = np.asarray(bytearray(img), dtype=np.uint8)
 print(image_nparray_)
