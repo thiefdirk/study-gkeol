@@ -199,7 +199,7 @@ from catboost import CatBoostClassifier
 
 tpot = TPOTClassifier(verbosity=2, random_state=72, cv=kfold, scoring='accuracy',warm_start=True, generations=10, population_size=100, early_stop=10)
 tpot.fit(x_train, y_train)
-###
+####
 
 print(tpot.score(x_test, y_test))
 tpot.export('tpot_digits_pipeline.py')
