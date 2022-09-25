@@ -9,7 +9,7 @@ import torch.nn.functional as F
 USE_CUDA = torch.cuda.is_available()
 DEVICE = torch.device('cuda' if USE_CUDA else 'cpu')
 print('torch:',torch.__version__,'use divece:',DEVICE)  # torch: 1.12.1 use divece: cuda
-
+###
 #1. 데이터
 x = np.array([1,2,3])
 y = np.array([1,2,3])
