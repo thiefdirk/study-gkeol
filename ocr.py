@@ -126,7 +126,7 @@ import io
 from keras.preprocessing import image
 from keras.utils import load_img
 # url = 'C:\study/aaa.jpg'
-path =  'D:/11111.jpg'
+path =  'D:/1212.jpeg'
 img = cv2.imencode('.jpg', cv2.imread(path))[1].tobytes() # png 인식 : cv2.imencode('.png', cv2.imread(path))[1].tobytes()
 url = 'https://user-images.githubusercontent.com/69428232/155486780-55525c3c-8f5f-4313-8590-dd69d4ce4111.jpg'
 image_nparray_ = np.asarray(bytearray(img), dtype=np.uint8)
