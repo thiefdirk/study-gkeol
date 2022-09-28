@@ -5,3 +5,4 @@ _data/dacon_chung/
 _data/dacon_travel/
 image_classifier/
 _data/torch_data/
+*.h5
