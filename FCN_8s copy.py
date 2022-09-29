@@ -30,7 +30,113 @@ train_label_path = 'D:\study_data\_data\dataset1/annotations_prepped_train/'
 test_image_path = 'D:\study_data\_data\dataset1/images_prepped_test/'
 test_label_path = 'D:\study_data\_data\dataset1/annotations_prepped_test/'
  
-BATCH_SIZE = 32
+BATCH_SIZE = 16
+
+
+
+def map_filename_to_image_and_mask(t_filename, a_filename, height=224, width=224):
+    '''
+    Preprocesses the dataset by:
+        * resizing the input image and label maps
+        * normalizing the input image pixels
+        * reshaping the label maps from (height, width, 1) to (height, width, 12)
+    
+    Args:
+        t_filename(string) -- path to the raw input image
+        a_filename(string) -- path to the raw annotation (label map) file
+        height(int) -- height in pixels to resize to
+        width(int) -- width in pixels to resize to
+    
+    Returns:
+        image(tensor) -- preprossed image
+        annotation(tensor) -- preprocessed annotation
+    '''
+ 
+    # Convert image and mask files to tensors
+    img_raw = tf.io.read_file(t_filename)
+    anno_raw = tf.io.read_file(a_filename)
+    image = tf.image.decode_jpeg(img_raw)
+    annotation = tf.image.decode_jpeg(anno_raw)
+ 
+    # Resize image and segmentation mask
+    image = tf.image.resize(image, (height, width,))
+    annotation = tf.image.resize(annotation, (height, width,))
+    image = tf.reshape(image, (height, width, 3,))
+    annotation = tf.cast(annotation, dtype=tf.int32)
+    annotation = tf.reshape(annotation, (height, width, 1,))
+    stack_list = []
+ 
+    # Reshape segmentation masks
+    for c in range(len(class_names)):
+        mask = tf.equal(annotation[:,:,0], tf.constant(c))
+        stack_list.append(tf.cast(mask, dtype=tf.int32))
+    
+    annotation = tf.stack(stack_list, axis=2)
+ 
+    # Normalize pixels in the input image
+    image = image / 127.5
+    image -= 1
+ 
+    return image, annotation
+ 
+def get_dataset_slice_paths(image_dir, label_map_dir):
+    '''
+    generates the lists of image and label map paths
+  
+    Args:
+        image_dir (string) -- path to the input images directory
+        label_map_dir (string) -- path to the label map directory
+ 
+    Returns:
+        image_paths (list of strings) -- paths to each image file
+        label_map_paths (list of strings) -- paths to each label map
+    '''
+ 
+    image_file_list = os.listdir(image_dir)
+    label_map_file_list = os.listdir(label_map_dir)
+    image_paths = [os.path.join(image_dir, fname) for fname in image_file_list]
+    label_map_paths = [os.path.join(label_map_dir, fname) for fname in label_map_file_list]
+ 
+    return image_paths, label_map_paths
+ 
+def get_training_dataset(image_paths, label_map_paths):
+    '''
+    Prepares shuffled batches of the training set.
+  
+    Args:
+        image_dir (string) -- path to the input images directory
+        label_map_dir (string) -- path to the label map directory
+ 
+    Returns:
+        tf Dataset containing the preprocessed train set
+    '''
+    training_dataset = tf.data.Dataset.from_tensor_slices((image_paths, label_map_paths))
+    training_dataset = training_dataset.map(map_filename_to_image_and_mask)
+    training_dataset = training_dataset.shuffle(100, reshuffle_each_iteration=True)
+    training_dataset = training_dataset.batch(BATCH_SIZE)
+    training_dataset = training_dataset.repeat()
+    training_dataset = training_dataset.prefetch(-1)
+ 
+    return training_dataset
+ 
+def get_validation_dataset(image_paths, label_map_paths):
+    '''
+    Prepares shuffled batches of the validation set.
+  
+    Args:
+        image_dir (string) -- path to the input images directory
+        label_map_dir (string) -- path to the label map directory
+ 
+    Returns:
+        tf Dataset containing the preprocessed train set
+    '''
+    validation_dataset = tf.data.Dataset.from_tensor_slices((image_paths, label_map_paths))
+    validation_dataset = validation_dataset.map(map_filename_to_image_and_mask)
+    validation_dataset = validation_dataset.batch(BATCH_SIZE)
+    validation_dataset = validation_dataset.repeat()
+ 
+    return validation_dataset
+
 
 # get the paths to the images
 training_image_paths, training_label_map_paths = get_dataset_slice_paths(train_image_path, train_label_path)
@@ -48,46 +154,6 @@ colors = sns.color_palette(None, len(class_names))
 for class_name, color in zip(class_names, colors):
     print(f'{class_name} -- {color}')
 
-# load the dataset
-def load_data(image_path, label_path):
-    image_list = []
-    label_list = []
-    for image in os.listdir(image_path):
-        image_list.append(image_path + image)
-    for label in os.listdir(label_path):
-        label_list.append(label_path + label)
-    return image_list, label_list
-
-# load the train dataset
-train_image_list, train_label_list = load_data(train_image_path, train_label_path)
-# load the test dataset
-test_image_list, test_label_list = load_data(test_image_path, test_label_path)
-
-# shuffle the train dataset
-train_image_list = tf.random.shuffle(train_image_list)
-train_label_list = tf.random.shuffle(train_label_list)
-
-
-# load the image and label
-def load_image_label(image_path, label_path):
-    image = tf.io.read_file(image_path)
-    image = tf.image.decode_png(image, channels=3)
-    image = tf.image.resize(image, [256, 256])
-    image = tf.cast(image, tf.float32) / 255.0
-    label = tf.io.read_file(label_path)
-    label = tf.image.decode_png(label, channels=1)
-    label = tf.image.resize(label, [256, 256])
-    label = tf.cast(label, tf.float32) / 255.0
-    return image, label
-
-# load the train image and label
-train_image_label = tf.data.Dataset.from_tensor_slices((train_image_list, train_label_list))
-train_image_label = train_image_label.map(load_image_label)
-train_image_label = train_image_label.batch(BATCH_SIZE)
-# load the test image and label
-test_image_label = tf.data.Dataset.from_tensor_slices((test_image_list, test_label_list))
-test_image_label = test_image_label.map(load_image_label)
-test_image_label = test_image_label.batch(BATCH_SIZE)
 
 
 def conv_block(inputs, filters, kernel_size, strides, padding='same'): # padding='same' or 'valid'
@@ -101,13 +167,12 @@ def deconv_block(inputs, filters, kernel_size, strides, padding='same'):
     x = tf.keras.layers.BatchNormalization()(x)
     x = tf.keras.layers.ReLU()(x)
     return x
-Vgg16 = tf.keras.applications.VGG16(include_top=False, weights='imagenet', input_shape=(256, 256, 3))
+Vgg16 = tf.keras.applications.VGG16(include_top=False, weights='imagenet', input_shape=(224, 224, 3))
 Vgg16.trainable = False # freeze the Vgg16
 
 def FCN_8s():
     x = Vgg16(Vgg16.input)
-    x = conv_block(x, 4096, 1, 1)
-    x = conv_block(x, 4096, 1, 1)
+    x = conv_block(x, 4096, 7, 1)
     x = conv_block(x, 4096, 1, 1)
     block5_conv1 = Vgg16.get_layer('block5_conv1').output
     block5_conv1 = conv_block(block5_conv1, 256, 1, 1)
@@ -118,7 +183,7 @@ def FCN_8s():
     x = deconv_block(concat1, 256, 4, 2)
     concat2 = tf.keras.layers.Concatenate()([x, block4_conv1])
     # 8x upsampling
-    x = deconv_block(concat2, 2, 16, 8)
+    x = deconv_block(concat2, 12, 16, 8)
     x = tf.keras.layers.Softmax()(x)
     # x = deconv_block(concat2, 128, 16, 8)
     # x = tf.keras.layers.Conv2D(1, 1, 1, padding='same', activation='softmax')(x)
@@ -180,24 +245,37 @@ def FCN_8s():
 
 # plt.show()
 
+train_count = len(training_image_paths)
+validation_count = len(validation_image_paths)
 
-fcnn = FCN_8s()
-fcnn.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accuracy'])
-fcnn.fit(train_image_label, epochs=10, validation_data=test_image_label)
-fcnn.summary()
+steps_per_epoch = train_count // BATCH_SIZE
+validation_steps = validation_count // BATCH_SIZE
 
-# save the model
-fcnn.save('FCN_8s.h5')
+
+# fcnn = FCN_8s()
+# fcnn.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accuracy'])
+# fcnn.fit(training_dataset, epochs=100, validation_data=validation_dataset, steps_per_epoch=steps_per_epoch, validation_steps=validation_steps)
+# fcnn.summary()
+
+# # save the model
+# fcnn.save('FCN_8s.h5')
 
 # load the model
-# fcnn = tf.keras.models.load_model('FCN_8s.h5')
+fcnn = tf.keras.models.load_model('FCN_8s.h5')
 
 # predict the test image
-pred = fcnn.predict(test_image_label)
-pred = np.argmax(pred, axis=-1)
-pred = np.expand_dims(pred, axis=-1)
-pred = pred * 255.0
-pred = pred.astype(np.uint8)
+pred = fcnn.predict(validation_dataset, steps=validation_steps)
+pred = np.argmax(pred, axis=3) # (batch_size, 224, 224)
+
+# iou
+def show_metrics(y_true, y_pred):
+    y_true = tf.cast(y_true, tf.float32)
+    y_pred = tf.cast(y_pred, tf.float32)
+    intersection = tf.reduce_sum(y_true * y_pred)
+    union = tf.reduce_sum(y_true) + tf.reduce_sum(y_pred) - intersection
+    iou = (intersection + 1e-7) / (union + 1e-7)
+    return iou
+
 
 # show the predict image
 plt.figure(figsize=(10, 10))
@@ -206,6 +284,7 @@ for i in range(9):
     plt.imshow(pred[i])
     
 plt.show()
+
 
 
 # Model: "vgg16"
