@@ -172,16 +172,16 @@ Vgg16.trainable = False # freeze the Vgg16
 
 def FCN_8s():
     x = Vgg16(Vgg16.input)
-    x = conv_block(x, 4096, 1, 1)
+    x = conv_block(x, 4096, 7, 1)
     x = conv_block(x, 4096, 1, 1)
     x = conv_block(x, 4096, 1, 1)
     block5_conv1 = Vgg16.get_layer('block5_conv1').output
     block5_conv1 = conv_block(block5_conv1, 256, 1, 1)
     block4_conv1 = Vgg16.get_layer('block4_conv1').output
-    block4_conv1 = conv_block(block4_conv1, 512, 1, 1)
+    block4_conv1 = conv_block(block4_conv1, 256, 1, 1)
     x = deconv_block(x, 256, 4, 2)
     concat1 = tf.keras.layers.Concatenate()([x, block5_conv1])
-    x = deconv_block(concat1, 512, 4, 2)
+    x = deconv_block(concat1, 256, 4, 2)
     concat2 = tf.keras.layers.Concatenate()([x, block4_conv1])
     # 8x upsampling
     x = deconv_block(concat2, 12, 16, 8)
@@ -200,7 +200,7 @@ validation_steps = validation_count // BATCH_SIZE
 
 fcnn = FCN_8s()
 fcnn.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accuracy'])
-fcnn.fit(training_dataset, epochs=170, validation_data=validation_dataset, steps_per_epoch=steps_per_epoch, validation_steps=validation_steps)
+fcnn.fit(training_dataset, epochs=100, validation_data=validation_dataset, steps_per_epoch=steps_per_epoch, validation_steps=validation_steps)
 fcnn.summary()
 
 # save the model
