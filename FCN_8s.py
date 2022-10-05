@@ -346,7 +346,7 @@ validation_steps = validation_count // BATCH_SIZE
 fcnn = tf.keras.models.load_model('FCN_8s.h5')
 
 # predict the test image
-pred = fcnn.predict(validation_dataset, steps=validation_steps) # steps : Total number of steps (batches of samples) before declaring the prediction round finished. Ignored with the default value of None.
+pred = fcnn.predict(validation_dataset, steps=validation_steps, verbose=1)
 pred = np.argmax(pred, axis=3) # (batch_size, 224, 224)
 
 my_image_path1 = 'D:/636E5906-FD2F-4C2E-BC7D-A257CA5BF180.png'
@@ -361,6 +361,20 @@ def predict_image(image_path):
     pred = np.argmax(pred, axis=3)
     pred = np.squeeze(pred, axis=0)
     return pred
+
+# iou
+def iou(y_true, y_pred):
+    intersection = np.sum(y_true * y_pred)
+    union = np.sum(y_true) + np.sum(y_pred) - intersection
+    return intersection / union
+
+score = iou(validation_dataset[0][1], pred[0]) # 0.0
+
+    
+    
+
+
+
 
 # pred1 = predict_image(my_image_path1)
 # pred2 = predict_image(my_image_path2)

@@ -20,7 +20,7 @@ scaler = StandardScaler()
 scaler.fit(x_train)
 x_train = scaler.transform(x_train)
 x_test = scaler.transform(x_test)
-
+##
 from sklearn.ensemble import BaggingClassifier # 배깅, scaling 해야함
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.linear_model import LogisticRegression
