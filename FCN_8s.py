@@ -303,17 +303,20 @@ def deconv_block(inputs, filters, kernel_size, strides, padding='same'):
     x = tf.keras.layers.BatchNormalization()(x)
     x = tf.keras.layers.ReLU()(x)
     return x
-Vgg16 = tf.keras.applications.VGG16(include_top=False, weights='imagenet', input_shape=(224, 224, 3))
-Vgg16.trainable = False # freeze the Vgg16
+
+# Vgg16.trainable = False # freeze the Vgg16
 
 def FCN_8s():
-    x = Vgg16(Vgg16.input)
+    model = tf.keras.applications.VGG16(include_top=False, weights='imagenet', input_shape=(224, 224, 3))
+    for layer in model.layers:
+        layer.trainable = False
+    x = model.output
     x = conv_block(x, 4096, 7, 1)
     x = conv_block(x, 4096, 1, 1)
     x = conv_block(x, 4096, 1, 1)
-    block5_conv1 = Vgg16.get_layer('block4_pool').output
+    block5_conv1 = model.get_layer('block4_pool').output
     block5_conv1 = conv_block(block5_conv1, 256, 1, 1)
-    block4_conv1 = Vgg16.get_layer('block3_pool').output
+    block4_conv1 = model.get_layer('block3_pool').output
     block4_conv1 = conv_block(block4_conv1, 256, 1, 1)
     x = deconv_block(x, 256, 4, 2)
     concat1 = tf.keras.layers.Concatenate()([x, block5_conv1])
@@ -324,7 +327,8 @@ def FCN_8s():
     x = tf.keras.layers.Softmax()(x)
     # x = deconv_block(concat2, 128, 16, 8)
     # x = tf.keras.layers.Conv2D(1, 1, 1, padding='same', activation='softmax')(x)
-    return tf.keras.Model(inputs=Vgg16.input, outputs=x)
+    model = tf.keras.Model(inputs=model.input, outputs=x)
+    return model
 
 
 train_count = len(training_image_paths)
@@ -334,16 +338,16 @@ steps_per_epoch = train_count // BATCH_SIZE
 validation_steps = validation_count // BATCH_SIZE
 
 
-# fcnn = FCN_8s()
-# fcnn.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accuracy'])
-# fcnn.fit(training_dataset, epochs=10, validation_data=validation_dataset, steps_per_epoch=steps_per_epoch, validation_steps=validation_steps)
-# fcnn.summary()
+fcnn = FCN_8s()
+fcnn.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accuracy'])
+fcnn.fit(training_dataset, epochs=1, validation_data=validation_dataset, steps_per_epoch=steps_per_epoch, validation_steps=validation_steps)
 
 # # save the model
 # fcnn.save('FCN_8s.h5')
 
 # load the model
-fcnn = tf.keras.models.load_model('FCN_8s.h5')
+# fcnn = tf.keras.models.load_model('FCN_8s.h5')
+fcnn.summary()
 
 # predict the test image
 pred = fcnn.predict(validation_dataset, steps=validation_steps, verbose=1)
@@ -373,7 +377,9 @@ image = image.numpy()
 annotation = annotation.numpy()
 
 score = iou(annotation[0], pred[0]) # 0.0
-
+print(annotation[0].shape) # (224, 224, 1)
+print(pred[0].shape) # (224, 224, 12)
+exit()
 print('iou score = ', score)
 
 pred = np.argmax(pred, axis=3) # (batch_size, 224, 224)
@@ -399,11 +405,11 @@ def plot_image(image_path, pred):
 # show 3 random images from the test set
 for i in range(3):
     # get a random image from the test set
-    image_index = np.random.randint(0, len(validation_image_paths))
+    image_index = np.random.randint(0, len(validation_image_paths)) # image.shape = (224, 224, 3)
     image = cv2.imread(validation_image_paths[image_index])
     image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB) # convert from BGR to RGB
     # get the label map for the image
-    label_map = cv2.imread(validation_label_map_paths[image_index], 0)
+    label_map = cv2.imread(validation_label_map_paths[image_index], 0) # label_map.shape = (224, 224)
     # get the predicted label map for the image
     pred_label_map = pred[image_index]
     # plot the image, label map, and predicted label map
