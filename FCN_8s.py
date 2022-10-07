@@ -347,7 +347,6 @@ fcnn = tf.keras.models.load_model('FCN_8s.h5')
 
 # predict the test image
 pred = fcnn.predict(validation_dataset, steps=validation_steps, verbose=1)
-pred = np.argmax(pred, axis=3) # (batch_size, 224, 224)
 
 my_image_path1 = 'D:/636E5906-FD2F-4C2E-BC7D-A257CA5BF180.png'
 my_image_path2 = 'D:/D1AC37EF-52D2-4260-880C-A87B70BB49D1.png'
@@ -368,12 +367,16 @@ def iou(y_true, y_pred):
     union = np.sum(y_true) + np.sum(y_pred) - intersection
     return intersection / union
 
-score = iou(validation_dataset[0][1], pred[0]) # 0.0
+# extract first image from validation dataset
+image, annotation = next(iter(validation_dataset)) # (1, 224, 224, 3), (1, 224, 224, 1), next : get next element
+image = image.numpy()
+annotation = annotation.numpy()
 
-    
-    
+score = iou(annotation[0], pred[0]) # 0.0
 
+print('iou score = ', score)
 
+pred = np.argmax(pred, axis=3) # (batch_size, 224, 224)
 
 
 # pred1 = predict_image(my_image_path1)
