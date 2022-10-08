@@ -195,7 +195,7 @@ kfold = StratifiedKFold(n_splits=n_splits,shuffle=True,random_state=123)
 from sklearn.metrics import accuracy_score
 from catboost import CatBoostClassifier
 # 2. 모델
-
+###
 
 tpot = TPOTClassifier(verbosity=2, random_state=72, cv=kfold, scoring='accuracy',warm_start=True, generations=10, population_size=100, early_stop=10)
 tpot.fit(x_train, y_train)
