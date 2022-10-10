@@ -375,15 +375,28 @@ def iou(y_true, y_pred):
     union = np.sum(y_true) + np.sum(y_pred) - intersection
     return intersection / union
 
+# iou for each class
+def iou_for_each_class(y_true, y_pred):
+    iou_list = []
+    for i in range(1, 12):
+        y_true_i = np.where(y_true == i, 1, 0)
+        y_pred_i = np.where(y_pred == i, 1, 0)
+        iou_list.append(iou(y_true_i, y_pred_i))
+    return iou_list
+
+
 # extract first image from validation dataset
 image, annotation = next(iter(validation_dataset)) # (1, 224, 224, 3), (1, 224, 224, 1), next : get next element
 image = image.numpy()
 annotation = annotation.numpy()
 
-score = iou(annotation[0], pred[0]) # 0.0
-print(annotation[0].shape) # (224, 224, 1)
-print(pred[0].shape) # (224, 224, 12)
-exit()
+
+score = iou_for_each_class(annotation, pred)
+
+# score = iou(annotation[0], pred[0]) # 0.0
+# print(annotation[0].shape) # (224, 224, 1)
+# print(pred[0].shape) # (224, 224, 12)
+
 print('iou score = ', score)
 
 pred = np.argmax(pred, axis=3) # (batch_size, 224, 224)
