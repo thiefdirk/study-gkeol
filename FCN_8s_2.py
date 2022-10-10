@@ -309,7 +309,7 @@ def deconv_block(inputs, filters, kernel_size, strides, padding='same'):
 
 # nn.conv2d(input, filter, strides, padding, use_cudnn_on_gpu=None, data_format=None, dilations=None, name=None) kernel_size default = 3
 # torch.nn.Conv2d(in_channels, out_channels, kernel_size, stride=1, padding=0, dilation=1, groups=1, bias=True, padding_mode='zeros', device=None, dtype=None)
-
+###
 def FCN_8s():
     model = tf.keras.applications.VGG16(include_top=False, weights='imagenet', input_shape=(224, 224, 3))
     for layer in model.layers:
