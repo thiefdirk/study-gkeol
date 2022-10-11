@@ -344,7 +344,7 @@ validation_steps = validation_count // BATCH_SIZE
 
 fcnn = FCN_8s()
 fcnn.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accuracy'])
-fcnn.fit(training_dataset, epochs=1, validation_data=validation_dataset, steps_per_epoch=steps_per_epoch, validation_steps=validation_steps)
+fcnn.fit(training_dataset, epochs=60, validation_data=validation_dataset, steps_per_epoch=steps_per_epoch, validation_steps=validation_steps)
 
 # # save the model
 # fcnn.save('FCN_8s.h5')
@@ -391,9 +391,9 @@ image = image.numpy()
 annotation = annotation.numpy()
 
 
-score = iou_for_each_class(annotation, pred)
+# score = iou_for_each_class(annotation[0], pred[0])
 
-# score = iou(annotation[0], pred[0]) # 0.0
+score = iou(annotation[0], pred[0]) # 0.0
 # print(annotation[0].shape) # (224, 224, 1)
 # print(pred[0].shape) # (224, 224, 12)
 
