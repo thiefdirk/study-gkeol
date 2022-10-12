@@ -26,7 +26,7 @@ from craft_text_detector import (
     empty_cuda_cache
 )
 
-# set image path and export folder directory
+## set image path and export folder directory
 # image = 'D:\Sample\HW-OCR/4.Validation\P.Paper\R.Free/IMG_OCR_53_4PR_95725.png' # can be filepath, PIL image or numpy array
 image = 'D:\study_data\_data\image\CRAFT/KakaoTalk_Photo_2022-10-07-11-32-46.jpeg' # can be filepath, PIL image or numpy array
 output_dir = 'D:\outputs/'
