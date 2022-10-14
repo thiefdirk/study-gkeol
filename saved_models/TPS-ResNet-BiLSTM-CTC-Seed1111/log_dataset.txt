@@ -1,0 +1,54 @@
+--------------------------------------------------------------------------------
+dataset_root: D:\study_data\_data\deep-text-recognition-benchmark\data_lmdb/train
+opt.select_data: ['/']
+opt.batch_ratio: ['1']
+--------------------------------------------------------------------------------
+dataset_root:    D:\study_data\_data\deep-text-recognition-benchmark\data_lmdb/train	 dataset: /
+sub-directory:	/.	 num samples: 251917
+num total samples of /: 251917 x 1.0 (total_data_usage_ratio) = 251917
+num samples of / per batch: 50 x 1.0 (batch_ratio) = 50
+--------------------------------------------------------------------------------
+dataset_root: D:\study_data\_data\deep-text-recognition-benchmark\data_lmdb/train
+opt.select_data: ['/']
+opt.batch_ratio: ['1']
+--------------------------------------------------------------------------------
+dataset_root:    D:\study_data\_data\deep-text-recognition-benchmark\data_lmdb/train	 dataset: /
+sub-directory:	/.	 num samples: 251997
+num total samples of /: 251997 x 1.0 (total_data_usage_ratio) = 251997
+num samples of / per batch: 50 x 1.0 (batch_ratio) = 50
+--------------------------------------------------------------------------------
+Total_batch_size: 50 = 50
+--------------------------------------------------------------------------------
+dataset_root:    D:\study_data\_data\deep-text-recognition-benchmark\data_lmdb/validation	 dataset: /
+sub-directory:	/.	 num samples: 53999
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+dataset_root: D:\study_data\_data\deep-text-recognition-benchmark\data_lmdb/train
+opt.select_data: ['/']
+opt.batch_ratio: ['1']
+--------------------------------------------------------------------------------
+dataset_root:    D:\study_data\_data\deep-text-recognition-benchmark\data_lmdb/train	 dataset: /
+sub-directory:	/.	 num samples: 251997
+num total samples of /: 251997 x 1.0 (total_data_usage_ratio) = 251997
+num samples of / per batch: 50 x 1.0 (batch_ratio) = 50
+--------------------------------------------------------------------------------
+Total_batch_size: 50 = 50
+--------------------------------------------------------------------------------
+dataset_root:    D:\study_data\_data\deep-text-recognition-benchmark\data_lmdb/validation	 dataset: /
+sub-directory:	/.	 num samples: 53999
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+dataset_root: D:\study_data\_data\deep-text-recognition-benchmark\data_lmdb/train
+opt.select_data: ['/']
+opt.batch_ratio: ['1']
+--------------------------------------------------------------------------------
+dataset_root:    D:\study_data\_data\deep-text-recognition-benchmark\data_lmdb/train	 dataset: /
+sub-directory:	/.	 num samples: 251997
+num total samples of /: 251997 x 1.0 (total_data_usage_ratio) = 251997
+num samples of / per batch: 50 x 1.0 (batch_ratio) = 50
+--------------------------------------------------------------------------------
+Total_batch_size: 50 = 50
+--------------------------------------------------------------------------------
+dataset_root:    D:\study_data\_data\deep-text-recognition-benchmark\data_lmdb/validation	 dataset: /
+sub-directory:	/.	 num samples: 53999
+--------------------------------------------------------------------------------
