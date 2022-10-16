@@ -162,7 +162,7 @@ print(predict.shape)
 iou_predict = predict.reshape(256, 256, 1)
 score = iou(annotation[0], iou_predict) # 0.0
 
-# get_value from tensor
+# get_value from tensor######
 
 print('score:', score.numpy())
 
