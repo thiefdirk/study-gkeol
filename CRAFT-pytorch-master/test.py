@@ -153,7 +153,7 @@ if __name__ == '__main__':
         args.poly = True
 
     t = time.time()
-
+##
     # load data
     for k, image_path in enumerate(image_list):
         print("Test image {:d}/{:d}: {:s}".format(k+1, len(image_list), image_path), end='\r')
