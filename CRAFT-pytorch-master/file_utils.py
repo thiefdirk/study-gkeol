@@ -40,7 +40,7 @@ def saveResult(img_file, img, boxes, dirname='./result/', verticals=None, texts=
         Return:
             None
         """
-        img = np.array(img)
+        img = np.array(img).copy()
 
         # make result file list
         filename, file_ext = os.path.splitext(os.path.basename(img_file))
@@ -56,7 +56,7 @@ def saveResult(img_file, img, boxes, dirname='./result/', verticals=None, texts=
             for i, box in enumerate(boxes):
                 poly = np.array(box).astype(np.int32).reshape((-1))
                 strResult = ','.join([str(p) for p in poly]) + '\r\n'
-                f.write(strResult)
+                f.write(strResult) # write result to file
 
                 poly = poly.reshape(-1, 2)
                 cv2.polylines(img, [poly.reshape((-1, 1, 2))], True, color=(0, 0, 255), thickness=2)

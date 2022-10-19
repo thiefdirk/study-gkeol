@@ -230,7 +230,7 @@ def getDetBoxes(textmap, linkmap, text_threshold, link_threshold, low_text, poly
     if poly:
         polys = getPoly_core(boxes, labels, mapper, linkmap)
     else:
-        polys = [None] * len(boxes)
+        polys = [None] * len(boxes) # dummy
 
     return boxes, polys
 
@@ -239,5 +239,5 @@ def adjustResultCoordinates(polys, ratio_w, ratio_h, ratio_net = 2):
         polys = np.array(polys)
         for k in range(len(polys)):
             if polys[k] is not None:
-                polys[k] *= (ratio_w * ratio_net, ratio_h * ratio_net)
+                polys[k] *= (ratio_w * ratio_net, ratio_h * ratio_net) # *= : 요소별 곱셈
     return polys
