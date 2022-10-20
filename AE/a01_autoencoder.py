@@ -20,7 +20,7 @@ decoded = Dense(784, activation='sigmoid')(encoded)
 # decoded = Dense(784, activation='linear')(encoded)
 # decoded = Dense(784, activation='tanh')(encoded)
 autoencoder = Model(input_img, decoded) # 입력값과 출력값을 지정해준다.
-# autoencoder.summary()
+# autoencoder.summary() #
 
 autoencoder.compile(optimizer='adam', loss='binary_crossentropy', metrics=['acc'])
 

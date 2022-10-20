@@ -33,15 +33,15 @@ def getDetBoxes_core(textmap, linkmap, text_threshold, link_threshold, low_text)
     mapper = []
     for k in range(1,nLabels):
         # size filtering
-        size = stats[k, cv2.CC_STAT_AREA]
-        if size < 10: continue
+        size = stats[k, cv2.CC_STAT_AREA] # size : area
+        if size < 10: continue # continue: 다음 반복문으로 넘어감
 
         # thresholding : text_score가 text_threshold보다 작으면 continue
-        if np.max(textmap[labels==k]) < text_threshold: continue
+        if np.max(textmap[labels==k]) < text_threshold: continue # textmap[labels==k] : textmap에서 labels가 k인 부분만 가져옴, np.max : 최대값
 
         # make segmentation map
-        segmap = np.zeros(textmap.shape, dtype=np.uint8)
-        segmap[labels==k] = 255
+        segmap = np.zeros(textmap.shape, dtype=np.uint8) # np.zeros : 0으로 채워진 배열 생성
+        segmap[labels==k] = 255 # labels==k : k번째 라벨에 해당하는 부분만 255로 채움
         segmap[np.logical_and(link_score==1, text_score==0)] = 0   # remove link area
         x, y = stats[k, cv2.CC_STAT_LEFT], stats[k, cv2.CC_STAT_TOP]
         w, h = stats[k, cv2.CC_STAT_WIDTH], stats[k, cv2.CC_STAT_HEIGHT]
