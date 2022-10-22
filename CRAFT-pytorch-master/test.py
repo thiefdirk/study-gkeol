@@ -41,7 +41,7 @@ def copyStateDict(state_dict): # state_dict 자리에 들어가는것 카피하�
     return new_state_dict
 
 def str2bool(v): # lower() : 대문자를 소문자로 변환
-    return v.lower() in ("yes", "y", "true", "t", "1")
+    return v.lower() in ("yes", "y", "true", "t", "1") # lower()했기 때문에 이 아래 단어들이 있으면 true 반환
 
 parser = argparse.ArgumentParser(description='CRAFT Text Detection')
 parser.add_argument('--trained_model', default='weights/craft_mlt_25k.pth', type=str, help='pretrained model')
@@ -136,7 +136,7 @@ if __name__ == '__main__':
         cudnn.benchmark = False
 
     net.eval() # eval() : 모델을 평가 모드로 설정. dropout, batch normalization 등의 layer들이 동작 방식이 변경된다.
-
+##
     # LinkRefiner
     refine_net = None
     if args.refine:
@@ -167,6 +167,7 @@ if __name__ == '__main__':
         mask_file = result_folder + "/res_" + filename + '_mask.jpg'
         cv2.imwrite(mask_file, score_text) # cv2.imwrite(mask_file, score_text) : score_text를 mask_file에 저장
 
-        file_utils.saveResult(image_path, image[:,:,::-1], polys, dirname=result_folder) # image[:,:,::-1] : image를 뒤집는다. opencv는 bgr로 읽기 때문에 rgb로 바꾸기 위해 뒤집는다.
+        file_utils.saveResult(image_path, image[:,:,::-1], polys, dirname=result_folder) 
+        # image[:,:,::-1] : image를 뒤집는다. opencv는 bgr로 읽기 때문에 rgb로 바꾸기 위해 뒤집는다.
 
     print("elapsed time : {}s".format(time.time() - t))
