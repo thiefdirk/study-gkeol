@@ -58,7 +58,7 @@ def lgb_hamsu(max_depth, num_leaves, min_child_samples, min_child_weight,
     results = r2_score(y_test, y_pred)
     return results
 
-
+#####
 lgb_bo = BayesianOptimization(lgb_hamsu, bayesian_params, random_state=1234)
 lgb_bo.maximize(init_points=5, n_iter=30)
 print(lgb_bo.max)
