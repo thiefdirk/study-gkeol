@@ -10,12 +10,12 @@ w = tf.compat.v1.Variable(tf.random_normal([1]), name='weight')
 
 hypothesis = x * w
 
-loss = tf.reduce_mean(tf.square(hypothesis - y))
+loss = tf.reduce_mean(tf.square(hypothesis - y)) # mse
 
 lr = 0.1
 gradient = tf.reduce_mean((w * x - y) * x) # gradient : 기울기
 descent = w - lr * gradient # descent : 하강
-update = w.assign(descent) # assign : 할당  
+update = w.assign(descent) # assign: 할당
 
 w_history = []
 loss_history = []
