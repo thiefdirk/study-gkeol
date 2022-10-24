@@ -72,7 +72,7 @@ model.add(Dense(1, activation='sigmoid'))
 model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['accuracy'])
 
 # model.fit(xy_train[0][0], xy_train[0][1]) #배치사이즈를 최대로 잡으면 이거도 건흥
-hist = model.fit_generator(xy_train, epochs=30, steps_per_epoch=32,
+hist = model.fit_generator(xy_train, epochs=30, steps_per_epoch=32, # fit_generator는 steps_per_epoch를 꼭 써줘야함
                     # 전체데이터/batch = 160/5 = 32
                     validation_data=xy_test,
                     validation_steps=24) # 생각이 안나심, 알아서 찾으라고 하심
