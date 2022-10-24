@@ -52,7 +52,7 @@ def resize_aspect_ratio(img, square_size, interpolation, mag_ratio=1):
 
     # make canvas and paste image
     target_h32, target_w32 = target_h, target_w
-    if target_h % 32 != 0:
+    if target_h % 32 != 0: # <---- resize ratio 조정 시 32의 배수로 나눠 주기 위함
         target_h32 = target_h + (32 - target_h % 32)
     if target_w % 32 != 0:
         target_w32 = target_w + (32 - target_w % 32)

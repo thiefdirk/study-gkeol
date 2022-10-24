@@ -26,15 +26,31 @@ def getDetBoxes_core(textmap, linkmap, text_threshold, link_threshold, low_text)
     ret, text_score = cv2.threshold(textmap, low_text, 1, 0) # threshold 뜻 : 0보다 작으면 0, 0보다 크면 1
     ret, link_score = cv2.threshold(linkmap, link_threshold, 1, 0)
 
-    text_score_comb = np.clip(text_score + link_score, 0, 1)
+    text_score_comb = np.clip(text_score + link_score, 0, 1) # np.clip : 배열의 최소, 최대값을 지정하여 범위를 벗어나는 값을 지정한 값으로 변환
     nLabels, labels, stats, centroids = cv2.connectedComponentsWithStats(text_score_comb.astype(np.uint8), connectivity=4) # connectedComponentsWithStats: https://docs.opencv.org/3.4/d3/dc0/group__imgproc__shape.html#ga819779b9857cc2f8601e6526a3a5bc71
+
+# 반환값으로 retval, labels, stats, centroids 를 반환합니다.
+ 
+#  retval : 객체 수 + 1 (배경 포함)
+ 
+#  labels : 객체에 번호가 지정된 레이블 맵
+ 
+#  stats : N행 5열, N은 객체 수 + 1이며 각각의 행은 번호가 지정된 객체를 의미, 5열에는 x, y, width, height, area 순으로 정보가 담겨 있습니다. x,y 는 좌측 상단 좌표를 의미하며 area는 면적, 픽셀의 수를 의미합니다.
+ 
+#  centroids : N행 2열, 2열에는 x,y 무게 중심 좌표가 입력되어 있습니다. 무게 중심 좌표는 픽셀의 x 좌표를 다 더해서 갯수로 나눈 값입니다. y좌표도 동일합니다.
+
 
     det = []
     mapper = []
     for k in range(1,nLabels):
         # size filtering
+<<<<<<< Updated upstream
         size = stats[k, cv2.CC_STAT_AREA] # size : area
         if size < 10: continue # continue: 다음 반복문으로 넘어감
+=======
+        size = stats[k, cv2.CC_STAT_AREA] # cv2.CC_STAT_AREA : 면적
+        if size < 10: continue
+>>>>>>> Stashed changes
 
         # thresholding : text_score가 text_threshold보다 작으면 continue
         if np.max(textmap[labels==k]) < text_threshold: continue # textmap[labels==k] : textmap에서 labels가 k인 부분만 가져옴, np.max : 최대값
@@ -56,7 +72,7 @@ def getDetBoxes_core(textmap, linkmap, text_threshold, link_threshold, low_text)
         segmap[sy:ey, sx:ex] = cv2.dilate(segmap[sy:ey, sx:ex], kernel)
 
         # make box
-        np_contours = np.roll(np.array(np.where(segmap!=0)),1,axis=0).transpose().reshape(-1,2)
+        np_contours = np.roll(np.array(np.where(segmap!=0)),1,axis=0).transpose().reshape(-1,2) # np.where : 조건에 맞는 인덱스를 반환
         rectangle = cv2.minAreaRect(np_contours)
         box = cv2.boxPoints(rectangle)
 
