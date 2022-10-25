@@ -25,6 +25,10 @@ import tensorflow as tf
 import urllib
 import zipfile
 from keras.preprocessing.image import ImageDataGenerator
+import numpy as np
+from tensorflow.keras.preprocessing import image
+import matplotlib.pyplot as plt
+import matplotlib.image as mpimg
 
 def solution_model():
     _TRAIN_URL = "https://storage.googleapis.com/download.tensorflow.org/data/horse-or-human.zip"
@@ -84,7 +88,8 @@ def solution_model():
                         verbose=1,
                         validation_data=validation_generator,
                         validation_steps=8)
-        #Your Code Here#)
+        
+    
     return model
     # NOTE: If training is taking a very long time, you should consider setting the batch size
     # appropriately on the generator, and the steps per epoch in the model.fit() function.

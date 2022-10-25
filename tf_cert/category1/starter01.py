@@ -31,7 +31,7 @@ def solution_model():
     
     model = tf.keras.Sequential([
         tf.keras.layers.Dense(1, input_shape=[1]),
-        tf.keras.layers.Dense(10),
+        tf.keras.layers.Dense(30),
         tf.keras.layers.Dense(1)])
     
     model.compile(optimizer='adam', loss='mean_squared_error')

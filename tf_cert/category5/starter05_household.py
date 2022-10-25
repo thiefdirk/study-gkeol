@@ -189,6 +189,9 @@ def solution_model():
 
     # Code to define your model.
     model = tf.keras.models.Sequential([
+        tf.keras.layers.LSTM(32, return_sequences=True, stateful=True,
+                                batch_input_shape=[BATCH_SIZE, N_PAST, N_FEATURES]),
+        tf.keras.layers.LSTM(32, return_sequences=True, stateful=True),
 
         # ADD YOUR LAYERS HERE.
 
@@ -212,13 +215,17 @@ def solution_model():
     ])
 
     # Code to train and compile the model
-    optimizer =  # YOUR CODE HERE
-    model.compile(
+    optimizer =  tf.keras.optimizers.SGD(lr=1e-5, momentum=0.9)
+    model.compile(loss=tf.keras.losses.Huber(),
+                    optimizer=optimizer,
+                    metrics=["mae"])
         # YOUR CODE HERE
-    )
-    model.fit(
+    model.fit(train_set, epochs=1, validation_data=valid_set)
         # YOUR CODE HERE
-    )
+        
+    score = model.evaluate(valid_set, verbose=0)
+    print('Test loss:', score[0])
+    print('Test accuracy:', score[1])
 
     return model
 
