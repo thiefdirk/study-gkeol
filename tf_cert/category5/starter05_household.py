@@ -120,10 +120,10 @@ def normalize_series(data, min, max):
 # DO NOT CHANGE THIS CODE
 def windowed_dataset(series, batch_size, n_past=24, n_future=24, shift=1):
     ds = tf.data.Dataset.from_tensor_slices(series)
-    ds = ds.window(size=n_past + n_future, shift=shift, drop_remainder=True)
-    ds = ds.flat_map(lambda w: w.batch(n_past + n_future))
-    ds = ds.map(lambda w: (w[:n_past], w[n_past:]))
-    return ds.batch(batch_size).prefetch(1)
+    ds = ds.window(size=n_past + n_future, shift=shift, drop_remainder=True) # ds.window() is used to create windows of size n_past + n_future, drop_remainder=True is used to drop the last window if it is smaller than n_past + n_future
+    ds = ds.flat_map(lambda w: w.batch(n_past + n_future)) # ds.flat_map() is used to flatten the dataset, batch() is used to convert the dataset into batches of size n_past + n_future
+    ds = ds.map(lambda w: (w[:n_past], w[n_past:])) # ds.map() is used to map the dataset to the required format, w[:n_past] is used to get the first n_past elements of the window, w[n_past:] is used to get the last n_future elements of the window
+    return ds.batch(batch_size).prefetch(1) # shape of the dataset is (batch_size, n_past, n_features) and (batch_size, n_future, n_features)
 
 
 
@@ -186,12 +186,17 @@ def solution_model():
     valid_set = windowed_dataset(series=x_valid, batch_size=BATCH_SIZE,
                                  n_past=N_PAST, n_future=N_FUTURE,
                                  shift=SHIFT)
+    
 
     # Code to define your model.
     model = tf.keras.models.Sequential([
-        tf.keras.layers.LSTM(32, return_sequences=True, stateful=True,
-                                batch_input_shape=[BATCH_SIZE, N_PAST, N_FEATURES]),
-        tf.keras.layers.LSTM(32, return_sequences=True, stateful=True),
+        tf.keras.layers.Conv1D(filters=32, kernel_size=5,
+                                 strides=1, padding="causal",
+                                    activation="relu",
+                                    input_shape=[N_PAST, N_FEATURES]), # input_shape : 
+        tf.keras.layers.LSTM(32, return_sequences=True),
+        tf.keras.layers.LSTM(32, return_sequences=True),
+        
 
         # ADD YOUR LAYERS HERE.
 
@@ -215,13 +220,14 @@ def solution_model():
     ])
 
     # Code to train and compile the model
-    optimizer =  tf.keras.optimizers.SGD(lr=1e-5, momentum=0.9)
-    model.compile(loss=tf.keras.losses.Huber(),
-                    optimizer=optimizer,
-                    metrics=["mae"])
+    optimizer =  tf.keras.optimizers.Adam(learning_rate=1e-3)
+    model.compile(loss='mae', optimizer=optimizer, metrics=['mae'])
         # YOUR CODE HERE
     model.fit(train_set, epochs=1, validation_data=valid_set)
         # YOUR CODE HERE
+        
+    y_pred = model.predict(valid_set)
+    print(y_pred.shape)
         
     score = model.evaluate(valid_set, verbose=0)
     print('Test loss:', score[0])

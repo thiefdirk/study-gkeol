@@ -27,6 +27,8 @@ import zipfile
 
 from craft import CRAFT
 
+# print cuda if cuda is available
+
 from collections import OrderedDict
 def copyStateDict(state_dict): # state_dict 자리에 들어가는것 카피하는 함수, 2019년에 --cuda false 시 오류가 뜬다고 하여 개발진이 픽스하며 넣은 코드
     #https://github.com/clovaai/CRAFT-pytorch/issues/1
@@ -58,8 +60,6 @@ parser.add_argument('--refine', default=False, action='store_true', help='enable
 parser.add_argument('--refiner_model', default='weights/craft_refiner_CTW1500.pth', type=str, help='pretrained refiner model')
 ##
 args = parser.parse_args()
-
-
 """ For test images in a folder """
 image_list, _, _ = file_utils.get_files(args.test_folder) 
 
@@ -121,6 +121,7 @@ def test_net(net, image, text_threshold, link_threshold, low_text, cuda, poly, r
 
 
 if __name__ == '__main__':
+    
     # load net
     net = CRAFT()     # initialize
 

@@ -73,7 +73,7 @@ def solution_model():
 
 
     model = tf.keras.Sequential([
-        tf.keras.layers.Embedding(vocab_size, embedding_dim, input_length=max_length),
+        tf.keras.layers.Embedding(vocab_size, embedding_dim, input_length=max_length), # shape=(None, 120, 16)
         tf.keras.layers.Bidirectional(tf.keras.layers.LSTM(64)),
         tf.keras.layers.Dense(24, activation='relu'),        
         tf.keras.layers.Dense(1, activation='sigmoid')

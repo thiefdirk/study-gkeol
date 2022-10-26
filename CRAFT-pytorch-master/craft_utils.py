@@ -44,13 +44,8 @@ def getDetBoxes_core(textmap, linkmap, text_threshold, link_threshold, low_text)
     mapper = []
     for k in range(1,nLabels):
         # size filtering
-<<<<<<< Updated upstream
-        size = stats[k, cv2.CC_STAT_AREA] # size : area
-        if size < 10: continue # continue: 다음 반복문으로 넘어감
-=======
         size = stats[k, cv2.CC_STAT_AREA] # cv2.CC_STAT_AREA : 면적
         if size < 10: continue
->>>>>>> Stashed changes
 
         # thresholding : text_score가 text_threshold보다 작으면 continue
         if np.max(textmap[labels==k]) < text_threshold: continue # textmap[labels==k] : textmap에서 labels가 k인 부분만 가져옴, np.max : 최대값

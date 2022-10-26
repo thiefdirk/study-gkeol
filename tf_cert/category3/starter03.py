@@ -84,10 +84,16 @@ def solution_model():
 
     model.fit_generator(train_generator,
                         steps_per_epoch=8,
-                        epochs=15,
+                        epochs=1,
                         verbose=1,
                         validation_data=validation_generator,
                         validation_steps=8)
+    
+    # print accuracy
+    from sklearn.metrics import accuracy_score
+    y_pred = model.predict_generator(validation_generator)
+    y_pred = np.where(y_pred > 0.5, 1, 0)
+    print(accuracy_score(validation_generator.classes, y_pred))
         
     
     return model
