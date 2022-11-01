@@ -28,7 +28,7 @@ from craft_text_detector import (
 
 ## set image path and export folder directory
 # image = 'D:\Sample\HW-OCR/4.Validation\P.Paper\R.Free/IMG_OCR_53_4PR_95725.png' # can be filepath, PIL image or numpy array
-image = 'D:\Sample\HW-OCR/4.Validation\P.Paper\R.Free/IMG_OCR_53_4PR_95725.png' # can be filepath, PIL image or numpy array
+image = 'C:\study\IMG_2731.jpg' # can be filepath, PIL image or numpy array
 output_dir = 'D:\outputs/'
 
 # read image
