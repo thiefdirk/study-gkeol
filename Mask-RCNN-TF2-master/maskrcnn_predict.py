@@ -33,36 +33,36 @@ model.load_weights(filepath="C:\study\Mask-RCNN-TF2-master\mask_rcnn_coco.h5",
 
 # load the input image, convert it from BGR to RGB channel
 # image = cv2.imread("C:\study\Mask-RCNN-TF2-master/test.jpg")
-# image = cv2.imread("D:/D1AC37EF-52D2-4260-880C-A87B70BB49D1.png")
+image = cv2.imread("D:/D1AC37EF-52D2-4260-880C-A87B70BB49D1.png")
 
 # image folder
-image = "C:\study\Mask-RCNN-TF2-master\images"
+# image = "C:\study\Mask-RCNN-TF2-master\images"
 
-image_list = []
+# image_list = []
 
-# loop over the image folder
-for filename in os.listdir(image):
-    # load the input image, convert it from BGR to RGB channel
-    image = cv2.imread(os.path.join(image, filename))
-    image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
-    image_list.append(image)
+# # loop over the image folder
+# for filename in os.listdir(image):
+#     # load the input image, convert it from BGR to RGB channel
+#     image = cv2.imread(os.path.join(image, filename))
+#     image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+#     image_list.append(image)
     
-    # perform a forward pass of the network to obtain the results
-    results = model.detect([image], verbose=1)
+#     # perform a forward pass of the network to obtain the results
+#     results = model.detect([image], verbose=1)
     
-    # extract the results for the first image
-    r = results[0]
+#     # extract the results for the first image
+#     r = results[0]
     
-    # visualize the results of the detection
-    mrcnn.visualize.display_instances(image=image,
-                                                boxes=r['rois'],
-                                                masks=r['masks'],
-                                                class_ids=r['class_ids'],
-                                                class_names=CLASS_NAMES,
-                                                scores=r['scores'])
+#     # visualize the results of the detection
+#     mrcnn.visualize.display_instances(image=image,
+#                                                 boxes=r['rois'],
+#                                                 masks=r['masks'],
+#                                                 class_ids=r['class_ids'],
+#                                                 class_names=CLASS_NAMES,
+#                                                 scores=r['scores'])
     
 
-exit()
+
 
 # output folder
 
