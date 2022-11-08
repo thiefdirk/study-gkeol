@@ -1,11 +1,23 @@
-The dataset is from: https://archive.ics.uci.edu/ml/datasets/individual+household+electric+power+consumption.
+station.csv
 
-The original source is:
+The dataset is from: https://data.giss.nasa.gov/cgi-bin/gistemp/stdata_show_v4.cgi?id=USW00024233&ds=14&dt=1
 
-    Georges Hebrail (georges.hebrail '@' edf.fr), Senior Researcher, EDF R&D, Clamart, France
-    Alice Berard, TELECOM ParisTech Master of Engineering Internship at EDF R&D, Clamart, France
+The GISS Surface Temperature Analysis ver. 4 (GISTEMP v4) is an estimate of global surface temperature change. This dataset is taken from the SeaTac weather station.
 
-This is a subset of the original dataset. The dataset has been cleaned up to fill in missing values. 
-This dataset is made available under the “Creative Commons Attribution 4.0 International (CC BY 4.0)” license.
-The text of the license is available here: https://creativecommons.org/licenses/by/4.0/
+This is a modified version of the original dataset. It has been cleaned up for learning and testing purposes as an example dataset for time series prediction.
+
+CITATIONS
+
+For information about GISS Surface Temperature Analysis ver. 4 (GISTEMP v4) see 
+https://data.giss.nasa.gov/gistemp/ 
+
+
+* GISTEMP Team, 2021: GISS Surface Temperature Analysis (GISTEMP), version 4. NASA Goddard Institute for Space Studies. Dataset accessed 2020-04-03 at https://data.giss.nasa.gov/gistemp/.
+
+* Lenssen, N., G. Schmidt, J. Hansen, M. Menne, A. Persin, R. Ruedy, and D. Zyss, 2019: Improvements in the GISTEMP uncertainty model. J. Geophys. Res. Atmos., 124, no. 12, 6307-6326, doi:10.1029/2018JD029522.
+See more references at https://data.giss.nasa.gov/gistemp/references.html
+
+
+
+
 
