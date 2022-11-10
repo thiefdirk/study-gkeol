@@ -38,7 +38,7 @@ def load_data(image_path, label_path):
     for label in os.listdir(label_path):
         label_list.append(label_path + label)
     return image_list, label_list
-
+#
 # load the train dataset
 train_image_list, train_label_list = load_data(train_image_path, train_label_path)
 # load the test dataset
