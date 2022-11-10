@@ -33,7 +33,7 @@ model.load_weights(filepath="C:\study\Mask-RCNN-TF2-master\mask_rcnn_coco.h5",
 
 # load the input image, convert it from BGR to RGB channel
 # image = cv2.imread("C:\study\Mask-RCNN-TF2-master/test.jpg")
-image = cv2.imread("D:/D1AC37EF-52D2-4260-880C-A87B70BB49D1.png")
+image = cv2.imread("D:/3A3C3901-2E0D-4121-BC39-1D70409E08A6_1_105_c.jpeg")
 
 # image folder
 # image = "C:\study\Mask-RCNN-TF2-master\images"
