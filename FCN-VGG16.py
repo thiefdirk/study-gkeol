@@ -26,7 +26,7 @@ train_image_path = 'D:\study_data\_data\dataset1/images_prepped_train/'
 train_label_path = 'D:\study_data\_data\dataset1/annotations_prepped_train/'
 test_image_path = 'D:\study_data\_data\dataset1/images_prepped_test/'
 test_label_path = 'D:\study_data\_data\dataset1/annotations_prepped_test/'
- 
+ ####
 BATCH_SIZE = 16
 
 # load the dataset
