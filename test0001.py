@@ -9,5 +9,4 @@ import tqdm
 # randam np.array (1316664, 1)
 
 a = pd.DataFrame(np.random.rand(48, 1))
-
-def df_to_np
+b = pd.DataFrame(np.random.rand(48, 1))
