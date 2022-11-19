@@ -6,19 +6,27 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 import tensorflow as tf
 import tqdm
-# randam np.array (1316664, 1)
 
-a = pd.DataFrame(np.random.rand(48, 1))
-b = pd.DataFrame(np.random.rand(48, 1))
+import numpy as np
+import pandas as pd
 
-# 데이터프레임에서 7과 8의 배수행 index 추출
+import matplotlib as mpl
+import matplotlib.pyplot as plt
+import seaborn as sns
 
-index = a.index[(a.index % 7 == 0) | (a.index % 8 == 0)]
+df_corr = x.corr() # df_corr : 3-dim dataframe
+mask = np.array(df_corr)
+mask[np.tril_indices_from(mask)] = False  # np.tril_indices_from(mask) : 아래쪽 삼각형만 True로 만들어라
 
-# 추출한 index를 이용하여 데이터프레임에서 행 삭제
+plt.figure(figsize= (10,8))
 
-a = a.drop(index)
+sns.heatmap(df_corr, 
+            cmap = sns.light_palette("red", as_cmap=True),
+            annot = True, 
+            mask = mask)
 
-# concat np.array
+plt.show()
 
-c = np.concatenate((a, b), axis=1)
+# 컬럼 19개 데이터 뒤에서 4번째 컬럼 드랍
+
+x = x.drop(x.columns[15], axis=1)
