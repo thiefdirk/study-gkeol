@@ -57,14 +57,16 @@ exported_file_paths = export_detected_regions(
     output_dir=output_dir,
     rectify=True
 )
+print(exported_file_paths)
+
 
 # export heatmap, detection points, box visualization
-export_extra_results(
-    image=image,
-    regions=prediction_result["boxes"],
-    heatmaps=prediction_result["heatmaps"],
-    output_dir=output_dir
-)
+# export_extra_results(
+#     image=image,
+#     regions=prediction_result["boxes"],
+#     heatmaps=prediction_result["heatmaps"],
+#     output_dir=output_dir
+# )
 
 # unload models from gpu
 empty_cuda_cache()
