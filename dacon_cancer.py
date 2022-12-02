@@ -3,12 +3,12 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
-from keras.preprocessing.image import ImageDataGenerator
 from PIL import Image
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import OneHotEncoder, StandardScaler, LabelEncoder
 import cv2
-
+import tensorflow_addons as tfa
+# tf.compat.v1.disable_eager_execution() # disable eager execution는 tensorflow 2.0에서 1.0으로 사용하기 위한 코드입니다.
 
 
 train_data = pd.read_csv('D:\open/train.csv', encoding='utf-8', index_col=0)
@@ -33,7 +33,10 @@ le = LabelEncoder()
 print(train_data.shape) # (1000, 28)
 print(test_data.shape) # (250, 26)
 
-train_data, val_data,train_label , val_label = train_test_split(train_data.drop('N_category', axis=1), train_data['N_category'], test_size=0.2, random_state=42, stratify=train_data['N_category'])
+train_x = train_data.drop(['N_category'], axis=1)
+train_y = train_data['N_category']
+
+train_data, val_data,train_label , val_label = train_test_split(train_x, train_y, test_size=0.2, random_state=42, stratify=train_data['N_category'])
 
 print(train_data.head())
 print(train_label.head())
@@ -56,64 +59,158 @@ for col in train_data.columns:
 
 
 #import image from D:\open\train_imgs/
-train_imgs = []
-for i in range(len(train_data)):
-    img = cv2.imread('D:\open'+train_data['img_path'][i])
-    # resize
-    img = np.array(img)/255
-    img = cv2.resize(img, (512, 512))
+# train_imgs = []
+# for i in range(len(train_x)):
+#     img = cv2.imread('D:\open'+train_x['img_path'][i])
+#     # resize
+#     img = np.array(img)/255
+#     img = cv2.resize(img, (512, 512))
     
-    train_imgs.append(np.array(img))
-    print(train_imgs)
+#     train_imgs.append(np.array(img))
+#     # print(train_imgs)
     
-np.save('C:\study\_data\dacon_cancer/train_imgs.npy', train_imgs)
-# train_imgs = np.load('C:\study\_data\dacon_cancer/train_imgs.npy')
-        
+# np.save('C:\study\_data\dacon_cancer/train_imgs.npy', train_imgs)
+train_imgs = np.load('C:\study\_data\dacon_cancer/train_imgs.npy')
+# train_imgs = train_imgs.astype(np.int32)
     
 
-mask_imgs = [] # grayscale
-for i in range(len(train_data)):
-    if train_data['mask_path'][i] == None:
-        mask_imgs.append(np.zeros((int(img.size[0]/2),int(img.size[1]/2))))
-    else: # grayscale
-        img = cv2.imread('D:\open'+train_data['mask_path'][i], cv2.IMREAD_GRAYSCALE)
-        img = np.array(img)/255
-        img = cv2.resize(img, (512, 512))
+# mask_imgs = [] # grayscale
+# for i in range(len(train_x)):
+#     if train_x['mask_path'][i] == '-':
+#         mask_imgs.append(np.zeros((512, 512, 1)))
+#         # print(mask_imgs)
         
-        mask_imgs.append(np.array(img))
+#     else: # grayscale
+#         img = cv2.imread('D:\open'+train_x['mask_path'][i], cv2.IMREAD_GRAYSCALE)
+#         # print(img)
         
-np.save('C:\study\_data\dacon_cancer/mask_imgs.npy', mask_imgs)
-# mask_imgs = np.load('C:\study\_data\dacon_cancer/mask_imgs.npy')
+#         # Normalize
+#         img = img.astype(np.float32) / 255.
+#         img = cv2.resize(img, (512, 512))
+#         img = np.expand_dims(img, axis=-1)
         
-test_imgs = []
-for i in range(len(test_data)):
-    img = cv2.imread('D:\open'+test_data['img_path'][i])
-    img = np.array(img)/255        
-    img = cv2.resize(img, (512, 512))
+#         mask_imgs.append(np.array(img))
+        
+# np.save('C:\study\_data\dacon_cancer/mask_imgs.npy', mask_imgs)
+mask_imgs = np.load('C:\study\_data\dacon_cancer/mask_imgs.npy')
+# mask_imgs = mask_imgs.astype('int32')
+      
 
-    test_imgs.append(np.array(img))
+# test_imgs = []
+# for i in range(len(test_data)):
+#     img = cv2.imread('D:\open'+test_data['img_path'][i])
+#     img = np.array(img)/255        
+#     img = cv2.resize(img, (512, 512))
+
+#     test_imgs.append(np.array(img))
     
-np.save('C:\study\_data\dacon_cancer/test_imgs.npy', test_imgs)
-# test_imgs = np.load('C:\study\_data\dacon_cancer/test_imgs.npy')
+# np.save('C:\study\_data\dacon_cancer/test_imgs.npy', test_imgs)
+test_imgs = np.load('C:\study\_data\dacon_cancer/test_imgs.npy')
+# test_imgs = test_imgs.astype('int32')
 
-exit()
+print(train_imgs.shape) # (800, 512, 512, 3)
+print(mask_imgs.shape) # (800, 512, 512, 1)
+print(test_imgs.shape) # (250, 512, 512, 3)
+
 print(train_data.shape) # (1000, 28)
 print(test_data.shape) # (250, 26)
 
-train_img, val_img = train_test_split(train_imgs, test_size=0.2, random_state=42, stratify=train_data['N_category'])
-train_mask, val_mask = train_test_split(mask_imgs, test_size=0.2, random_state=42, stratify=train_data['N_category'])
+train_img, val_img = train_test_split(train_imgs, test_size=0.2, random_state=42)
+train_mask, val_mask = train_test_split(mask_imgs, test_size=0.2, random_state=42)
+
+print(train_data.shape) # (1000, 28)
+print(val_data.shape) # (250, 26)
+print(train_label.shape) # (800,)
+print(val_label.shape) # (200,)
+print(train_img.shape) # (640, 512, 512, 3)
+print(val_img.shape) # (160, 512, 512, 3)
+print(train_mask.shape) # (640, 512, 512, 1)
+print(val_mask.shape) # (160, 512, 512, 1)
+
+train_data = train_data.drop(['img_path', 'mask_path', '수술연월일'], axis=1)
+test_data = test_data.drop(['img_path', '수술연월일'], axis=1)
 
 
-train_data = train_data.drop(['ID', 'img_path', 'mask_path'], axis=1)
-test_data = test_data.drop(['ID', 'img_path'], axis=1)
+
+# train_data = train_data.astype('int32')
+# test_data = test_data.astype('int32')
     
 # multi input model(img, data)
 
+class DataGenerator(tf.keras.utils.Sequence):
+    def __init__(self, img, data,mask, label, batch_size=32, shuffle=True):
+        self.img = img
+        self.data = data
+        self.label = label
+        self.mask = mask
+        self.batch_size = batch_size
+        self.shuffle = shuffle
+        self.on_epoch_end()
+        
+    def __len__(self):
+        return int(np.floor(len(self.img) / self.batch_size))
+    
+    def __getitem__(self, index):
+        
+        indexes = self.indexes[index*self.batch_size:(index+1)*self.batch_size]
+        print(indexes)
+        
+        img_temp = [self.img[k] for k in indexes]
+        data_temp = [self.data.iloc[k] for k in indexes]
+        mask_temp = [self.mask[k] for k in indexes]
+        label_temp = [self.label[k] for k in indexes]
+        
+        img_temp = np.array(img_temp)
+        data_temp = np.array(data_temp)
+        mask_temp = np.array(mask_temp)
+        label_temp = np.array(label_temp)
+        
+        return [img_temp, data_temp], [mask_temp, label_temp]
+    
+    def on_epoch_end(self):
+        self.indexes = np.arange(len(self.img))
+        if self.shuffle == True:
+            np.random.shuffle(self.indexes)
+            
+class DataGenerator_pred(tf.keras.utils.Sequence):
+    def __init__(self, img, data, batch_size=32, shuffle=False):
+        self.img = img
+        self.data = data
+        self.batch_size = batch_size
+        self.shuffle = shuffle
+        self.on_epoch_end()
+        
+    def __len__(self):
+        return int(np.floor(len(self.img) / self.batch_size))
+    
+    def __getitem__(self, index):
+            
+            indexes = self.indexes[index*self.batch_size:(index+1)*self.batch_size]
+            
+            img_temp = [self.img[k] for k in indexes]
+            data_temp = [self.data.iloc[k] for k in indexes]
+            
+            img_temp = np.array(img_temp)
+            data_temp = np.array(data_temp)
+            
+            return [img_temp, data_temp]
+        
+    def on_epoch_end(self):
+        self.indexes = np.arange(len(self.img))
+        if self.shuffle == True:
+            np.random.shuffle(self.indexes)
+        
+            
+train_generator = DataGenerator(train_img, train_data, train_mask, train_label, batch_size=32, shuffle=False)
+val_generator = DataGenerator(val_img, val_data, val_mask, val_label, batch_size=32, shuffle=False)
+test_generator = DataGenerator_pred(test_imgs, test_data, batch_size=32, shuffle=False)
+
+
 # img model(unet with pretrained weight)
-from keras.layers import Input, Conv2D, MaxPooling2D, UpSampling2D, concatenate, BatchNormalization, Activation, Dropout, Add, Conv2DTranspose, GlobalMaxPooling2D, GlobalAveragePooling2D
-from keras.models import Model
-from keras.optimizers import Adam
-from keras.callbacks import ModelCheckpoint, EarlyStopping
+from tensorflow.keras.layers import Input, Conv2D, MaxPooling2D, UpSampling2D, concatenate, BatchNormalization, Activation, Dropout, Add, Conv2DTranspose, GlobalMaxPooling2D, GlobalAveragePooling2D
+from tensorflow.keras.models import Model
+from tensorflow.keras.optimizers import Adam
+from tensorflow.keras.callbacks import ModelCheckpoint, EarlyStopping
 
 def unet(input_size=(512,512,3)): # input = (512,512,3), output = (512,512,1)
     inputs = Input(input_size)
@@ -286,17 +383,19 @@ def get_wnet():
     conv19 = Conv2D(1, (1, 1), activation='sigmoid')(conv18)
 
     model = Model(inputs=[inputs], outputs=[conv19])
-    model.compile(optimizer=Adam(1e-4), loss='binary_crossentropy', metrics='accuracy')
+    model.compile(optimizer=Adam(1e-4), loss='binary_crossentropy')
+    model.fit(train_img, train_mask, batch_size=1, epochs=100, validation_data=(val_img, val_mask))
+    model.save('C:\study\_data\dacon_cancer/img_model.h5')
     return model
 
 
 # data model
-from keras.layers import Input, Dense, Dropout, BatchNormalization
-from keras.models import Model
-from keras.optimizers import Adam
-from keras.callbacks import ModelCheckpoint, EarlyStopping
+from tensorflow.keras.layers import Input, Dense, Dropout, BatchNormalization
+from tensorflow.keras.models import Model
+from tensorflow.keras.optimizers import Adam
+from tensorflow.keras.callbacks import ModelCheckpoint, EarlyStopping, ReduceLROnPlateau
 
-def data_model(input_size=(25,)): # input = (25,), output = (1,)
+def data_model(input_size=(23,)): # input = (25,), output = (1,)
     inputs = Input(input_size)
     x = Dense(128, activation='relu')(inputs)
     x = BatchNormalization()(x)
@@ -322,13 +421,18 @@ def data_model(input_size=(25,)): # input = (25,), output = (1,)
     x = Dense(1, activation='sigmoid')(x)
     model = Model(inputs=inputs, outputs=x)
     
-    model.compile(optimizer=Adam(lr=1e-4), loss='binary_crossentropy', metrics=['accuracy'])
+    model.compile(optimizer=Adam(lr=1e-4), loss='binary_crossentropy')
+    model.fit(train_data, train_label, epochs=100, batch_size=32, validation_data=(val_data, val_label),
+              callbacks=[ModelCheckpoint('C:\study\_data\dacon_cancer/data_model.h5', save_best_only=True), 
+                         EarlyStopping(patience=30),
+                         ReduceLROnPlateau(patience=10, factor=0.5)])
+    model.save('C:\study\_data\dacon_cancer/data_model.h5')
     return model
 
 # train model
-from keras.callbacks import ModelCheckpoint, EarlyStopping
-from keras.models import load_model
-from keras.utils import plot_model
+from tensorflow.keras.callbacks import ModelCheckpoint, EarlyStopping
+from tensorflow.keras.models import load_model
+from tensorflow.keras.utils import plot_model
 import os
 
 # merge model
@@ -338,10 +442,11 @@ def merge_model(): # input = (512, 512, 3), (25,), output = (1)
     model2 = data_model()
     
     inputs1 = Input((512, 512, 3))
-    inputs2 = Input((25,))
-    
+    inputs2 = Input((23,))
     x1 = model1(inputs1)
     x2 = model2(inputs2)
+
+    
     
     # (512, 512, 1) -> f
     conv1 = Conv2D(128, (3, 3), activation='relu', padding='same')(x1)
@@ -368,20 +473,26 @@ def merge_model(): # input = (512, 512, 3), (25,), output = (1)
     dense1 = Dropout(0.5)(dense1)
     dense1 = Dense(1, activation='sigmoid')(dense1)
     
-    model = Model(inputs=[inputs1, inputs2], outputs=[dense1])
-    model.compile(optimizer=Adam(lr=1e-4), loss='binary_crossentropy', metrics=['f1_score'])
+    #
+    model = Model(inputs=[inputs1, inputs2], outputs=[x1, dense1])
+    model.compile(optimizer=Adam(lr=1e-4), loss='binary_crossentropy', metrics=tfa.metrics.F1Score(num_classes=1, average='macro'))
+    checkpoint = ModelCheckpoint('C:\study\_data\dacon_cancer/model.h5', monitor='val_metrics', verbose=1, save_best_only=True, mode='max')
+    early = EarlyStopping(monitor='val_metrics', mode='max', patience=10, verbose=1)
+    reduce_lr = ReduceLROnPlateau(monitor='val_metrics', mode='max', factor=0.5, patience=5, min_lr=0.00001, verbose=1)
+    callbacks_list = [checkpoint, early, reduce_lr]
+    model.fit(train_generator, epochs=100, validation_data=val_generator, callbacks=callbacks_list)
     
     return model
 
 # train
-from keras.callbacks import ModelCheckpoint, EarlyStopping
-from keras.models import load_model
-from keras.utils import plot_model
+from tensorflow.keras.callbacks import ModelCheckpoint, EarlyStopping
+from tensorflow.keras.models import load_model
+from tensorflow.keras.utils import plot_model
 import os
 
 def train():
     model = merge_model()
-    plot_model(model, to_file='model.png', show_shapes=True)
+    plot_model(model, to_file='C:\study\_data\dacon_cancer/model.png', show_shapes=True)
     model.summary()
     
     # # load data
@@ -390,22 +501,17 @@ def train():
     # val_data = np.load('val_data.npy')
     # val_label = np.load('val_label.npy')
     
-    # train
-    checkpoint = ModelCheckpoint('model.h5', monitor='val_f1_score', verbose=1, save_best_only=True, mode='max')
-    early = EarlyStopping(monitor='val_f1_score', mode='max', patience=10, verbose=1)
-    callbacks_list = [checkpoint, early]
-    model.fit([train_img, train_data], [train_mask,train_label], validation_data=([val_img, val_data], [val_mask,val_label]), epochs=100, batch_size=8, callbacks=callbacks_list)
     
     # save model
-    model.save('model.h5')
+    model.save('C:\study\_data\dacon_cancer/model.h5')
     
     return model
 
-from keras.models import load_model
+from tensorflow.keras.models import load_model
 from sklearn.metrics import f1_score, accuracy_score, precision_score, recall_score
 # test
 def test():
-    model = load_model('model.h5', custom_objects={'f1_score': f1_score})
+    model = load_model('C:\study\_data\dacon_cancer/model.h5', custom_objects={'f1_score': f1_score})
     model.summary()
     
     # load data
@@ -413,10 +519,10 @@ def test():
     # test_label = np.load('test_label.npy')
     
     # test
-    pred = model.predict([test_imgs, test_data], batch_size=8)
+    pred = model.predict(test_generator)
     submisson_pred = pd.read_csv('D:\open/sample_submission.csv')
     submisson_pred['N_category'] = pred
-    submisson_pred.to_csv('submission.csv', index=False)
+    submisson_pred.to_csv('D:\open/submission.csv', index=False)
     
     return model
 
