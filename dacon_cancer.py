@@ -447,7 +447,7 @@ def merge_model(): # input = (512, 512, 3), (25,), output = (1)
     x2 = model2(inputs2)
 
     
-    
+    ###
     # (512, 512, 1) -> f
     conv1 = Conv2D(128, (3, 3), activation='relu', padding='same')(x1)
     conv1 = BatchNormalization()(conv1)
