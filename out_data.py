@@ -21,7 +21,7 @@ name = ['기온', '강수량', '습도', '일조', '적설', '지면온도', '�
 year_month = ['2019_12','2020_12','2021_01','2021_12']
 year = ['2019','2020','2021']
 # df = pd.read_csv(path + '2021_01.31풍속.csv',encoding='cp949') # + 명령어는 문자를 앞문자와 더해줌  index_col=n n번째 컬럼을 인덱스로 인식
-
+####
 for i in range(len(year)):
     for j in range(len(name)):
         df = pd.read_csv(path + year_month[i] + '_31' + name[j] + '.csv',encoding='cp949')
