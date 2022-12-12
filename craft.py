@@ -28,8 +28,13 @@ from craft_text_detector import (
 
 ## set image path and export folder directory
 # image = 'D:\Sample\HW-OCR/4.Validation\P.Paper\R.Free/IMG_OCR_53_4PR_95725.png' # can be filepath, PIL image or numpy array
-image = 'C:\study\IMG_2731.jpg' # can be filepath, PIL image or numpy array
+image = 'D:\KakaoTalk_20221212_202734375.png' # can be filepath, PIL image or numpy array
 output_dir = 'D:\outputs/'
+
+# check time
+
+import time
+start_time = time.time()
 
 # read image
 image = read_image(image)
@@ -43,11 +48,11 @@ prediction_result = get_prediction(
     image=image,
     craft_net=craft_net,
     refine_net=refine_net,
-    text_threshold=0.7,
-    link_threshold=0.4,
-    low_text=0.4,
+    text_threshold=0.5,
+    link_threshold=0.7,
+    low_text=0.3, 
     cuda=True,
-    long_size=1280
+    long_size=250
 )
 
 # export detected text regions
@@ -61,12 +66,14 @@ print(exported_file_paths)
 
 
 # export heatmap, detection points, box visualization
-# export_extra_results(
-#     image=image,
-#     regions=prediction_result["boxes"],
-#     heatmaps=prediction_result["heatmaps"],
-#     output_dir=output_dir
-# )
+export_extra_results(
+    image=image,
+    regions=prediction_result["boxes"],
+    heatmaps=prediction_result["heatmaps"],
+    output_dir=output_dir
+)
 
 # unload models from gpu
 empty_cuda_cache()
+
+print("--- %s seconds ---" % (time.time() - start_time))
