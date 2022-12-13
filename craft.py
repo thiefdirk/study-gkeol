@@ -28,7 +28,7 @@ from craft_text_detector import (
 
 ## set image path and export folder directory
 # image = 'D:\Sample\HW-OCR/4.Validation\P.Paper\R.Free/IMG_OCR_53_4PR_95725.png' # can be filepath, PIL image or numpy array
-image = 'D:\KakaoTalk_20221212_202734375.png' # can be filepath, PIL image or numpy array
+image = 'D:\KakaoTalk_Photo_2022-12-13-11-53-02.png' # can be filepath, PIL image or numpy array
 output_dir = 'D:\outputs/'
 
 # check time
@@ -48,11 +48,11 @@ prediction_result = get_prediction(
     image=image,
     craft_net=craft_net,
     refine_net=refine_net,
-    text_threshold=0.5,
-    link_threshold=0.7,
-    low_text=0.3, 
+    text_threshold=0.7,
+    link_threshold=0.4,
+    low_text=0.4, 
     cuda=True,
-    long_size=250
+    long_size=200
 )
 
 # export detected text regions
