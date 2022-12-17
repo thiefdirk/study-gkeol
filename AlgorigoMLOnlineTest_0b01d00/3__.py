@@ -136,7 +136,7 @@ pred = rf2.predict(x_test)
 print('accuracy_score : ', accuracy_score(y_test, pred)) 
 
 # rf accuracy_score :  0.94025
-# xgb accuracy_score :  
+# xgb accuracy_score :  0.93805
 
 # plot_importance
 
