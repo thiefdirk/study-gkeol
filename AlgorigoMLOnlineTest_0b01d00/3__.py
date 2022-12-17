@@ -1,21 +1,15 @@
-# EDA
 
-import tensorflow as tf
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
-import os
-import cv2
-import random
 from sklearn.ensemble import RandomForestClassifier, RandomForestRegressor
 from xgboost import XGBClassifier, XGBRegressor
 from sklearn.metrics import accuracy_score, r2_score
 
-train_data = pd.read_csv('C:\study\AlgorigoMLOnlineTest_0b01d00\data\data/train.csv', index_col=0)
-test_data = pd.read_csv('C:\study\AlgorigoMLOnlineTest_0b01d00\data\data/test.csv', index_col=0)
-unlabel_data = pd.read_csv('C:\study\AlgorigoMLOnlineTest_0b01d00\data\data/unlabeled.csv', index_col=0)
-
+train_data = pd.read_csv('./AlgorigoMLOnlineTest_0b01d00/data/train.csv', index_col=0)
+test_data = pd.read_csv('./AlgorigoMLOnlineTest_0b01d00/data/test.csv', index_col=0)
+unlabel_data = pd.read_csv('./AlgorigoMLOnlineTest_0b01d00/data/unlabeled.csv', index_col=0)
 
 
 print(train_data.info())
@@ -55,9 +49,12 @@ print(unlabel_data.head())
 
 
 
-# fill nan cols with unlabel_data predict
+# nan 컬럼(output) 과 nan이 아닌 컬럼(input) 분리
 
-nan_cols = ['Online boarding', 'Seat comfort', 'Inflight entertainment', 'On-board service', 'Leg room service', 'Baggage handling', 'Checkin service', 'Inflight service', 'Cleanliness', 'Departure Delay in Minutes', 'Arrival Delay in Minutes']
+nan_cols = ['Online boarding', 'Seat comfort', 'Inflight entertainment',
+            'On-board service', 'Leg room service', 'Baggage handling',
+            'Checkin service', 'Inflight service', 'Cleanliness',
+            'Departure Delay in Minutes', 'Arrival Delay in Minutes']
 x_train_2 = x_train.drop(nan_cols, axis=1)
 
 unlabel_data_x = unlabel_data.drop(nan_cols, axis=1)
@@ -74,7 +71,7 @@ y_test_2 = x_test[nan_cols]
 #     unlabel_data_y[col] = le2.fit_transform(unlabel_data_y[col])
 #     y_test_2[col] = le2.fit_transform(y_test_2[col])
 
-#multi classifcation
+# train 결측치 예측 모델
 
 rf = RandomForestClassifier(n_estimators=100, random_state=1234, verbose=1)
 pred_list = []
@@ -101,8 +98,8 @@ x_train_2 = pd.concat([x_train_2, change_pred_list], axis=1)
 
 # plot_importance 하위 3개 컬럼 제거
 
-# x_train_2 = x_train_2.drop(['Gender'], axis=1)
-# x_test = x_test.drop(['Gender'], axis=1)
+x_train_2 = x_train_2.drop(['Gender'], axis=1)
+x_test = x_test.drop(['Gender'], axis=1)
 
 
 # nan check
@@ -128,18 +125,77 @@ print(y_train.isnull().sum())
 # model
 
 
-# rf2 = XGBClassifier(n_estimators=100, random_state=1234)
-rf2 = RandomForestClassifier(n_estimators=100, random_state=1234)
-rf2.fit(x_train_2, y_train)
-pred = rf2.predict(x_test)
-print('accuracy_score : ', accuracy_score(y_test, pred)) 
+# # rf2 = XGBClassifier(n_estimators=100, random_state=1234)
+# rf2 = RandomForestClassifier(n_estimators=100, random_state=1234)
+# rf2.fit(x_train_2, y_train)
+# pred = rf2.predict(x_test)
+# print('accuracy_score : ', accuracy_score(y_test, pred)) 
+
+# # plot_importance
+# from xgboost import plot_importance
+
+# fig, ax = plt.subplots(figsize=(10, 12))
+# plot_importance(rf2, ax=ax)
+# plt.rcParams["font.size"] = 15
+# plt.show()
 
 # rf accuracy_score :  0.94025
 # xgb accuracy_score :  0.93805
+
 # 하위 3개 컬럼 제거 후 rf accuracy_score :  0.93095
-# 하위 3개 컬럼 제거 후 xgb accuracy_score :  0.92565
 # 하위 2개 컬럼 제거 후 rf accuracy_score :  0.93605
 # 하위 1개 컬럼 제거 후 rf accuracy_score :  0.93995
+
+# bayesian optimization
+
+from bayes_opt import BayesianOptimization
+
+def rf_cv(n_estimators, max_depth, min_samples_split, min_samples_leaf, max_features):
+    model = RandomForestClassifier(n_estimators=int(n_estimators),
+                                      max_depth=int(max_depth),
+                                        min_samples_split=int(min_samples_split),
+                                        min_samples_leaf=int(min_samples_leaf),
+                                        max_features=int(max_features),
+                                        random_state=1234)
+    model.fit(x_train_2, y_train)
+    pred = model.predict(x_test)
+    score = accuracy_score(y_test, pred)
+    return score
+
+pbounds = {'n_estimators': (100, 1000),
+              'max_depth': (5, 30),
+                'min_samples_split': (2, 10),
+                'min_samples_leaf': (1, 10),
+                'max_features': (1, 10)}
+
+optimizer = BayesianOptimization(
+    f=rf_cv,
+    pbounds=pbounds,
+    random_state=1234,
+)
+
+optimizer.maximize(init_points=2, n_iter=15)
+
+
+print(optimizer.max) 
+# {'target': 0.9417, 'params': {'max_depth': 28.384607962569884,
+# 'max_features': 5.579713799274501, 'min_samples_leaf': 1.32220275014516,
+# 'min_samples_split': 2.967664253719808, 'n_estimators': 813.6814293566729}}
+
+rf2 = RandomForestClassifier(n_estimators=813.6814293566729,
+                                        max_depth=28.384607962569884,
+                                        min_samples_split=2.967664253719808,
+                                        min_samples_leaf=1.32220275014516,
+                                        max_features=5.579713799274501,
+                                        random_state=1234)
+
+rf2.fit(x_train_2, y_train)
+pred = rf2.predict(x_test)
+print('accuracy_score : ', accuracy_score(y_test, pred)) 
+# 튜닝전 rf accuracy_score :  0.94025
+# 튜닝후 rf accuracy_score :  0.9417
+                            
+    
 
 
 

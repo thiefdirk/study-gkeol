@@ -1,25 +1,14 @@
 # EDA
 
-import tensorflow as tf
+# import tensorflow
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
-import os
-import cv2
-import random
 
-train_data = pd.read_csv('C:\study\AlgorigoMLOnlineTest_0b01d00\data\data/train.csv')
-test_data = pd.read_csv('C:\study\AlgorigoMLOnlineTest_0b01d00\data\data/test.csv')
-unlabel_data = pd.read_csv('C:\study\AlgorigoMLOnlineTest_0b01d00\data\data/unlabeled.csv')
-
-# correlation
-
-# corr = train_data.corr()
-# plt.figure(figsize=(10,10))
-# sns.heatmap(corr, annot=True, cmap='RdYlGn', linewidths=0.2, annot_kws={'size':8})
-# plt.xticks(rotation=50)
-# plt.show()
+train_data = pd.read_csv('./AlgorigoMLOnlineTest_0b01d00/data/train.csv', index_col=0)
+test_data = pd.read_csv('./AlgorigoMLOnlineTest_0b01d00/data/test.csv', index_col=0)
+unlabel_data = pd.read_csv('./AlgorigoMLOnlineTest_0b01d00/data/unlabeled.csv', index_col=0)
 
 print(train_data.info())
 print(test_data.info())

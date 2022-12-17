@@ -1,6 +1,5 @@
 # EDA
 
-import tensorflow as tf
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -11,9 +10,9 @@ import random
 from xgboost import XGBClassifier, XGBRegressor
 
 
-train_data = pd.read_csv('C:\study\AlgorigoMLOnlineTest_0b01d00\data\data/train.csv', index_col=0)
-test_data = pd.read_csv('C:\study\AlgorigoMLOnlineTest_0b01d00\data\data/test.csv', index_col=0)
-unlabel_data = pd.read_csv('C:\study\AlgorigoMLOnlineTest_0b01d00\data\data/unlabeled.csv', index_col=0)
+train_data = pd.read_csv('./AlgorigoMLOnlineTest_0b01d00/data/train.csv', index_col=0)
+test_data = pd.read_csv('./AlgorigoMLOnlineTest_0b01d00/data/test.csv', index_col=0)
+unlabel_data = pd.read_csv('./AlgorigoMLOnlineTest_0b01d00/data/unlabeled.csv', index_col=0)
 
 # correlation
 
@@ -49,6 +48,14 @@ for col in unlabed_cat_cols:
 train_data = train_data.fillna(0)
 test_data = test_data.fillna(0)
 unlabel_data = unlabel_data.fillna(0)
+
+# dropna 
+
+# test_data = test_data.dropna(axis=0)
+# unlabel_data = unlabel_data.dropna(axis=0)
+
+# dropna 후  accuarcy_score :  0.9313681255326616
+
     
 x_train = train_data.drop(['satisfaction'], axis=1)
 y_train = train_data['satisfaction']
@@ -85,6 +92,7 @@ print('accuracy_score : ', accuracy_score(y_test, pred))
 from xgboost import plot_importance
 
 plot_importance(xgb)
+plt.rcParams['font.size'] = 20
 plt.show()
 
 
