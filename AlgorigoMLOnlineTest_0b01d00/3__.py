@@ -75,33 +75,43 @@ y_test_2 = x_test[nan_cols]
 
 # xgboostclassifier labelencoding
 
-le2 = LabelEncoder()
+# le2 = LabelEncoder()
 
-for col in nan_cols:
-    unlabel_data_y[col] = le2.fit_transform(unlabel_data_y[col])
-    y_test_2[col] = le2.fit_transform(y_test_2[col])
+# for col in nan_cols:
+#     unlabel_data_y[col] = le2.fit_transform(unlabel_data_y[col])
+#     y_test_2[col] = le2.fit_transform(y_test_2[col])
 
 #multi classifcation
 
-rf = RandomForestClassifier(n_estimators=100, random_state=1234)
+rf = RandomForestClassifier(n_estimators=100, random_state=1234, verbose=1)
 pred_list = []
 change_pred_list = []
 for col in nan_cols:
     rf.fit(unlabel_data_x, unlabel_data_y[col])
-    pred = rf.predict(x_test_2)
-    pred_list.append(pred)
+    # pred = rf.predict(x_test_2)
+    # pred_list.append(pred)
     change_pred = rf.predict(x_train_2)
     change_pred_list.append(change_pred)
     
-pred_list = np.array(pred_list)
-pred_list = pred_list.T
-pred_list = pd.DataFrame(pred_list, columns=nan_cols)
+# pred_list = np.array(pred_list)
+# pred_list = pred_list.T
+# pred_list = pd.DataFrame(pred_list, columns=nan_cols)
 
 change_pred_list = np.array(change_pred_list)
 change_pred_list = change_pred_list.T
 change_pred_list = pd.DataFrame(change_pred_list, columns=nan_cols)
 
+x_train_2 = x_train_2.reset_index(drop=True)
+change_pred_list = change_pred_list.reset_index(drop=True)
+
 x_train_2 = pd.concat([x_train_2, change_pred_list], axis=1)
+
+
+# nan check
+
+print(x_train_2.isnull().sum())
+print(y_train.isnull().sum())
+
 
 # acc = 0
 
@@ -116,20 +126,24 @@ x_train_2 = pd.concat([x_train_2, change_pred_list], axis=1)
 
 
 
-# corr = x_train.corr()
-# plt.figure(figsize=(10,10))
-# sns.heatmap(corr, annot=True, cmap='RdYlGn', linewidths=0.2, annot_kws={'size':8})
-# plt.xticks(rotation=50)
-# plt.show()
-
 
 # model
 
 
-rf2 = RandomForestClassifier(n_estimators=100, random_state=1234)
+rf2 = XGBClassifier(n_estimators=100, random_state=1234)
 rf2.fit(x_train_2, y_train)
-pred = rf.predict(x_test)
-print('accuracy_score : ', accuracy_score(y_test, pred))
+pred = rf2.predict(x_test)
+print('accuracy_score : ', accuracy_score(y_test, pred)) 
+
+# rf accuracy_score :  0.94025
+# xgb accuracy_score :  
+
+# plot_importance
+
+from xgboost import plot_importance
+
+plot_importance(rf2)
+plt.show()
 
 
 

@@ -64,6 +64,12 @@ sns.heatmap(corr, annot=True, cmap='RdYlGn', linewidths=0.2, annot_kws={'size':8
 plt.xticks(rotation=50)
 plt.show()
 
+corr2 = unlabel_data.corr()
+plt.figure(figsize=(10,10))
+sns.heatmap(corr2, annot=True, cmap='RdYlGn', linewidths=0.2, annot_kws={'size':8})
+plt.xticks(rotation=30)
+plt.show()
+
 
 
 

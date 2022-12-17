@@ -8,10 +8,12 @@ import seaborn as sns
 import os
 import cv2
 import random
+from xgboost import XGBClassifier, XGBRegressor
 
-train_data = pd.read_csv('C:\study\AlgorigoMLOnlineTest_0b01d00\data\data/train.csv')
-test_data = pd.read_csv('C:\study\AlgorigoMLOnlineTest_0b01d00\data\data/test.csv')
-unlabel_data = pd.read_csv('C:\study\AlgorigoMLOnlineTest_0b01d00\data\data/unlabeled.csv')
+
+train_data = pd.read_csv('C:\study\AlgorigoMLOnlineTest_0b01d00\data\data/train.csv', index_col=0)
+test_data = pd.read_csv('C:\study\AlgorigoMLOnlineTest_0b01d00\data\data/test.csv', index_col=0)
+unlabel_data = pd.read_csv('C:\study\AlgorigoMLOnlineTest_0b01d00\data\data/unlabeled.csv', index_col=0)
 
 # correlation
 
@@ -52,6 +54,8 @@ x_train = train_data.drop(['satisfaction'], axis=1)
 y_train = train_data['satisfaction']
 x_test = test_data.drop(['satisfaction'], axis=1)
 y_test = test_data['satisfaction']
+
+
     
 print(train_data.head())
 print(test_data.head())
@@ -71,9 +75,26 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import accuracy_score
 
 rf = RandomForestClassifier(n_estimators=100, random_state=1234)
-rf.fit(x_train, y_train)
-pred = rf.predict(x_test)
-print('accuracy_score : ', accuracy_score(y_test, pred)) # accuracy_score :  0.93505
+xgb = XGBClassifier(n_estimators=100, random_state=1234)
+xgb.fit(x_train, y_train)
+pred = xgb.predict(x_test)
+print('accuracy_score : ', accuracy_score(y_test, pred)) 
+
+# plot_importance
+
+from xgboost import plot_importance
+
+plot_importance(xgb)
+plt.show()
+
+
+
+
+# rf 
+# accuracy_score :  0.93505
+
+# xgb
+# accuracy_score :  0.9296
 
 
 
