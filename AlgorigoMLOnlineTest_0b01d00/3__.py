@@ -16,19 +16,12 @@ train_data = pd.read_csv('C:\study\AlgorigoMLOnlineTest_0b01d00\data\data/train.
 test_data = pd.read_csv('C:\study\AlgorigoMLOnlineTest_0b01d00\data\data/test.csv', index_col=0)
 unlabel_data = pd.read_csv('C:\study\AlgorigoMLOnlineTest_0b01d00\data\data/unlabeled.csv', index_col=0)
 
-# correlation
 
-# corr = train_data.corr()
-# plt.figure(figsize=(10,10))
-# sns.heatmap(corr, annot=True, cmap='RdYlGn', linewidths=0.2, annot_kws={'size':8})
-# plt.xticks(rotation=50)
-# plt.show()
 
 print(train_data.info())
 print(test_data.info())
 print(unlabel_data.info())
 
-print(train_data.head())
 
 # labelencoding
 
@@ -106,6 +99,11 @@ change_pred_list = change_pred_list.reset_index(drop=True)
 
 x_train_2 = pd.concat([x_train_2, change_pred_list], axis=1)
 
+# plot_importance 하위 3개 컬럼 제거
+
+# x_train_2 = x_train_2.drop(['Gender'], axis=1)
+# x_test = x_test.drop(['Gender'], axis=1)
+
 
 # nan check
 
@@ -130,20 +128,18 @@ print(y_train.isnull().sum())
 # model
 
 
-rf2 = XGBClassifier(n_estimators=100, random_state=1234)
+# rf2 = XGBClassifier(n_estimators=100, random_state=1234)
+rf2 = RandomForestClassifier(n_estimators=100, random_state=1234)
 rf2.fit(x_train_2, y_train)
 pred = rf2.predict(x_test)
 print('accuracy_score : ', accuracy_score(y_test, pred)) 
 
 # rf accuracy_score :  0.94025
 # xgb accuracy_score :  0.93805
-
-# plot_importance
-
-from xgboost import plot_importance
-
-plot_importance(rf2)
-plt.show()
+# 하위 3개 컬럼 제거 후 rf accuracy_score :  0.93095
+# 하위 3개 컬럼 제거 후 xgb accuracy_score :  0.92565
+# 하위 2개 컬럼 제거 후 rf accuracy_score :  0.93605
+# 하위 1개 컬럼 제거 후 rf accuracy_score :  0.93995
 
 
 
