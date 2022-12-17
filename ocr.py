@@ -170,3 +170,4 @@ for (bbox, text, prob) in results:
 	# cv2.putText(business_card_image, text, (tl[0], tl[1] - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.8, (0, 255, 0), 2)
  
 plt_imshow("Image", business_card_image, figsize=(16,10))
+###

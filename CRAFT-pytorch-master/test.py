@@ -46,7 +46,7 @@ def str2bool(v): # lower() : 대문자를 소문자로 변환
     return v.lower() in ("yes", "y", "true", "t", "1") # lower()했기 때문에 이 아래 단어들이 있으면 true 반환
 
 parser = argparse.ArgumentParser(description='CRAFT Text Detection')
-parser.add_argument('--trained_model', default='weights/craft_mlt_25k.pth', type=str, help='pretrained model')
+parser.add_argument('--trained_model', default='C:\study\CRAFT-pytorch-master\craft_mlt_25k.pth', type=str, help='pretrained model')
 parser.add_argument('--text_threshold', default=0.7, type=float, help='text confidence threshold')
 parser.add_argument('--low_text', default=0.4, type=float, help='text low-bound score') # low_bound 뜻 : 최소한의 높이를 가진 글자를 찾는다는 뜻
 parser.add_argument('--link_threshold', default=0.4, type=float, help='link confidence threshold')
@@ -55,7 +55,7 @@ parser.add_argument('--canvas_size', default=1280, type=int, help='image size fo
 parser.add_argument('--mag_ratio', default=1.5, type=float, help='image magnification ratio')
 parser.add_argument('--poly', default=False, action='store_true', help='enable polygon type')
 parser.add_argument('--show_time', default=False, action='store_true', help='show processing time')
-parser.add_argument('--test_folder', default='/data/', type=str, help='folder path to input images')
+parser.add_argument('--test_folder', default='C:\study\CRAFT-pytorch-master\data', type=str, help='folder path to input images')
 parser.add_argument('--refine', default=False, action='store_true', help='enable link refiner')
 parser.add_argument('--refiner_model', default='weights/craft_refiner_CTW1500.pth', type=str, help='pretrained refiner model')
 ##
@@ -115,6 +115,7 @@ def test_net(net, image, text_threshold, link_threshold, low_text, cuda, poly, r
     ret_score_text = imgproc.cvt2HeatmapImg(render_img)
 
     if args.show_time : print("\ninfer/postproc time : {:.3f}/{:.3f}".format(t0, t1))
+    
 
     return boxes, polys, ret_score_text
 
@@ -162,6 +163,19 @@ if __name__ == '__main__':
         image = imgproc.loadImage(image_path)
 
         bboxes, polys, score_text = test_net(net, image, args.text_threshold, args.link_threshold, args.low_text, args.cuda, args.poly, refine_net)
+
+        # polys([[x1,y1],[x2,y2],[x3,y3],[x4,y4]]) 기준으로 image crop
+        for i, poly in enumerate(polys):
+            poly = np.array(poly).astype(np.int32).reshape((-1))
+            poly = poly.reshape(-1, 2)
+            x_min = np.min(poly[:, 0])
+            x_max = np.max(poly[:, 0])
+            y_min = np.min(poly[:, 1])
+            y_max = np.max(poly[:, 1])
+            cropped = image[y_min:y_max, x_min:x_max]
+            cv2.imwrite(result_folder + "/res_" + str(i) + ".jpg", cropped)
+        
+
 
         # save score text
         filename, file_ext = os.path.splitext(os.path.basename(image_path))
